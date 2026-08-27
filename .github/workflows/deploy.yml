@@ -42,13 +42,16 @@ jobs:
           node-version: 24
           cache: npm # 或 pnpm / yarn
       - name: Setup Pages
-        uses: actions/configure-pages@v4
+        uses: actions/configure-pages@v6
+        with:
+          # 仓库尚未启用 Pages 时，由工作流自动启用并设置为 GitHub Actions 构建
+          enablement: true
       - name: Install dependencies
         run: npm ci # 或 pnpm install / yarn install / bun install
       - name: Build with VitePress
         run: npm run docs:build # 或 pnpm docs:build / yarn docs:build / bun run docs:build
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: docs/.vitepress/dist
 
@@ -63,4 +66,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
