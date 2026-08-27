@@ -18,9 +18,6 @@ export default defineConfig({
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     logo: '/datawhale-logo.png',
-    nav: [
-      { text: 'PDF版本下载', link: 'https://github.com/datawhalechina/repo-template/releases' },
-    ],
     search: {
       provider: 'local',
       options: {
@@ -55,15 +52,16 @@ export default defineConfig({
     ],
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/datawhalechina/repo-template' }
+      { icon: 'github', link: 'https://github.com/wangxunx/robo-genesis-101' }
     ],
 
     editLink: {
-      pattern: 'https://github.com/datawhalechina/repo-template/blob/main/docs/:path'
+      pattern: 'https://github.com/wangxunx/robo-genesis-101/blob/main/docs/:path'
     },
 
+    // 备案号属于 Datawhale 主站，个人 GitHub Pages 站不适用；
+    // 待本教程投稿并由官方站点承载后再补回 footer.message。
     footer: {
-      message: '<a href="https://beian.miit.gov.cn/" target="_blank">京ICP备2026002630号-1</a> | <a href="https://beian.mps.gov.cn/#/query/webSearch?code=11010602202215" rel="noreferrer" target="_blank">京公网安备11010602202215号</a>',
       copyright: '本作品采用 <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">知识共享署名-非商业性使用-相同方式共享 4.0 国际许可协议（CC BY-NC-SA 4.0）</a> 进行许可'
     }
   }
