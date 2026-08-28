@@ -62,7 +62,7 @@ export default defineConfig({
     // 备案号属于 Datawhale 主站，个人 GitHub Pages 站不适用；
     // 待本教程投稿并由官方站点承载后再补回 footer.message。
     footer: {
-      copyright: '本作品采用 <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">知识共享署名-非商业性使用-相同方式共享 4.0 国际许可协议（CC BY-NC-SA 4.0）</a> 进行许可'
+      copyright: '除另有注明的第三方材料外，本项目原创内容采用 MIT License；第三方材料保留原许可'
     }
   }
 })

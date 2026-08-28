@@ -25,6 +25,9 @@ Lectures and hands-on work form one learning path, not independent tracks. Reade
 - `docs/` — VitePress documentation source and course materials.
 - `docs/.vitepress/config.mts` — site title, navigation, sidebar, links, and deployment base.
 - `docs/public/` — static assets published as-is by VitePress.
+- `src/robo_genesis/` — installable Python package; currently the M1 skeleton for reusable course implementations.
+- `tests/` — Python package and behavior tests.
+- `pyproject.toml` / `uv.lock` — Python package metadata and reproducible dependency resolution.
 - `package.json` / `package-lock.json` — documentation dependencies and commands.
 - `.github/workflows/deploy.yml` — GitHub Pages build and deployment workflow.
 

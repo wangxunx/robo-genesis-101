@@ -46,6 +46,6 @@ https://wangxunx.github.io/robo-genesis-101/
 
 ## LICENSE
 
-<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="知识共享许可协议" style="border-width:0" src="https://img.shields.io/badge/license-CC%20BY--NC--SA%204.0-lightgrey" /></a><br />本作品采用<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">知识共享署名-非商业性使用-相同方式共享 4.0 国际许可协议</a>进行许可。
+除另有注明的第三方材料外，本项目有权许可的原创代码、讲义、notebook、练习和原创课程媒体均采用 [MIT License](LICENSE)。
 
-*注：默认使用CC 4.0协议，也可根据自身项目情况选用其他协议*
+第三方代码、资产、数据集、模型、商标及其他材料保留各自的原始许可与使用限制，不受项目 MIT License 覆盖。具体来源和边界见 [NOTICE.md](NOTICE.md) 与文件或目录内的独立许可说明。
