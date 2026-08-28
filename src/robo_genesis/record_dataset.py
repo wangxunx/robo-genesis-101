@@ -27,7 +27,6 @@ from __future__ import annotations
 
 import argparse
 import shutil
-from pathlib import Path
 
 import cv2
 import numpy as np
@@ -38,7 +37,7 @@ from lerobot.datasets.lerobot_dataset import LeRobotDataset
 
 from .build_scene import SceneDomainRandomizationConfig, build_scene
 from .grasp_demo import TaskSpec, run_pick_place
-from .paths import DATASETS_DIR
+from .paths import DATASETS_DIR, resolve_cli_path
 from .randomize import DomainRandomizationConfig, EnvRandomizer, RandomizationConfig
 
 # The sim runs at dt=0.01 (see build_scene): 100 control steps per second.
@@ -55,10 +54,6 @@ OBJECT_DISPLAY_NAMES = {
     "011_banana": "banana",
     "014_lemon": "lemon",
     "018_plum": "plum",
-    "013_apple": "apple",
-    "017_orange": "orange",
-    "016_pear": "pear",
-    "025_mug": "mug",
 }
 
 
@@ -213,7 +208,13 @@ def main() -> None:
         "one is sampled per episode.",
     )
     parser.add_argument("--repo-id", default="genesis/banana_pick")
-    parser.add_argument("--root", default=None, help="Output dir (default: datasets/<repo-name>).")
+    parser.add_argument(
+        "--output-dir",
+        "--root",
+        dest="output_dir",
+        default=None,
+        help="Dataset output directory (default: configured datasets/<repo-name>).",
+    )
     parser.add_argument("--vcodec", default="libsvtav1")
     parser.add_argument("--overwrite", action="store_true", help="Delete an existing dataset dir first.")
     parser.add_argument(
@@ -281,12 +282,17 @@ def main() -> None:
     args = parser.parse_args()
 
     img_wh = (args.img_width, args.img_height)
-    root = Path(args.root) if args.root else DATASETS_DIR / args.repo_id.split("/")[-1]
+    root = resolve_cli_path(
+        args.output_dir,
+        default=DATASETS_DIR / args.repo_id.split("/")[-1],
+    )
     if root.exists():
         if args.overwrite:
             shutil.rmtree(root)
         else:
-            raise SystemExit(f"[record] {root} already exists. Use --overwrite or pass a new --root.")
+            raise SystemExit(
+                f"[record] {root} already exists. Use --overwrite or pass a new --output-dir."
+            )
 
     max_attempts = args.max_attempts if args.max_attempts > 0 else args.episodes * 5
 

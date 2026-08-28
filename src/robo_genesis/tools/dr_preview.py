@@ -33,7 +33,7 @@ import cv2
 import imageio.v2 as imageio
 import numpy as np
 
-from ..paths import EVAL_RESULTS_DIR
+from ..paths import EVAL_RESULTS_DIR, resolve_cli_path
 
 DEFAULT_OUT = EVAL_RESULTS_DIR / "dr_preview"
 
@@ -142,7 +142,7 @@ def _build_montage(
 
 
 def _orchestrate(args: argparse.Namespace) -> None:
-    out_dir = Path(args.out)
+    out_dir = resolve_cli_path(args.output_dir, default=DEFAULT_OUT)
     frames_dir = out_dir / "frames"
     frames_dir.mkdir(parents=True, exist_ok=True)
 
@@ -201,7 +201,13 @@ def main() -> None:
     parser.add_argument("--wrist", action="store_true", help="Also render + montage the wrist camera.")
     parser.add_argument("--cpu", action="store_true", help="Use the CPU backend.")
     parser.add_argument("--steps", type=int, default=30, help="Settle steps before rendering.")
-    parser.add_argument("--out", default=str(DEFAULT_OUT), help="Output directory.")
+    parser.add_argument(
+        "--output-dir",
+        "--out",
+        dest="output_dir",
+        default=None,
+        help="Output directory (default: configured outputs/eval_results/dr_preview).",
+    )
     parser.add_argument("--tile-width", type=int, default=512, help="Per-tile width in the montage (px).")
     parser.add_argument("--cols", type=int, default=None, help="Montage columns (default: min(n, 3)).")
     args = parser.parse_args()

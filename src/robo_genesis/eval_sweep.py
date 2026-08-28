@@ -42,7 +42,7 @@ import genesis as gs
 
 from .build_scene import SceneDomainRandomizationConfig, build_scene
 from .eval_policy import _str2bool, evaluate_policy, load_policy
-from .paths import EVAL_RESULTS_DIR
+from .paths import DATASETS_DIR, EVAL_RESULTS_DIR, resolve_cli_path
 from .randomize import DomainRandomizationConfig, EnvRandomizer, RandomizationConfig
 from .stats import wilson, wilson_err
 
@@ -149,7 +149,11 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Sweep checkpoints -> success-rate curve.")
     parser.add_argument("--run-dir", required=True, help="Training run dir (contains checkpoints/).")
     parser.add_argument("--repo-id", required=True, help="Dataset repo id the policy trained on.")
-    parser.add_argument("--dataset-root", default=None, help="Local dataset dir (feature shapes/stats/fps).")
+    parser.add_argument(
+        "--dataset-root",
+        default=None,
+        help="Local dataset directory (default: configured datasets/<repo-name>).",
+    )
     parser.add_argument("--device", default="cuda", help="Inference device (cuda | cpu | mps).")
     parser.add_argument("--use-amp", action="store_true")
     parser.add_argument("-c", "--cpu", action="store_true", help="Run the Genesis sim on CPU backend.")
@@ -178,7 +182,13 @@ def main() -> None:
         default=None,
         help="Only evaluate these checkpoint steps (default: all found).",
     )
-    parser.add_argument("--out-dir", default=None, help="Output dir (default: eval_results/sweep_<run-name>).")
+    parser.add_argument(
+        "--output-dir",
+        "--out-dir",
+        dest="output_dir",
+        default=None,
+        help="Output directory (default: configured outputs/eval_results/sweep_<run-name>).",
+    )
     # -- Layer A domain randomization (appearance-OOD evaluation) --
     parser.add_argument(
         "--dr-appearance",
@@ -241,11 +251,18 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    run_dir = Path(args.run_dir)
+    run_dir = resolve_cli_path(args.run_dir)
+    dataset_root = resolve_cli_path(
+        args.dataset_root,
+        default=DATASETS_DIR / args.repo_id.split("/")[-1],
+    )
     checkpoints = discover_checkpoints(run_dir, args.steps)
     if not checkpoints:
         raise SystemExit(f"[sweep] no usable checkpoints found under {run_dir}/checkpoints")
-    out_dir = Path(args.out_dir) if args.out_dir else EVAL_RESULTS_DIR / f"sweep_{run_dir.name}"
+    out_dir = resolve_cli_path(
+        args.output_dir,
+        default=EVAL_RESULTS_DIR / f"sweep_{run_dir.name}",
+    )
 
     print(f"[sweep] {len(checkpoints)} checkpoint(s): {[s for s, _ in checkpoints]}")
 
@@ -300,7 +317,13 @@ def main() -> None:
         for step, pm in checkpoints:
             label = f"dom{d}:step{step}" if args.dr_appearance else str(step)
             print(f"[sweep] --- domain {d} checkpoint step={step} ---")
-            pb = load_policy(str(pm), args.repo_id, args.dataset_root, args.device, use_amp=args.use_amp)
+            pb = load_policy(
+                str(pm),
+                args.repo_id,
+                str(dataset_root),
+                args.device,
+                use_amp=args.use_amp,
+            )
             res = evaluate_policy(
                 bundle, pb,
                 episodes=args.episodes,

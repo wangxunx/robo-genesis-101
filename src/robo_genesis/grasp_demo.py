@@ -26,7 +26,7 @@ import genesis as gs
 from genesis.utils.geom import euler_to_quat, quat_to_xyz
 
 from .build_scene import build_scene
-from .paths import FRAMES_DIR
+from .paths import FRAMES_DIR, resolve_cli_path
 from .scene_config import FRANKA_QPOS, TABLE_TOP_Z
 
 # A place target is either an object name (place onto/into it) or a tabletop (x, y).
@@ -434,6 +434,11 @@ def main() -> None:
     )
     parser.add_argument("--tol", type=float, default=0.06, help="Success tolerance (m).")
     parser.add_argument("--save-frames", action="store_true", help="Save world-cam frames per stage.")
+    parser.add_argument(
+        "--output-dir",
+        default=None,
+        help="Frame output directory (default: configured outputs/grasp_demo_frames).",
+    )
     args = parser.parse_args()
 
     task = TaskSpec(pick_object=args.pick, place_target=_parse_place(args.place), success_tol=args.tol)
@@ -447,7 +452,7 @@ def main() -> None:
     if args.save_frames:
         import imageio.v2 as imageio
 
-        out_dir = FRAMES_DIR
+        out_dir = resolve_cli_path(args.output_dir, default=FRAMES_DIR)
         out_dir.mkdir(parents=True, exist_ok=True)
         for tag, img in frames:
             imageio.imwrite(out_dir / f"{tag}.png", img)

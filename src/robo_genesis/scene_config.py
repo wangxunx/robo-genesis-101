@@ -7,8 +7,7 @@ from pathlib import Path
 
 import trimesh
 
-# Bundled assets live at the repo root (one level above this package); see paths.py.
-ASSETS = Path(__file__).resolve().parent.parent / "assets"
+from .paths import YCB_MODELS_DIR
 
 # == Table (built from box primitives) ==
 TABLE_TOP_Z = 0.75  # height of the tabletop surface (m)
@@ -25,24 +24,9 @@ FRANKA_EULER = (0.0, 0.0, 0.0)
 
 # == YCB object xy positions on the tabletop (z filled in at build time) ==
 # Minimal pick-and-place set for pipeline development: three reliably reachable pick
-# objects plus one place container. Objects that are not reliably graspable by the
-# scripted parallel-jaw pick (apple, orange, pear, mug) and the earlier distractors
-# (cracker_box, mustard_bottle) are disabled to reduce clutter and grasp-time
-# collisions. Re-enable them later (e.g. as domain-randomization distractors) by uncommenting.
+# objects plus one place container. This is also the complete set of YCB assets
+# approved for redistribution with the course.
 YCB_LAYOUT = {
-    # -- disabled distractors / hard-to-grasp objects --
-    # "003_cracker_box": {"pos": (0.28, -0.18, 0.0), "euler": (0.0, 0.0, 15.0)},
-    # "006_mustard_bottle": {"pos": (0.42, 0.04, 0.0), "euler": (0.0, 0.0, -20.0)},
-    # apple/orange: large smooth spheres (~7.5 cm) -- only marginally graspable (flaky at
-    # realistic friction) and near the gripper's 8 cm limit.
-    # "013_apple": {"pos": (0.45, 0.28, 0.0), "euler": (0.0, 0.0, 0.0), "friction": 1.0},
-    # "017_orange": {"pos": (0.45, -0.22, 0.0), "euler": (0.0, 0.0, 0.0), "friction": 1.0},
-    # pear: round cross-section (~6.6 cm) makes parallel jaws slip on lift -- not reliable.
-    # "016_pear": {"pos": (0.35, -0.13, 0.0), "euler": (0.0, 0.0, 90.0), "friction": 1.0},
-    # mug: currently fails the scripted grasp (thin walls / handle) -- disabled for now.
-    # "025_mug": {"pos": (0.22, 0.10, 0.0), "euler": (0.0, 0.0, 10.0)},
-    # -- active pick objects (spread apart to reduce grasp-time collisions and give the
-    #    task randomizer some position-jitter room) --
     "011_banana": {"pos": (0.31, 0.22, 0.0), "euler": (0.0, 0.0, 35.0)},
     # lemon: small oblate ellipsoid; grasped near its equator. In pickable pool.
     "014_lemon": {"pos": (0.34, -0.08, 0.0), "euler": (0.0, 0.0, 0.0), "friction": 1.0},
@@ -51,6 +35,9 @@ YCB_LAYOUT = {
     # -- place container --
     "024_bowl": {"pos": (0.50, -0.10, 0.0), "euler": (0.0, 0.0, 0.0)},
 }
+
+# Genesis resolves this path inside its installed asset collection.
+FRANKA_MJCF = "xml/franka_emika_panda/panda.xml"
 
 # == Domain randomization: Layer-A per-object appearance priors ==
 # Domain randomization (DR) of object color is deliberately constrained to each object's
@@ -173,11 +160,12 @@ def _mesh_geometry(mesh_path: Path) -> tuple[float, float]:
     return rest_z_offset, radius_xy
 
 
-def get_ycb_assets() -> dict[str, YCBAsset]:
+def get_ycb_assets(models_dir: Path | None = None) -> dict[str, YCBAsset]:
+    root = YCB_MODELS_DIR if models_dir is None else Path(models_dir).resolve()
     assets: dict[str, YCBAsset] = {}
     for name in YCB_LAYOUT:
-        mesh_path = ASSETS / "ycb" / name / "textured.obj"
-        collision_path = ASSETS / "ycb" / name / "collision.ply"
+        mesh_path = root / name / "textured.obj"
+        collision_path = root / name / "collision.ply"
         rest_z_offset, radius_xy = _mesh_geometry(mesh_path)
         assets[name] = YCBAsset(
             name=name,

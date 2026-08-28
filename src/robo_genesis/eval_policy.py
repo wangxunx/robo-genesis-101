@@ -56,7 +56,7 @@ from lerobot.utils.device_utils import get_safe_torch_device
 
 from .build_scene import build_scene
 from .grasp_demo import TaskSpec, check_success
-from .paths import EVAL_RESULTS_DIR, EVAL_VIDEOS_DIR
+from .paths import DATASETS_DIR, EVAL_RESULTS_DIR, EVAL_VIDEOS_DIR, resolve_cli_path
 from .randomize import EnvRandomizer, RandomizationConfig
 from .record_dataset import CONTROL_FPS, task_description
 from .stats import wilson
@@ -537,7 +537,11 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Policy-agnostic closed-loop eval.")
     parser.add_argument("--policy-path", required=True, help="Checkpoint dir (contains config.json + model.safetensors).")
     parser.add_argument("--repo-id", required=True, help="Repo id of the dataset the policy trained on.")
-    parser.add_argument("--dataset-root", default=None, help="Local dataset dir (for feature shapes/stats/fps).")
+    parser.add_argument(
+        "--dataset-root",
+        default=None,
+        help="Local dataset directory (default: configured datasets/<repo-name>).",
+    )
     parser.add_argument("--device", default="cuda", help="cuda | cpu | mps (auto-falls back if unavailable).")
     parser.add_argument("--use-amp", action="store_true", help="Enable autocast on CUDA inference.")
     parser.add_argument(
@@ -576,16 +580,23 @@ def main() -> None:
         action="store_true",
         help="Save each episode's rollout to mp4 (1x3: world + wrist + third-person view side by side).",
     )
-    parser.add_argument("--video-dir", default=None, help="Where to write rollout videos (default: eval_videos/<repo>).")
+    parser.add_argument(
+        "--video-dir",
+        default=None,
+        help="Rollout video directory (default: configured outputs/eval_videos/<repo>).",
+    )
     parser.add_argument(
         "--results-out",
         default=None,
-        help="Write a structured results JSON here (default: eval_results/<repo>/<checkpoint>.json). "
+        help="Write a structured results JSON here "
+        "(default: configured outputs/eval_results/<repo>/<checkpoint>.json). "
         "Pass 'none' to skip.",
     )
     args = parser.parse_args()
 
     repo_name = args.repo_id.split("/")[-1]
+    policy_path = resolve_cli_path(args.policy_path)
+    dataset_root = resolve_cli_path(args.dataset_root, default=DATASETS_DIR / repo_name)
     gs.init(backend=gs.cpu if args.cpu else gs.gpu)
     bundle = build_scene(
         show_viewer=args.vis, n_envs=1, add_world_cam=True, add_wrist_cam=True,
@@ -594,15 +605,15 @@ def main() -> None:
 
     rename_map = json.loads(args.rename_map) if args.rename_map else None
     pb = load_policy(
-        args.policy_path,
+        str(policy_path),
         args.repo_id,
-        args.dataset_root,
+        str(dataset_root),
         args.device,
         use_amp=args.use_amp,
         rename_map=rename_map,
     )
 
-    video_dir = Path(args.video_dir) if args.video_dir else EVAL_VIDEOS_DIR / repo_name
+    video_dir = resolve_cli_path(args.video_dir, default=EVAL_VIDEOS_DIR / repo_name)
 
     results = evaluate_policy(
         bundle, pb,
@@ -622,14 +633,17 @@ def main() -> None:
         print(f"[eval] rollout videos -> {video_dir}")
 
     if args.results_out != "none":
-        label = checkpoint_label(args.policy_path)
-        out = Path(args.results_out) if args.results_out else EVAL_RESULTS_DIR / repo_name / f"{label}.json"
+        label = checkpoint_label(str(policy_path))
+        out = resolve_cli_path(
+            args.results_out,
+            default=EVAL_RESULTS_DIR / repo_name / f"{label}.json",
+        )
         results["meta"] = {
-            "policy_path": args.policy_path,
+            "policy_path": str(policy_path),
             "policy_type": pb.policy_type,
             "checkpoint": label,
             "repo_id": args.repo_id,
-            "dataset_root": args.dataset_root,
+            "dataset_root": str(dataset_root),
             "device": str(pb.device),
             "balanced": args.balanced,
             "timestamp": datetime.now().isoformat(timespec="seconds"),

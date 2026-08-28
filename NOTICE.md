@@ -7,15 +7,15 @@ license boundary and dispositions reflected below.
 
 Audit date: 2026-08-28.
 
-Except for the two Datawhale template files identified below, none of the
-third-party assets reviewed here has been copied into this repository. Approved
-assets remain subject to their later migration step and original license.
+The four YCB objects identified below were vendored during M1.4. The two
+Datawhale template files also predate this audit. No other reviewed third-party
+assets have been copied into this repository.
 
 ## Audit summary
 
 | Material | Location reviewed | License evidence | Approved disposition |
 |---|---|---|---|
-| ManiSkill-distributed YCB meshes and textures | `franka_fruit_pick_demo/assets/ycb/` at the recorded `course` baseline | ManiSkill identifies its assets as CC BY-NC 4.0 | Vendor only banana, lemon, plum, and bowl during the approved later asset step; include the original license and provenance |
+| ManiSkill-distributed YCB meshes and textures | `franka_fruit_pick_demo/assets/ycb/` at the recorded `course` baseline | ManiSkill identifies its assets as CC BY-NC 4.0 | M1.4 vendors only banana, lemon, plum, and bowl with the original license, provenance, and checksums |
 | Franka Emika Panda MJCF model | `franka_fruit_pick_demo/assets/robots/franka/` at the recorded `course` baseline | Model README and MuJoCo Menagerie upstream identify the model as Apache-2.0 | Do not copy the incomplete source bundle; use the model bundled with the pinned Genesis version |
 | Source-course renders and slide exports | Both source courses at their recorded baselines | Project lead confirmed on 2026-08-28 that the course code, lectures, and teaching content are original | Original portions use MIT after migration; preserve notices for depicted or embedded third-party material |
 | Datawhale template media already in this repository | `docs/public/datawhale-logo.png`, `docs/public/learning.GIF` | Inherited template README declares CC BY-NC-SA 4.0 for the work; separate trademark permission was not found | Keep outside the project MIT boundary until Datawhale brand use is confirmed or the media is replaced |
@@ -88,10 +88,18 @@ the assets as covered by the course's own content or code license. The
 noncommercial restriction must remain visible to downstream users.
 
 M0.5 approved vendoring only the four objects used by the course mainline:
-`011_banana`, `014_lemon`, `018_plum`, and `024_bowl`. Their later migration
-must include the CC BY-NC 4.0 license, source and archive checksum, object list,
-and modification record. The other six audited objects remain excluded unless
-a later lesson requests and separately reviews them.
+`011_banana`, `014_lemon`, `018_plum`, and `024_bowl`. M1.4 copied their 24 files
+(4,463,632 bytes) byte-for-byte from the fixed source commit into
+`assets/third_party/ycb/models/`. The directory includes the CC BY-NC 4.0 legal
+text, source archive checksum, object list, modification record, and a per-file
+`SHA256SUMS` manifest. The SHA-256 of that manifest is:
+
+```text
+df3d55d6b357ee9acbc48453eeeac6a35549eecc4c24aea5eb8aff41f3059948
+```
+
+The other six audited objects remain excluded unless a later lesson requests
+and separately reviews them.
 
 ### Apparent scaling discrepancy
 
@@ -103,9 +111,10 @@ local `mani_skill_dataset_scaled` files are different and are not part of the
 approved migration baseline.
 
 Therefore the reviewed apple and orange files must be treated as unmodified
-ManiSkill assets. A future scaling operation would create modified assets and
-must be recorded as such. The stale fallback description must be corrected when
-the asset setup interface is redesigned after this audit.
+ManiSkill assets, but neither object is included in RoboGenesis 101. M1.4 removes
+the stale fallback and all scaled-asset branches. The course does not use or
+generate scaled assets; changing that decision would require a separate asset
+and license review.
 
 ## 2. Franka Emika Panda MJCF model
 
@@ -236,5 +245,6 @@ The project lead approved the following M0.5 decisions on 2026-08-28:
 Datawhale trademark and template-media authorization remains to be confirmed.
 Until then, those materials are not covered by the project MIT License.
 
-M1.1 copies no third-party asset. The approved YCB files and their license are
-added only in the later asset migration step.
+M1.1 copied no third-party assets. M1.4 added only the four approved YCB objects
+and their license/provenance files; the Franka model continues to come from the
+pinned Genesis installation.

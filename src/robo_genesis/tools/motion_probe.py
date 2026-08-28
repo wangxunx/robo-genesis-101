@@ -31,7 +31,7 @@ import numpy as np
 import genesis as gs
 
 from ..build_scene import build_scene
-from ..paths import EVAL_RESULTS_DIR
+from ..paths import EVAL_RESULTS_DIR, resolve_cli_path
 from ..grasp_demo import (
     FINGERS_DOF,
     LIFT_HAND_Z,
@@ -441,13 +441,22 @@ def main() -> None:
     ap.add_argument("--pick", nargs="+", default=["011_banana"])
     ap.add_argument("--place", default="024_bowl")
     ap.add_argument("-c", "--cpu", action="store_true")
-    ap.add_argument("--out-dir", default=None)
+    ap.add_argument(
+        "--output-dir",
+        "--out-dir",
+        dest="output_dir",
+        default=None,
+        help="Output directory (default: configured outputs/eval_results/motion_probe).",
+    )
     ap.add_argument("--compare", action="store_true", help="Run baseline vs landed primitive over --seeds.")
     ap.add_argument("--seeds", type=int, nargs="+", default=[0], help="Randomizer seeds for --compare.")
     ap.add_argument("--max-dq", type=float, default=0.006, help="Landed per-step joint cap (rad); joint speed = max_dq/dt.")
     args = ap.parse_args()
 
-    out_dir = Path(args.out_dir) if args.out_dir else EVAL_RESULTS_DIR / "motion_probe"
+    out_dir = resolve_cli_path(
+        args.output_dir,
+        default=EVAL_RESULTS_DIR / "motion_probe",
+    )
     gs.init(backend=gs.cpu if args.cpu else gs.gpu)
     bundle = build_scene(show_viewer=False, n_envs=1, add_world_cam=True, add_wrist_cam=True)
 

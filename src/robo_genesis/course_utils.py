@@ -11,10 +11,11 @@ import importlib.metadata
 import os
 import platform
 import sys
-from pathlib import Path
 from typing import Any
 
 import numpy as np
+
+from .paths import OUTPUTS_DIR
 
 
 def _version(distribution: str) -> str:
@@ -101,11 +102,10 @@ def assert_pose_close(actual: Any, target: Any, atol: float = 0.03, *, label: st
 
 def notebook_mode(output_name: str, *, show_viewer: bool | None = None) -> dict[str, Any]:
     """Return consistent notebook runtime settings and create its output directory."""
-    output_root = Path(os.environ.get("GENESIS_COURSE_OUTPUT", "outputs"))
-    output_dir = output_root / output_name
+    output_dir = OUTPUTS_DIR / output_name
     output_dir.mkdir(parents=True, exist_ok=True)
     if show_viewer is None:
-        show_viewer = os.environ.get("GENESIS_COURSE_VIEWER", "0") == "1"
+        show_viewer = os.environ.get("ROBO_GENESIS_VIEWER", "0") == "1"
     config = {"show_viewer": show_viewer, "output_dir": output_dir}
     print(f"viewer={show_viewer}; output_dir={output_dir.resolve()}")
     return config

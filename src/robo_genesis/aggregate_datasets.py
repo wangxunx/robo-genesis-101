@@ -17,7 +17,7 @@ Usage:
         --dataset-root datasets/banana_pick_50ep \
         --dataset-root datasets/lemon_pick_50ep \
         --dataset-root datasets/plum_pick_50ep \
-        --out datasets/fruit_pick_150ep
+        --output-dir datasets/fruit_pick_150ep
 
 Then train on the merged dir:
     uv run python -m robo_genesis.train_policy act \
@@ -33,10 +33,12 @@ import shutil
 import sys
 from pathlib import Path
 
+from .paths import resolve_cli_path
+
 
 def _resolve_source(root: str) -> Path:
     """Validate a source dataset dir and return its absolute path."""
-    path = Path(root).expanduser().resolve()
+    path = resolve_cli_path(root)
     if not path.is_dir():
         sys.exit(f"[error] dataset root not found: {path}")
     if not (path / "meta" / "info.json").is_file():
@@ -56,7 +58,9 @@ def main() -> None:
         help="Source dataset dir (repeat for each dataset to merge; order is preserved).",
     )
     ap.add_argument(
+        "--output-dir",
         "--out",
+        dest="output_dir",
         required=True,
         metavar="DIR",
         help="Output directory for the merged dataset.",
@@ -99,7 +103,7 @@ def main() -> None:
     else:
         repo_ids = [f"genesis/{p.name}" for p in roots]
 
-    out = Path(args.out).expanduser().resolve()
+    out = resolve_cli_path(args.output_dir)
     aggr_repo_id = args.aggr_repo_id or f"genesis/{out.name}"
 
     print("[aggregate] merging:")

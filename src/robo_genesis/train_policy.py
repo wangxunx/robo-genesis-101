@@ -38,9 +38,8 @@ import argparse
 import json
 import subprocess
 import sys
-from pathlib import Path
 
-from .paths import DATASETS_DIR
+from .paths import DATASETS_DIR, TRAIN_OUTPUTS_DIR, resolve_cli_path
 
 # Per-preset defaults. `type` -> `--policy.type=<t>` (train from scratch);
 # `path` -> `--policy.path=<p>` (fine-tune from a pretrained checkpoint/base).
@@ -74,10 +73,13 @@ def build_command(args: argparse.Namespace, passthrough: list[str]) -> list[str]
         kind, value = PRESETS[args.policy]["policy_arg"]
         policy_flag = f"--policy.{kind}={value}"
 
-    dataset_root = args.dataset_root or str(DATASETS_DIR / args.repo_id.split("/")[-1])
+    dataset_root = resolve_cli_path(
+        args.dataset_root,
+        default=DATASETS_DIR / args.repo_id.split("/")[-1],
+    )
     batch_size = args.batch_size if args.batch_size is not None else PRESETS[args.policy]["batch_size"]
-    job_name = args.name or f"{args.policy}_{Path(dataset_root).name}"
-    output_dir = args.output_dir or f"outputs/train/{job_name}"
+    job_name = args.name or f"{args.policy}_{dataset_root.name}"
+    output_dir = resolve_cli_path(args.output_dir, default=TRAIN_OUTPUTS_DIR / job_name)
 
     cmd = [
         sys.executable, "-m", "lerobot.scripts.lerobot_train",
@@ -130,7 +132,11 @@ def main() -> None:
         help="Local dataset dir (default: datasets/<repo-name>).",
     )
     parser.add_argument("--name", default=None, help="Job/output name (default: <policy>_<dataset-dir>).")
-    parser.add_argument("--output-dir", default=None, help="Run output dir (default: outputs/train/<name>).")
+    parser.add_argument(
+        "--output-dir",
+        default=None,
+        help="Run output directory (default: configured outputs/train/<name>).",
+    )
     parser.add_argument("--steps", type=int, default=20000, help="Training steps.")
     parser.add_argument("--batch-size", type=int, default=None, help="Override the preset batch size.")
     parser.add_argument("--save-freq", type=int, default=10000, help="Checkpoint every N steps (and at the end).")

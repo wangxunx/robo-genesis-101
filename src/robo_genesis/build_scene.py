@@ -12,14 +12,15 @@ import numpy as np
 import genesis as gs
 from genesis.utils.geom import trans_R_to_T, euler_to_R
 
+from .paths import SCENE_FRAMES_DIR, resolve_cli_path
 from .scene_config import (
-    ASSETS,
     DR_APPEARANCE_PRIORS,
     FRANKA_EULER,
     FRANKA_FORCE_MAX,
     FRANKA_FORCE_MIN,
     FRANKA_KP,
     FRANKA_KV,
+    FRANKA_MJCF,
     FRANKA_POS,
     FRANKA_QPOS,
     TABLE_CENTER,
@@ -124,9 +125,7 @@ def _dr_sample_object_color(prior: dict, dr_rng: np.random.Generator):
 
 
 def _ensure_assets() -> Path:
-    if not (ASSETS / "robots" / "franka" / "panda.xml").exists():
-        setup_assets()
-    return ASSETS
+    return setup_assets()
 
 
 def _add_table(
@@ -186,8 +185,8 @@ def build_scene(
     scene_dr: "SceneDomainRandomizationConfig | None" = None,
     rigid_overrides: "dict | None" = None,
 ) -> SceneBundle:
-    assets = _ensure_assets()
-    ycb_assets = get_ycb_assets()
+    ycb_models_dir = _ensure_assets()
+    ycb_assets = get_ycb_assets(ycb_models_dir)
 
     # Layer A: a single RNG stream drives all build-time appearance/intrinsics DR, so a
     # given (scene_dr.seed) fully determines the sampled appearance domain.
@@ -198,16 +197,8 @@ def build_scene(
     cx, cy = TABLE_CENTER
     camera_lookat = (cx, cy, TABLE_TOP_Z)
 
-    # Contact-physics knobs stay overridable so tools can A/B the solver settings whose defaults
-    # or availability changed across Genesis versions (see tools/physics_ab.py).
-    #
-    # friction_cone=elliptic is required to hold small round objects (lemon/plum) in the two-finger
-    # pinch. Genesis 1.3.1's default pyramidal cone approximates friction by a pyramid, making the
-    # tangential limit direction-dependent and too weak under the sustained gravity shear of a grasp:
-    # the lemon slid ~325 mm in-gripper and flew out (verified with tools/physics_ab.py). The exact
-    # elliptic cone (bounded by the true sqrt(f_t1^2+f_t2^2) <= mu*f_n, paired with impratio=100)
-    # cuts that to 0.6 mm at ~no cost. Genesis <=1.1.2, on which the stable datasets were recorded,
-    # had no pyramidal-cone option, so this restores the grip behavior those datasets were built on.
+    # Keep the compatibility-tested elliptic friction cone configurable for focused
+    # regression checks while using it as the course default for stable grasps.
     rigid_kwargs = dict(
         dt=0.01,
         constraint_solver=gs.constraint_solver.Newton,
@@ -258,7 +249,7 @@ def build_scene(
 
     franka = scene.add_entity(
         gs.morphs.MJCF(
-            file=str(assets / "robots" / "franka" / "panda.xml"),
+            file=FRANKA_MJCF,
             pos=FRANKA_POS,
             euler=FRANKA_EULER,
         ),
@@ -356,7 +347,7 @@ def main() -> None:
     parser.add_argument(
         "--setup-assets",
         action="store_true",
-        help="Refresh YCB and robot symlinks before building.",
+        help="Compatibility flag; vendored YCB assets are always validated before building.",
     )
     parser.add_argument("--no-world-cam", action="store_true", help="Disable the fixed world camera.")
     parser.add_argument("--no-wrist-cam", action="store_true", help="Disable the wrist camera.")
@@ -369,6 +360,11 @@ def main() -> None:
         "--save-frames",
         action="store_true",
         help="Render and save one frame from each camera at the end of the run.",
+    )
+    parser.add_argument(
+        "--output-dir",
+        default=None,
+        help="Frame output directory (default: configured outputs/scene_frames).",
     )
     parser.add_argument(
         "--dr-appearance",
@@ -394,9 +390,6 @@ def main() -> None:
     )
     parser.add_argument("--dr-seed", type=int, default=None, help="Seed for the Layer-A appearance RNG.")
     args = parser.parse_args()
-
-    if args.setup_assets:
-        setup_assets()
 
     scene_dr = SceneDomainRandomizationConfig(
         enabled=args.dr_appearance,
@@ -429,12 +422,16 @@ def main() -> None:
     if args.save_frames:
         import imageio.v2 as imageio
 
+        output_dir = resolve_cli_path(args.output_dir, default=SCENE_FRAMES_DIR)
+        output_dir.mkdir(parents=True, exist_ok=True)
         if bundle.world_cam is not None:
-            imageio.imwrite("world_cam.png", bundle.world_cam.render(rgb=True)[0])
-            print("Saved world_cam.png")
+            world_path = output_dir / "world_cam.png"
+            imageio.imwrite(world_path, bundle.world_cam.render(rgb=True)[0])
+            print(f"Saved {world_path}")
         if bundle.wrist_cam is not None:
-            imageio.imwrite("wrist_cam.png", bundle.wrist_cam.render(rgb=True)[0])
-            print("Saved wrist_cam.png")
+            wrist_path = output_dir / "wrist_cam.png"
+            imageio.imwrite(wrist_path, bundle.wrist_cam.render(rgb=True)[0])
+            print(f"Saved {wrist_path}")
 
 
 if __name__ == "__main__":

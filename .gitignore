@@ -12,3 +12,7 @@ htmlcov/
 build/
 dist/
 *.egg-info/
+
+# Local course data and generated artifacts
+datasets/
+outputs/
