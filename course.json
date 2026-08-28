@@ -1,0 +1,245 @@
+{
+  "schema_version": 1,
+  "course": {
+    "id": "robo-genesis-101",
+    "title": {
+      "zh": "RoboGenesis 101：基于 Genesis 的机器人学习实践",
+      "en": "RoboGenesis 101: Practical Robot Learning with Genesis"
+    },
+    "default_locale": "zh",
+    "locales": [
+      "zh",
+      "en"
+    ]
+  },
+  "lessons": [
+    {
+      "id": "L01",
+      "slug": "introduction-and-environment-diagnostics",
+      "title": {
+        "zh": "导论、运行平台与环境诊断",
+        "en": "Introduction, Runtime Platforms, and Environment Diagnostics"
+      },
+      "duration_minutes": 60,
+      "hardware": "cpu-ok",
+      "notebook": {
+        "zh": "notebooks/zh/l01-introduction-and-environment-diagnostics.ipynb",
+        "en": "notebooks/en/l01-introduction-and-environment-diagnostics.ipynb"
+      },
+      "lecture": {
+        "zh": "docs/zh/lessons/l01-introduction-and-environment-diagnostics.md",
+        "en": "docs/en/lessons/l01-introduction-and-environment-diagnostics.md"
+      },
+      "status": "planned"
+    },
+    {
+      "id": "L02",
+      "slug": "scenes-entities-and-simulation-lifecycle",
+      "title": {
+        "zh": "场景、实体与仿真生命周期",
+        "en": "Scenes, Entities, and the Simulation Lifecycle"
+      },
+      "duration_minutes": 90,
+      "hardware": "cpu-ok",
+      "notebook": {
+        "zh": "notebooks/zh/l02-scenes-entities-and-simulation-lifecycle.ipynb",
+        "en": "notebooks/en/l02-scenes-entities-and-simulation-lifecycle.ipynb"
+      },
+      "lecture": {
+        "zh": "docs/zh/lessons/l02-scenes-entities-and-simulation-lifecycle.md",
+        "en": "docs/en/lessons/l02-scenes-entities-and-simulation-lifecycle.md"
+      },
+      "status": "planned"
+    },
+    {
+      "id": "L03",
+      "slug": "rigid-body-physics-and-stable-simulation",
+      "title": {
+        "zh": "刚体物理与稳定仿真",
+        "en": "Rigid-Body Physics and Stable Simulation"
+      },
+      "duration_minutes": 90,
+      "hardware": "cpu-ok",
+      "notebook": {
+        "zh": "notebooks/zh/l03-rigid-body-physics-and-stable-simulation.ipynb",
+        "en": "notebooks/en/l03-rigid-body-physics-and-stable-simulation.ipynb"
+      },
+      "lecture": {
+        "zh": "docs/zh/lessons/l03-rigid-body-physics-and-stable-simulation.md",
+        "en": "docs/en/lessons/l03-rigid-body-physics-and-stable-simulation.md"
+      },
+      "status": "planned"
+    },
+    {
+      "id": "L04",
+      "slug": "robot-models-dofs-and-joint-control",
+      "title": {
+        "zh": "机器人模型、DOF 与关节控制",
+        "en": "Robot Models, Degrees of Freedom, and Joint Control"
+      },
+      "duration_minutes": 90,
+      "hardware": "cpu-ok",
+      "notebook": {
+        "zh": "notebooks/zh/l04-robot-models-dofs-and-joint-control.ipynb",
+        "en": "notebooks/en/l04-robot-models-dofs-and-joint-control.ipynb"
+      },
+      "lecture": {
+        "zh": "docs/zh/lessons/l04-robot-models-dofs-and-joint-control.md",
+        "en": "docs/en/lessons/l04-robot-models-dofs-and-joint-control.md"
+      },
+      "status": "planned"
+    },
+    {
+      "id": "L05",
+      "slug": "inverse-kinematics-end-effector-poses-and-cameras",
+      "title": {
+        "zh": "逆运动学、末端位姿与相机",
+        "en": "Inverse Kinematics, End-Effector Poses, and Cameras"
+      },
+      "duration_minutes": 120,
+      "hardware": "cpu-ok",
+      "notebook": {
+        "zh": "notebooks/zh/l05-inverse-kinematics-end-effector-poses-and-cameras.ipynb",
+        "en": "notebooks/en/l05-inverse-kinematics-end-effector-poses-and-cameras.ipynb"
+      },
+      "lecture": {
+        "zh": "docs/zh/lessons/l05-inverse-kinematics-end-effector-poses-and-cameras.md",
+        "en": "docs/en/lessons/l05-inverse-kinematics-end-effector-poses-and-cameras.md"
+      },
+      "status": "planned"
+    },
+    {
+      "id": "L06",
+      "slug": "building-a-grasping-task-scene",
+      "title": {
+        "zh": "抓取任务场景搭建",
+        "en": "Building a Grasping Task Scene"
+      },
+      "duration_minutes": 120,
+      "hardware": "cpu-ok",
+      "notebook": {
+        "zh": "notebooks/zh/l06-building-a-grasping-task-scene.ipynb",
+        "en": "notebooks/en/l06-building-a-grasping-task-scene.ipynb"
+      },
+      "lecture": {
+        "zh": "docs/zh/lessons/l06-building-a-grasping-task-scene.md",
+        "en": "docs/en/lessons/l06-building-a-grasping-task-scene.md"
+      },
+      "status": "planned"
+    },
+    {
+      "id": "L07",
+      "slug": "demonstration-acquisition-and-scripted-experts",
+      "title": {
+        "zh": "演示数据获取与脚本化专家",
+        "en": "Demonstration Acquisition and Scripted Experts"
+      },
+      "duration_minutes": 120,
+      "hardware": "gpu-recommended",
+      "notebook": {
+        "zh": "notebooks/zh/l07-demonstration-acquisition-and-scripted-experts.ipynb",
+        "en": "notebooks/en/l07-demonstration-acquisition-and-scripted-experts.ipynb"
+      },
+      "lecture": {
+        "zh": "docs/zh/lessons/l07-demonstration-acquisition-and-scripted-experts.md",
+        "en": "docs/en/lessons/l07-demonstration-acquisition-and-scripted-experts.md"
+      },
+      "status": "planned"
+    },
+    {
+      "id": "L08",
+      "slug": "synthetic-data-recording-and-throughput",
+      "title": {
+        "zh": "合成数据录制与采数吞吐",
+        "en": "Synthetic Data Recording and Collection Throughput"
+      },
+      "duration_minutes": 120,
+      "hardware": "gpu-recommended",
+      "notebook": {
+        "zh": "notebooks/zh/l08-synthetic-data-recording-and-throughput.ipynb",
+        "en": "notebooks/en/l08-synthetic-data-recording-and-throughput.ipynb"
+      },
+      "lecture": {
+        "zh": "docs/zh/lessons/l08-synthetic-data-recording-and-throughput.md",
+        "en": "docs/en/lessons/l08-synthetic-data-recording-and-throughput.md"
+      },
+      "status": "planned"
+    },
+    {
+      "id": "L09",
+      "slug": "dataset-anatomy-and-imitation-learning",
+      "title": {
+        "zh": "数据集解剖与模仿学习 101",
+        "en": "Dataset Anatomy and Imitation Learning 101"
+      },
+      "duration_minutes": 90,
+      "hardware": "gpu-recommended",
+      "notebook": {
+        "zh": "notebooks/zh/l09-dataset-anatomy-and-imitation-learning.ipynb",
+        "en": "notebooks/en/l09-dataset-anatomy-and-imitation-learning.ipynb"
+      },
+      "lecture": {
+        "zh": "docs/zh/lessons/l09-dataset-anatomy-and-imitation-learning.md",
+        "en": "docs/en/lessons/l09-dataset-anatomy-and-imitation-learning.md"
+      },
+      "status": "planned"
+    },
+    {
+      "id": "L10",
+      "slug": "domain-randomization",
+      "title": {
+        "zh": "域随机化",
+        "en": "Domain Randomization"
+      },
+      "duration_minutes": 90,
+      "hardware": "gpu-recommended",
+      "notebook": {
+        "zh": "notebooks/zh/l10-domain-randomization.ipynb",
+        "en": "notebooks/en/l10-domain-randomization.ipynb"
+      },
+      "lecture": {
+        "zh": "docs/zh/lessons/l10-domain-randomization.md",
+        "en": "docs/en/lessons/l10-domain-randomization.md"
+      },
+      "status": "planned"
+    },
+    {
+      "id": "L11",
+      "slug": "act-and-smolvla-policy-training",
+      "title": {
+        "zh": "ACT 与 SmolVLA 策略训练",
+        "en": "Training ACT and SmolVLA Policies"
+      },
+      "duration_minutes": 150,
+      "hardware": "gpu-required",
+      "notebook": {
+        "zh": "notebooks/zh/l11-act-and-smolvla-policy-training.ipynb",
+        "en": "notebooks/en/l11-act-and-smolvla-policy-training.ipynb"
+      },
+      "lecture": {
+        "zh": "docs/zh/lessons/l11-act-and-smolvla-policy-training.md",
+        "en": "docs/en/lessons/l11-act-and-smolvla-policy-training.md"
+      },
+      "status": "planned"
+    },
+    {
+      "id": "L12",
+      "slug": "closed-loop-evaluation-and-capstone",
+      "title": {
+        "zh": "闭环评估与 Capstone",
+        "en": "Closed-Loop Evaluation and Capstone"
+      },
+      "duration_minutes": 120,
+      "hardware": "gpu-required",
+      "notebook": {
+        "zh": "notebooks/zh/l12-closed-loop-evaluation-and-capstone.ipynb",
+        "en": "notebooks/en/l12-closed-loop-evaluation-and-capstone.ipynb"
+      },
+      "lecture": {
+        "zh": "docs/zh/lessons/l12-closed-loop-evaluation-and-capstone.md",
+        "en": "docs/en/lessons/l12-closed-loop-evaluation-and-capstone.md"
+      },
+      "status": "planned"
+    }
+  ]
+}
