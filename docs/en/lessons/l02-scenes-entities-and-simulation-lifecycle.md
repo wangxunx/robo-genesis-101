@@ -376,9 +376,10 @@ two capabilities separately.
 
 ## Lab: one box, one lifecycle
 
-The companion executable notebook is not yet published. This section defines
-how to read the experiment and what evidence it must produce without claiming
-that the experiment has already run.
+The companion executable notebook implements the experiment below. Before
+running its first code cell, learners predict the build boundary, which state
+values should change, and what evidence can establish motion without a camera.
+The final comparison revisits those predictions.
 
 ### Phase 1 — initialize once
 
@@ -406,18 +407,21 @@ true. It then inspects the primitive hierarchy and reads the first valid state.
 
 ### Phase 4 — step and compare
 
-The notebook records initial position, quaternion, and linear velocity, advances
-twenty steps, and records the final state. It verifies shapes and finite values,
-then checks the directional prediction `final_z < initial_z` without asserting a
-fabricated absolute coordinate.
+The notebook records initial position, quaternion, and linear velocity. When
+rendering is enabled, it also validates and saves an initial camera frame before
+advancing twenty steps. It then records the final state, verifies shapes and
+finite values, and checks the directional prediction `final_z < initial_z`
+without asserting a fabricated absolute coordinate.
 
 ### Phase 5 — observe honestly
 
-With rendering enabled, the notebook validates the returned RGB array: it must
-have image height and width dimensions, three or four channels as supported by
-the selected renderer, finite values, and a sensible numeric range for its
-dtype. With rendering disabled, it produces only the clearly labelled
-state-derived schematic.
+With rendering enabled, the notebook validates both initial and final RGB
+arrays, then displays the two camera frames side by side with their measured
+heights. With rendering disabled, it displays a state-derived initial/final Box
+comparison beside the measured height trajectory. That figure remains clearly
+labelled as a schematic rather than a camera image. In either branch, reflection
+prompts ask learners to distinguish state evidence from rendering evidence and
+compare the result with their prediction.
 
 ### Phase 6 — prove the closed topology
 
@@ -438,13 +442,14 @@ The core lab passes only if all of the following are true:
 - twenty steps produce an observed decrease in Box height;
 - post-build topology addition produces the expected, narrowly checked failure;
   and
-- the enabled rendering branch validates RGB data, or the disabled branch is
-  reported as an explicit skip and produces only a labelled schematic.
+- the enabled rendering branch validates initial and final RGB data, or the
+  disabled branch is reported as an explicit skip and produces only a labelled
+  state comparison and trajectory.
 
-Before L02 is marked verified, the same notebook must pass in two clean kernels
-on the reference machine: default `auto` must select `gs.amdgpu`, and forced
-`cpu` must select `gs.cpu`. The rendering-enabled reference run is additional
-evidence and does not turn a GPU into a prerequisite for the core lesson.
+The recorded L02 verification runs the same notebook in separate clean kernels
+on the reference machine: default `auto` selects `gs.amdgpu`, and forced `cpu`
+selects `gs.cpu`. The rendering-enabled reference run is additional evidence
+and does not turn a GPU into a prerequisite for the core lesson.
 
 ## Common failures and diagnosis
 

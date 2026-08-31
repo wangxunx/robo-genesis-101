@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 
 from robo_genesis.course_validation import (
+    _paired_relative_files,
     markdown_heading_levels,
     parse_frontmatter,
     validate_notebook_pair,
@@ -99,3 +100,29 @@ def test_notebook_pair_rejects_code_drift_outputs_and_syntax(tmp_path: Path) -> 
     assert any("committed outputs are not allowed" in error for error in errors)
     assert any("Python syntax error" in error for error in errors)
     assert any("code cell 1 sources differ" in error for error in errors)
+
+
+def test_paired_files_ignore_jupyter_checkpoints(tmp_path: Path) -> None:
+    for locale in ("zh", "en"):
+        locale_directory = tmp_path / "notebooks" / locale
+        locale_directory.mkdir(parents=True)
+        (locale_directory / "lesson.ipynb").write_text("{}", encoding="utf-8")
+
+    checkpoint_directory = tmp_path / "notebooks" / "en" / ".ipynb_checkpoints"
+    checkpoint_directory.mkdir()
+    (checkpoint_directory / "lesson-checkpoint.ipynb").write_text("{}", encoding="utf-8")
+
+    errors: list[str] = []
+    localized, relative_paths = _paired_relative_files(
+        tmp_path,
+        base_directory="notebooks",
+        pattern="*.ipynb",
+        errors=errors,
+    )
+
+    assert errors == []
+    assert {path.as_posix() for path in relative_paths} == {"lesson.ipynb"}
+    assert all(
+        {path.as_posix() for path in files} == {"lesson.ipynb"}
+        for files in localized.values()
+    )

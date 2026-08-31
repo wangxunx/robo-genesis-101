@@ -216,3 +216,15 @@ PYOPENGL_PLATFORM=egl ROCR_VISIBLE_DEVICES=0 \
 | EN / AMD 离屏渲染 | `auto` → `gs.amdgpu` | `PASS` | 51.17 秒 | RGB 为 `(360, 640, 3)`、`uint8`、全部有限，像素范围 `[10, 204]`；未触发 fallback。 |
 
 四次运行的初始高度均为 `0.5 m`，20 步后为约 `0.298895 m`，下降约 `0.201105 m`。这些数值记录本次 smoke 的实际观察，不是面向所有硬件的硬编码课程预期。EN/ZH 两份 notebook 都已从头执行；英文 notebook 本身同时通过 AMD 与 CPU 路径，双语 code cell 源码和 ID 保持一致。
+
+### 9.1 教学可视化调整后的复验
+
+M2.5 验收后，L02 增加了运行前预测问题、状态分支的初始/最终 Box 对比与高度轨迹，以及渲染分支的初始/最终 RGB 对比。核心生命周期断言、后端选择和显式渲染开关没有改变。2026-08-31 使用本节记录的同一隔离环境和命令结构重新执行最终 notebook：
+
+| notebook / 能力路径 | backend mode → 实际 backend | 执行时间 | 调整后结果 |
+| --- | --- | ---: | --- |
+| EN / AMD 状态可视化 | `auto` → `gs.amdgpu` | 37.17 秒 | 核心断言全部通过；生成初始/最终 Box 状态对比和 20 步高度轨迹，明确标注为非相机图像。 |
+| ZH / CPU 状态可视化 | `cpu` → `gs.cpu` | 32.57 秒 | 中文 notebook 从干净 kernel 自上而下通过，与英文使用相同 code cell 和 ID；最终输出文字调整后又以独立 kernel 和已有编译缓存复验一次，用时 9.90 秒。 |
+| EN / AMD 初始/最终 RGB | `auto` → `gs.amdgpu` | 51.20 秒 | 初始和最终 RGB 均为 `(360, 640, 3)` `uint8`；各自范围为 `[10, 206]` 和 `[10, 204]`，并排对比图生成成功。 |
+
+三次复验中的状态值仍为初始 `z=0.5 m`、20 步后约 `z=0.298895 m`。仓库中的双语 notebook 继续保持无 output、`execution_count: null`，所有图像仍只写入已忽略的 `outputs/`。

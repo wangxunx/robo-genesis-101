@@ -209,10 +209,11 @@ def _paired_relative_files(
             errors.append(f"{directory.relative_to(root)}: locale directory is missing")
             localized[locale] = {}
             continue
+        # Jupyter checkpoint copies are generated local artifacts, not course content.
         localized[locale] = {
             PurePosixPath(path.relative_to(directory).as_posix()): path
             for path in directory.rglob(pattern)
-            if path.is_file()
+            if path.is_file() and ".ipynb_checkpoints" not in path.parts
         }
 
     union = set().union(*(set(files) for files in localized.values()))
