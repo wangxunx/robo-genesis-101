@@ -44,6 +44,21 @@ def test_repository_passes_all_course_gates() -> None:
     assert summary.python_files >= 1
 
 
+def test_bilingual_project_documents_have_matching_heading_structure() -> None:
+    readme_zh = (PROJECT_ROOT / "README.md").read_text(encoding="utf-8")
+    readme_en = (PROJECT_ROOT / "README_en.md").read_text(encoding="utf-8")
+
+    assert markdown_heading_levels(readme_zh) == markdown_heading_levels(readme_en)
+
+    for name in ("CONTRIBUTING.md", "CONTENT_GUIDE.md"):
+        text = (PROJECT_ROOT / name).read_text(encoding="utf-8")
+        zh_section = text.split("\n## 中文\n", maxsplit=1)[1].split(
+            "\n## English\n", maxsplit=1
+        )[0]
+        en_section = text.split("\n## English\n", maxsplit=1)[1]
+        assert markdown_heading_levels(zh_section) == markdown_heading_levels(en_section)
+
+
 def test_frontmatter_and_heading_parser_ignore_fenced_examples() -> None:
     text = """---
 lesson: L01

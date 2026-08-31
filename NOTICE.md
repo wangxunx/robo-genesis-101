@@ -209,11 +209,6 @@ Datawhale logo. M0.5 therefore kept both files outside the project MIT boundary;
 brand-use confirmation or replacement remains required before publication. No
 brand asset was changed in M0.4 or M1.1.
 
-The current README also embeds a remote Datawhale QR-code image from
-`datawhalechina/pumpkin-book`. It is linked rather than stored, but its source
-and permission must be confirmed or the link removed when the README is
-rewritten in M1.10.
-
 ## 5. Datasets, checkpoints, models, and dependencies
 
 M0.2 excluded all local datasets, checkpoints, evaluation outputs, videos,

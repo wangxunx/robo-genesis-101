@@ -22,26 +22,45 @@ Lectures and hands-on work form one learning path, not independent tracks. Reade
 
 ## Repository Layout
 
+- `README.md` / `README_en.md` — synchronized Chinese and English project entry points and course progress tables.
+- `CONTRIBUTING.md` — bilingual contribution workflow and pull-request requirements.
+- `CONTENT_GUIDE.md` — bilingual lecture, notebook, terminology, status, and evidence standards.
+- `course.json` — canonical bilingual lesson order, titles, slugs, duration, hardware requirements, paths, and publication status.
 - `docs/` — VitePress documentation source and course materials.
 - `docs/{zh,en}/lessons/` — paired bilingual lecture pages; M1 skeletons remain `planned` until their lesson-development gates pass.
 - `docs/.vitepress/config.mts` — site title, navigation, sidebar, links, and deployment base.
 - `docs/public/` — static assets published as-is by VitePress.
 - `notebooks/{zh,en}/` — paired lesson notebooks whose code cells must remain identical across locales.
-- `src/robo_genesis/` — installable Python package; currently the M1 skeleton for reusable course implementations.
+- `src/robo_genesis/` — installable Python package and source of truth for reusable scene, data, training, and evaluation behavior.
 - `scripts/validate_course.py` — thin entry point for the installed repository-wide course validator.
-- `tests/` — Python package and behavior tests.
-- `course.json` — canonical bilingual lesson metadata, ordering, hardware requirements, paths, and publication status.
+- `tests/` — Python behavior, pure-logic, and repository-contract tests.
+- `assets/third_party/` — vendored third-party assets with directory-specific provenance and license records.
+- `COMPATIBILITY.md` — accepted runtime versions, verified platforms, evidence, and unsupported or unverified paths.
+- `MIGRATION.md` — source baselines, migration decisions, implementation records, and acceptance history.
+- `LICENSE`, `LICENSE_POLICY.md`, and `NOTICE.md` — project license and third-party boundary records.
 - `pyproject.toml` / `uv.lock` — Python package metadata and reproducible dependency resolution.
 - `package.json` / `package-lock.json` — documentation dependencies and commands.
 - `.github/workflows/validate.yml` — pull-request gate for course contracts, tests, and the documentation build.
 - `.github/workflows/deploy.yml` — GitHub Pages build and deployment workflow, including the same Python gates before upload.
 
-When notebooks, Python source, generation scripts, or multilingual directories are added, document their responsibilities here. Do not assume that directories or commands mentioned only in the course plan are available.
+When repository structure changes, update this section and the bilingual README layout sections in the same change. Do not assume that directories or commands mentioned only in the course plan are available.
+
+## Sources of Truth
+
+- `course.json` owns lesson metadata, order, localized titles, canonical paths, hardware requirements, and status.
+- English lectures are the development source for mechanism-level prose; Chinese lectures are synchronized natural adaptations shipped in the same change.
+- `src/robo_genesis/` owns reusable behavior. Notebooks are teaching entry points and must not maintain divergent copies of shared implementations.
+- `COMPATIBILITY.md` owns platform and version claims. A dependency resolving successfully does not count as runtime verification.
+- `NOTICE.md` and directory-level license files own third-party provenance and redistribution terms.
+- `MIGRATION.md` records historical sources and accepted implementation decisions; it is not a runtime dependency.
+
+The complete authoring contract is in `CONTENT_GUIDE.md`; contributor setup and pull-request expectations are in `CONTRIBUTING.md`.
 
 ## Editing Invariants
 
 - Read the target section and its surrounding context before editing; match the established depth, terminology, and tone.
 - Mirror structural and prose changes across EN/ZH unless told otherwise.
+- Keep `README.md` and `README_en.md` synchronized. The course tables must match `course.json`; do not edit their status independently.
 - Distinguish template placeholders, planned work, and completed content. Do not invent completion status, contributors, links, or experimental results.
 - When pages are added, removed, renamed, or reordered, update `docs/.vitepress/config.mts` and all affected links in the same change.
 - The README, homepage, course outline, and sidebar must describe the same course order and completion status.
@@ -59,6 +78,7 @@ When notebooks, Python source, generation scripts, or multilingual directories a
 - Put reusable implementations in clearly defined source modules. Notebooks must still expose the key logic for the lesson instead of acting only as black-box wrappers.
 - If a file is generated, edit its source of truth and run the generator. Do not assume a generation relationship unless the repository defines one.
 - Notebooks should run top to bottom from a clean kernel. Do not commit large outputs, caches, or machine-specific paths that do not help learners.
+- EN/ZH notebook pairs must keep the same cell-type sequence and identical code-cell IDs and source. Localize Markdown cells only.
 - Long-running or hardware-intensive exercises should provide a minimal verification path. Clearly disclose when the full experiment was not run.
 - Datasets, checkpoints, training logs, and build artifacts stay out of Git unless repository policy explicitly requires them.
 
@@ -84,9 +104,12 @@ When notebooks, Python source, generation scripts, or multilingual directories a
 Before handing off a change, run at least:
 
 ```sh
-PYTHONPATH=src python3 -m robo_genesis.course_validation
-git diff --check
+.venv/bin/python -m robo_genesis.course_validation
+.venv/bin/python -m pytest
+.venv/bin/python -m compileall -q src scripts tests
+npm ci
 npm run docs:build
+git diff --check
 ```
 
 Also verify manually that every sidebar target and relative link resolves, the README agrees with the site content, generated files were not edited directly, and unrun experiments are not described as verified.
@@ -95,7 +118,17 @@ For notebook or Python changes, add the relevant syntax checks, unit tests, or s
 
 ## Commands
 
-Install dependencies with:
+Create the dependency-light validation environment used by CI with:
+```sh
+UV_PROJECT_ENVIRONMENT=.venv uv sync --only-group dev --locked
+uv pip install --python .venv/bin/python --no-deps --editable .
+```
+Install the complete course dependency set with:
+```sh
+uv sync --locked --all-extras
+```
+The complete install is not, by itself, proof of GPU compatibility. Follow `COMPATIBILITY.md` for the verified AMD ROCm wheel set and platform limitations.
+Install documentation dependencies with:
 ```sh
 npm ci
 ```
@@ -109,6 +142,6 @@ npm run docs:build
 ```
 Run the repository-wide course gate with:
 ```sh
-PYTHONPATH=src python3 -m robo_genesis.course_validation
+.venv/bin/python -m robo_genesis.course_validation
 ```
 Use `npm install <package>` only when intentionally adding or updating a dependency. Commit both `package.json` and `package-lock.json` when dependencies change.

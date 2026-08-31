@@ -548,10 +548,11 @@ def _validate_notebooks(
 
 def _markdown_sources(root: Path) -> tuple[Path, ...]:
     sources = list((root / "docs").rglob("*.md"))
-    for name in ("README.md", "README_en.md"):
-        path = root / name
-        if path.is_file():
-            sources.append(path)
+    sources.extend(
+        path
+        for path in root.glob("*.md")
+        if path.is_file() and not path.name.endswith(".plan.md")
+    )
     return tuple(sorted(path for path in sources if path.is_file()))
 
 
@@ -790,6 +791,41 @@ def _validate_overview_tables(
             website_routes=False,
             errors=errors,
         )
+
+
+def _validate_project_document_parity(root: Path, errors: list[str]) -> None:
+    readmes = (root / "README.md", root / "README_en.md")
+    if all(path.is_file() for path in readmes):
+        heading_levels = tuple(
+            markdown_heading_levels(path.read_text(encoding="utf-8"))
+            for path in readmes
+        )
+        if heading_levels[0] != heading_levels[1]:
+            errors.append(
+                "README.md / README_en.md: bilingual heading levels differ: "
+                f"zh={heading_levels[0]}, en={heading_levels[1]}"
+            )
+
+    for name in ("CONTRIBUTING.md", "CONTENT_GUIDE.md"):
+        path = root / name
+        if not path.is_file():
+            errors.append(f"{name}: required bilingual project guide is missing")
+            continue
+        text = path.read_text(encoding="utf-8")
+        zh_marker = "\n## 中文\n"
+        en_marker = "\n## English\n"
+        if zh_marker not in text or en_marker not in text:
+            errors.append(f"{name}: missing Chinese or English section")
+            continue
+        zh_section = text.split(zh_marker, maxsplit=1)[1].split(en_marker, maxsplit=1)[0]
+        en_section = text.split(en_marker, maxsplit=1)[1]
+        zh_levels = markdown_heading_levels(zh_section)
+        en_levels = markdown_heading_levels(en_section)
+        if zh_levels != en_levels:
+            errors.append(
+                f"{name}: bilingual section heading levels differ: "
+                f"zh={zh_levels}, en={en_levels}"
+            )
 
 
 def _published_placeholder_patterns(locale: str) -> tuple[re.Pattern[str], ...]:
@@ -1130,6 +1166,7 @@ def validate_repository(root: Path | str = PROJECT_ROOT) -> CourseValidationSumm
     )
     _validate_markdown_links(repository_root, notebook_markdown, errors)
     _validate_overview_tables(repository_root, manifest, errors)
+    _validate_project_document_parity(repository_root, errors)
     _validate_published_content(repository_root, manifest, errors)
     python_count = _validate_python_sources(repository_root, notebook_code, errors)
     _validate_dependencies(repository_root, errors)
