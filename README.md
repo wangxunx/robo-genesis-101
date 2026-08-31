@@ -13,12 +13,23 @@
 https://wangxunx.github.io/robo-genesis-101/
 
 ## 目录
-*这里写你的项目目录，及其完成状态，已完成的部分添加上跳转链接*
 
-|  章节名   | 简介 | 状态 |
-|  ----  | ---- | ---- |
-| [第1章 xxx](https://github.com/wangxunx/robo-genesis-101) | xxx | ✅   |
-| 第2章                                                     | xxx | 🚧  |
+当前 12 讲均为 `planned` 结构骨架，页面存在不代表课程内容已经完成。
+
+| 讲次 | 主题 | 状态 |
+|---|---|---|
+| L01 | [导论、运行平台与环境诊断](docs/zh/lessons/l01-introduction-and-environment-diagnostics.md) | `planned` |
+| L02 | [场景、实体与仿真生命周期](docs/zh/lessons/l02-scenes-entities-and-simulation-lifecycle.md) | `planned` |
+| L03 | [刚体物理与稳定仿真](docs/zh/lessons/l03-rigid-body-physics-and-stable-simulation.md) | `planned` |
+| L04 | [机器人模型、DOF 与关节控制](docs/zh/lessons/l04-robot-models-dofs-and-joint-control.md) | `planned` |
+| L05 | [逆运动学、末端位姿与相机](docs/zh/lessons/l05-inverse-kinematics-end-effector-poses-and-cameras.md) | `planned` |
+| L06 | [抓取任务场景搭建](docs/zh/lessons/l06-building-a-grasping-task-scene.md) | `planned` |
+| L07 | [演示数据获取与脚本化专家](docs/zh/lessons/l07-demonstration-acquisition-and-scripted-experts.md) | `planned` |
+| L08 | [合成数据录制与采数吞吐](docs/zh/lessons/l08-synthetic-data-recording-and-throughput.md) | `planned` |
+| L09 | [数据集解剖与模仿学习 101](docs/zh/lessons/l09-dataset-anatomy-and-imitation-learning.md) | `planned` |
+| L10 | [域随机化](docs/zh/lessons/l10-domain-randomization.md) | `planned` |
+| L11 | [ACT 与 SmolVLA 策略训练](docs/zh/lessons/l11-act-and-smolvla-policy-training.md) | `planned` |
+| L12 | [闭环评估与 Capstone](docs/zh/lessons/l12-closed-loop-evaluation-and-capstone.md) | `planned` |
 
 
 ## 贡献者名单

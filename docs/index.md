@@ -1,50 +1,24 @@
 ---
-# https://vitepress.dev/reference/default-theme-home-page
 layout: home
+title: RoboGenesis 101
 
 hero:
-  name: "Datawhale开源教程"
-  text: "AI前沿知识开源教程"
-  tagline: 开始学起来吧~
-  image:
-    src: /learning.GIF
-    alt: Datawhale开源教程
+  name: RoboGenesis 101
+  text: 选择课程语言 · Choose your language
+  tagline: 从 Genesis 仿真基础走向机器人策略学习的双语实践课程
   actions:
     - theme: brand
-      text: 开始学习
-      link: /chapter1/
+      text: 中文阅读
+      link: /zh/
+    - theme: alt
+      text: Read in English
+      link: /en/
 
 features:
-  - title: 💥 前沿
-    details: 紧跟技术发展输出最前沿的知识
-  - title: 🎁 免费
-    details: 无任何形式的收费
-  - title: 🌐 开源
-    details: 教程和代码源文件全部托管在GitHub
+  - title: 12 讲渐进式路径
+    details: 从场景、物理和控制逐步推进到数据、策略训练与闭环评估。
+  - title: Bilingual by design
+    details: Lectures and notebooks use paired English and Chinese structures.
+  - title: 当前状态 · Current status
+    details: All lesson pages are planned scaffolds and are not yet published course content.
 ---
-<script setup>
-import { VPTeamMembers } from 'vitepress/theme'
-
-const members = [
-  {
-    avatar: 'https://www.github.com/Sm1les.png',
-    name: 'Sm1les',
-    title: '项目负责人',
-    links: [
-      { icon: 'github', link: 'https://github.com/Sm1les' },
-    ]
-  },
-  {
-    avatar: 'https://www.github.com/Sm1les.png',
-    name: '马里奥',
-    title: '核心贡献者',
-    links: [
-      { icon: 'github', link: 'https://github.com/Sm1les' },
-    ]
-  }
-]
-</script>
-
-
-<h2 align="center">Team</h2>
-<VPTeamMembers size="small" :members />

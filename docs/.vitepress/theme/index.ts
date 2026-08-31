@@ -7,10 +7,25 @@ import vImageViewer from 'vitepress-plugin-image-viewer/lib/vImageViewer.vue';
 import { useRoute } from 'vitepress';
 import { h } from 'vue';
 
-// 公告栏组件
-const Announcement = () => h('div', {
-    class: 'announcement-banner',
-}, '⚠️ Alpha内测版本警告：此为早期内部构建版本，尚不完整且可能存在错误，欢迎大家提Issue反馈问题或建议。')
+const announcementText = {
+    root: '⚠️ Alpha 内测版本 · Alpha preview: course content is incomplete and may change.',
+    zh: '⚠️ Alpha 内测版本：课程内容尚未完成，可能发生变更，欢迎通过 Issue 提交反馈。',
+    en: '⚠️ Alpha preview: course content is incomplete and may change. Feedback is welcome through Issues.'
+}
+
+const Announcement = {
+    setup() {
+        const route = useRoute()
+        return () => {
+            const locale = /\/en(?:\/|$)/.test(route.path)
+                ? 'en'
+                : /\/zh(?:\/|$)/.test(route.path)
+                  ? 'zh'
+                  : 'root'
+            return h('div', { class: 'announcement-banner' }, announcementText[locale])
+        }
+    }
+}
 
 export default {
     extends: DefaultTheme,
