@@ -10,4 +10,4 @@ status: planned
 
 # L05 · Inverse Kinematics, End-Effector Poses, and Cameras
 
-> This lesson is currently a planned structural scaffold. Its full content will be developed and reviewed during the L05 lesson phase.
+> This lesson has not been published yet. The complete lecture and companion notebook are still being prepared.

@@ -10,4 +10,4 @@ status: planned
 
 # L08 · Synthetic Data Recording and Collection Throughput
 
-> This lesson is currently a planned structural scaffold. Its full content will be developed and reviewed during the L08 lesson phase.
+> This lesson has not been published yet. The complete lecture and companion notebook are still being prepared.

@@ -10,4 +10,4 @@ status: planned
 
 # L04 · Robot Models, Degrees of Freedom, and Joint Control
 
-> This lesson is currently a planned structural scaffold. Its full content will be developed and reviewed during the L04 lesson phase.
+> This lesson has not been published yet. The complete lecture and companion notebook are still being prepared.

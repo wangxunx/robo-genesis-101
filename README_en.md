@@ -16,7 +16,7 @@ The course follows a concept–code–experiment–evidence loop: lectures expla
 - English course: <https://wangxunx.github.io/robo-genesis-101/en/>
 - 中文课程：<https://wangxunx.github.io/robo-genesis-101/zh/>
 
-The online site currently presents the course structure. Complete lesson content will be published progressively after lesson-level development and review.
+The online site currently presents the course outline and material status. Complete lesson content will be published progressively once it is ready and has been verified.
 
 ## Audience and prerequisites
 
@@ -112,7 +112,7 @@ This command uses the repository's portable dependency resolution; by itself it 
 uv run python -m robo_genesis.setup_assets
 ```
 
-The lesson notebooks and full experiments are still scheduled for later milestones. Do not treat the current scaffolds as finished tutorials.
+The lesson notebooks and full experiments have not been published yet. The current placeholders show the planned course structure and are not finished tutorials.
 
 ## Repository layout
 
