@@ -4,9 +4,12 @@ docs/.vitepress/cache
 
 # Python environments, caches, coverage, and build outputs
 .venv/
+.uv-cache/
 __pycache__/
 *.py[cod]
 .pytest_cache/
+# Jupyter 会在打开 notebook 时生成检查点副本，未忽略会破坏双语配对校验
+.ipynb_checkpoints/
 .coverage
 htmlcov/
 build/
