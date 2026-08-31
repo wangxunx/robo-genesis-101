@@ -23,8 +23,10 @@ Lectures and hands-on work form one learning path, not independent tracks. Reade
 ## Repository Layout
 
 - `docs/` — VitePress documentation source and course materials.
+- `docs/{zh,en}/lessons/` — paired bilingual lecture pages; M1 skeletons remain `planned` until their lesson-development gates pass.
 - `docs/.vitepress/config.mts` — site title, navigation, sidebar, links, and deployment base.
 - `docs/public/` — static assets published as-is by VitePress.
+- `notebooks/{zh,en}/` — paired lesson notebooks whose code cells must remain identical across locales.
 - `src/robo_genesis/` — installable Python package; currently the M1 skeleton for reusable course implementations.
 - `tests/` — Python package and behavior tests.
 - `course.json` — canonical bilingual lesson metadata, ordering, hardware requirements, paths, and publication status.
