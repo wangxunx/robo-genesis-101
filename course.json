@@ -49,7 +49,7 @@
         "zh": "docs/zh/lessons/l02-scenes-entities-and-simulation-lifecycle.md",
         "en": "docs/en/lessons/l02-scenes-entities-and-simulation-lifecycle.md"
       },
-      "status": "planned"
+      "status": "cpu-verified"
     },
     {
       "id": "L03",

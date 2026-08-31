@@ -5,14 +5,14 @@ locale: en
 title: "Scenes, Entities, and the Simulation Lifecycle"
 duration_minutes: 90
 hardware: cpu-ok
-status: planned
+status: cpu-verified
 ---
 
 # L02 · Scenes, Entities, and the Simulation Lifecycle
 
-> **Course status:** the lecture content is available, but the companion
-> executable notebook and its clean-kernel verification are not yet published.
-> L02 therefore remains `planned`.
+> **Course status:** the lecture and executable notebook are available. The
+> notebook has passed clean-kernel verification on CPU and on the reference AMD
+> ROCm platform, including offscreen rendering. L02 is `cpu-verified`.
 
 ## Where this lesson fits
 

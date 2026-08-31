@@ -2,10 +2,10 @@
 
 [简体中文](README.md)
 
-> **Project status: Alpha / course-infrastructure development.** All 12 lessons
-> are currently `planned` structural scaffolds. The presence of a page or
-> notebook does not mean its content, experiment, or learning outcome has been
-> completed or verified.
+> **Project status: Alpha / course development.** L02 now has bilingual lecture
+> and notebook content and has passed clean-kernel CPU verification, so its
+> status is `cpu-verified`; the other 11 lessons remain `planned`. The presence
+> of a page or notebook does not mean that lesson has been verified.
 
 RoboGenesis 101 is a Datawhale open-source course for learners with basic Python experience who want a structured, hands-on introduction to robot learning. Using Genesis as its simulation platform, the course connects environment diagnostics, scenes, and rigid-body physics with robot control, inverse kinematics, grasping, demonstration data, imitation learning, policy training, and closed-loop evaluation.
 
@@ -46,7 +46,7 @@ Training loss or open-loop action prediction is not treated as task success. The
 | Lesson | Topic | Planned duration | Hardware | Status |
 |---|---|---:|---|---|
 | L01 | [Introduction, Runtime Platforms, and Environment Diagnostics](docs/en/lessons/l01-introduction-and-environment-diagnostics.md) | 60 min | `cpu-ok` | `planned` |
-| L02 | [Scenes, Entities, and the Simulation Lifecycle](docs/en/lessons/l02-scenes-entities-and-simulation-lifecycle.md) | 90 min | `cpu-ok` | `planned` |
+| L02 | [Scenes, Entities, and the Simulation Lifecycle](docs/en/lessons/l02-scenes-entities-and-simulation-lifecycle.md) | 90 min | `cpu-ok` | `cpu-verified` |
 | L03 | [Rigid-Body Physics and Stable Simulation](docs/en/lessons/l03-rigid-body-physics-and-stable-simulation.md) | 90 min | `cpu-ok` | `planned` |
 | L04 | [Robot Models, Degrees of Freedom, and Joint Control](docs/en/lessons/l04-robot-models-dofs-and-joint-control.md) | 90 min | `cpu-ok` | `planned` |
 | L05 | [Inverse Kinematics, End-Effector Poses, and Cameras](docs/en/lessons/l05-inverse-kinematics-end-effector-poses-and-cameras.md) | 120 min | `cpu-ok` | `planned` |

@@ -29,7 +29,11 @@ def test_repository_manifest_defines_the_canonical_learning_path() -> None:
     assert [lesson.id for lesson in manifest.lessons] == [
         f"L{number:02d}" for number in range(1, 13)
     ]
-    assert all(lesson.status is CourseStatus.PLANNED for lesson in manifest.lessons)
+    assert [lesson.status for lesson in manifest.lessons] == [
+        CourseStatus.PLANNED,
+        CourseStatus.CPU_VERIFIED,
+        *([CourseStatus.PLANNED] * 10),
+    ]
     assert [lesson.hardware for lesson in manifest.lessons] == [
         *([HardwareRequirement.CPU_OK] * 6),
         *([HardwareRequirement.GPU_RECOMMENDED] * 4),

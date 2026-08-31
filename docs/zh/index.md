@@ -25,12 +25,13 @@ features:
 
 ## 课程状态
 
-> 当前 12 讲均为 `planned` 结构骨架。页面已经存在不代表讲义或实验已经完成。
+> L02 已完成双语讲义与 notebook，并在隔离环境中通过 CPU clean-kernel 验证，
+> 状态为 `cpu-verified`；其余 11 讲仍为 `planned`。页面已经存在不代表对应课程已经完成验证。
 
 | 讲次 | 主题 | 预计时长 | 硬件 | 状态 |
 |---|---|---:|---|---|
 | L01 | [导论、运行平台与环境诊断](/zh/lessons/l01-introduction-and-environment-diagnostics) | 60 分钟 | `cpu-ok` | `planned` |
-| L02 | [场景、实体与仿真生命周期](/zh/lessons/l02-scenes-entities-and-simulation-lifecycle) | 90 分钟 | `cpu-ok` | `planned` |
+| L02 | [场景、实体与仿真生命周期](/zh/lessons/l02-scenes-entities-and-simulation-lifecycle) | 90 分钟 | `cpu-ok` | `cpu-verified` |
 | L03 | [刚体物理与稳定仿真](/zh/lessons/l03-rigid-body-physics-and-stable-simulation) | 90 分钟 | `cpu-ok` | `planned` |
 | L04 | [机器人模型、DOF 与关节控制](/zh/lessons/l04-robot-models-dofs-and-joint-control) | 90 分钟 | `cpu-ok` | `planned` |
 | L05 | [逆运动学、末端位姿与相机](/zh/lessons/l05-inverse-kinematics-end-effector-poses-and-cameras) | 120 分钟 | `cpu-ok` | `planned` |

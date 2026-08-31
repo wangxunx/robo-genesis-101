@@ -165,3 +165,54 @@ M1.1 应完成而 M0.7 不提前实现以下工作：
 - 闭环策略 rollout、成功判据、成功率和置信区间留到 M3.8/L12，不得由当前开环动作推断。
 - 文档站构建验证只证明当前站点没有因本次 Markdown 文件变化而回归；`COMPATIBILITY.md` 尚未接入 VitePress 导航。
 - 本文件验收后成为 M1.1 的版本输入；后续若升级任一核心版本，必须重跑对应兼容性验证并更新本矩阵。
+
+## 9. L02 干净 kernel 验证
+
+> 验证日期：2026-08-31（Asia/Shanghai）
+>
+> 范围：L02 双语 notebook 的 CPU 最低能力、参考 AMD 后端和离屏渲染。以下结果不扩大第 5 节的平台支持范围。
+
+验证环境从系统 Python 3.12.3 新建，先用当前 `uv.lock` 安装默认依赖和 dev 组，再安装第 3.2 节列出的四个已校验 ROCm 7.2.1 wheels。PyTorch wheel 所需的 `filelock==3.32.4`、`sympy==1.14.0` 和 `mpmath==1.3.0` 取自同一 lock；当前项目以 editable 方式从本仓库加载。`uv pip check` 检查 175 个包并返回 `All installed packages are compatible`。
+
+| 项目 | 实测值 |
+| --- | --- |
+| Python | `3.12.3` |
+| Genesis | `1.3.3` |
+| PyTorch distribution | `2.9.1+rocm7.2.1.lw.gitff65f5bc` |
+| `torch.__version__` | `2.9.1+rocm7.2.1.gitff65f5bc` |
+| PyTorch HIP runtime | `7.2.53211-e1a6bc5663` |
+| 参考设备 | AMD Radeon AI PRO R9700；本轮将一张物理卡映射为进程内 `cuda:0` |
+
+四次执行均由 `jupyter nbconvert --execute --to notebook` 启动独立 kernel；执行后的 notebook 写入临时目录，仓库中的 notebook 保持无 output、`execution_count: null`。命令中的 `<env>` 和 `<tmp>` 分别表示本轮临时虚拟环境及临时输出目录：
+
+```sh
+ROCR_VISIBLE_DEVICES=0 ROBO_GENESIS_BACKEND=auto ROBO_GENESIS_RENDER=0 \
+  <env>/bin/jupyter nbconvert --execute --to notebook \
+  --ExecutePreprocessor.timeout=600 --output en-auto.ipynb --output-dir <tmp> \
+  notebooks/en/l02-scenes-entities-and-simulation-lifecycle.ipynb
+
+ROBO_GENESIS_BACKEND=cpu ROBO_GENESIS_RENDER=0 \
+  <env>/bin/jupyter nbconvert --execute --to notebook \
+  --ExecutePreprocessor.timeout=600 --output zh-cpu.ipynb --output-dir <tmp> \
+  notebooks/zh/l02-scenes-entities-and-simulation-lifecycle.ipynb
+
+ROBO_GENESIS_BACKEND=cpu ROBO_GENESIS_RENDER=0 \
+  <env>/bin/jupyter nbconvert --execute --to notebook \
+  --ExecutePreprocessor.timeout=600 --output en-cpu.ipynb --output-dir <tmp> \
+  notebooks/en/l02-scenes-entities-and-simulation-lifecycle.ipynb
+
+PYOPENGL_PLATFORM=egl ROCR_VISIBLE_DEVICES=0 \
+  ROBO_GENESIS_BACKEND=auto ROBO_GENESIS_RENDER=1 \
+  <env>/bin/jupyter nbconvert --execute --to notebook \
+  --ExecutePreprocessor.timeout=600 --output en-amd-render.ipynb --output-dir <tmp> \
+  notebooks/en/l02-scenes-entities-and-simulation-lifecycle.ipynb
+```
+
+| notebook / 能力路径 | backend mode → 实际 backend | 渲染 | 执行时间 | 关键观察 |
+| --- | --- | --- | ---: | --- |
+| EN / AMD 核心路径 | `auto` → `gs.amdgpu` | 关闭并明确报告 `SKIP` | 38.90 秒 | build、单 link/geom 层级、20 步状态和两个预期异常均通过；状态张量位于 `cuda:0`。 |
+| ZH / CPU 最低路径 | `cpu` → `gs.cpu` | 关闭并明确报告 `SKIP` | 32.65 秒 | 与 AMD 路径相同的核心断言全部通过；状态张量位于 CPU。 |
+| EN / CPU 最低路径 | `cpu` → `gs.cpu` | 关闭并明确报告 `SKIP` | 33.18 秒 | 状态更新后再次从头执行；输出报告 `lesson_status: cpu-verified`，核心断言全部通过。 |
+| EN / AMD 离屏渲染 | `auto` → `gs.amdgpu` | `PASS` | 51.17 秒 | RGB 为 `(360, 640, 3)`、`uint8`、全部有限，像素范围 `[10, 204]`；未触发 fallback。 |
+
+四次运行的初始高度均为 `0.5 m`，20 步后为约 `0.298895 m`，下降约 `0.201105 m`。这些数值记录本次 smoke 的实际观察，不是面向所有硬件的硬编码课程预期。EN/ZH 两份 notebook 都已从头执行；英文 notebook 本身同时通过 AMD 与 CPU 路径，双语 code cell 源码和 ID 保持一致。

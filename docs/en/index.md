@@ -25,12 +25,12 @@ features:
 
 ## Course status
 
-> All 12 lessons are currently `planned` structural scaffolds. An existing page does not mean that its lecture or experiment is complete.
+> L02 now has bilingual lecture and notebook content and has passed clean-kernel CPU verification, so its status is `cpu-verified`; the other 11 lessons remain `planned`. An existing page does not mean that lesson has been verified.
 
 | Lesson | Topic | Planned duration | Hardware | Status |
 |---|---|---:|---|---|
 | L01 | [Introduction, Runtime Platforms, and Environment Diagnostics](/en/lessons/l01-introduction-and-environment-diagnostics) | 60 min | `cpu-ok` | `planned` |
-| L02 | [Scenes, Entities, and the Simulation Lifecycle](/en/lessons/l02-scenes-entities-and-simulation-lifecycle) | 90 min | `cpu-ok` | `planned` |
+| L02 | [Scenes, Entities, and the Simulation Lifecycle](/en/lessons/l02-scenes-entities-and-simulation-lifecycle) | 90 min | `cpu-ok` | `cpu-verified` |
 | L03 | [Rigid-Body Physics and Stable Simulation](/en/lessons/l03-rigid-body-physics-and-stable-simulation) | 90 min | `cpu-ok` | `planned` |
 | L04 | [Robot Models, Degrees of Freedom, and Joint Control](/en/lessons/l04-robot-models-dofs-and-joint-control) | 90 min | `cpu-ok` | `planned` |
 | L05 | [Inverse Kinematics, End-Effector Poses, and Cameras](/en/lessons/l05-inverse-kinematics-end-effector-poses-and-cameras) | 120 min | `cpu-ok` | `planned` |

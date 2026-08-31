@@ -5,13 +5,14 @@ locale: zh
 title: "场景、实体与仿真生命周期"
 duration_minutes: 90
 hardware: cpu-ok
-status: planned
+status: cpu-verified
 ---
 
 # L02 · 场景、实体与仿真生命周期
 
-> **课程状态：** 讲义内容已经提供，但配套的可执行 notebook 及其干净
-> kernel 验证尚未发布，因此 L02 仍保持 `planned`。
+> **课程状态：** 讲义和可执行 notebook 均已提供。notebook 已在 CPU 和参考
+> AMD ROCm 平台上通过干净 kernel 验证，其中包括离屏渲染；L02 状态为
+> `cpu-verified`。
 
 ## 本讲定位
 
