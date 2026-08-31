@@ -23,6 +23,9 @@ dependencies = [
     "trimesh==5.0.0",
 ]
 
+[project.scripts]
+robo-genesis-validate = "robo_genesis.course_validation:main"
+
 [project.optional-dependencies]
 data = [
     "imageio==2.37.4",

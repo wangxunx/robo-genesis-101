@@ -28,11 +28,13 @@ Lectures and hands-on work form one learning path, not independent tracks. Reade
 - `docs/public/` — static assets published as-is by VitePress.
 - `notebooks/{zh,en}/` — paired lesson notebooks whose code cells must remain identical across locales.
 - `src/robo_genesis/` — installable Python package; currently the M1 skeleton for reusable course implementations.
+- `scripts/validate_course.py` — thin entry point for the installed repository-wide course validator.
 - `tests/` — Python package and behavior tests.
 - `course.json` — canonical bilingual lesson metadata, ordering, hardware requirements, paths, and publication status.
 - `pyproject.toml` / `uv.lock` — Python package metadata and reproducible dependency resolution.
 - `package.json` / `package-lock.json` — documentation dependencies and commands.
-- `.github/workflows/deploy.yml` — GitHub Pages build and deployment workflow.
+- `.github/workflows/validate.yml` — pull-request gate for course contracts, tests, and the documentation build.
+- `.github/workflows/deploy.yml` — GitHub Pages build and deployment workflow, including the same Python gates before upload.
 
 When notebooks, Python source, generation scripts, or multilingual directories are added, document their responsibilities here. Do not assume that directories or commands mentioned only in the course plan are available.
 
@@ -82,6 +84,7 @@ When notebooks, Python source, generation scripts, or multilingual directories a
 Before handing off a change, run at least:
 
 ```sh
+PYTHONPATH=src python3 -m robo_genesis.course_validation
 git diff --check
 npm run docs:build
 ```
@@ -103,5 +106,9 @@ npm run docs:dev
 Build the documentation with:
 ```sh
 npm run docs:build
+```
+Run the repository-wide course gate with:
+```sh
+PYTHONPATH=src python3 -m robo_genesis.course_validation
 ```
 Use `npm install <package>` only when intentionally adding or updating a dependency. Commit both `package.json` and `package-lock.json` when dependencies change.

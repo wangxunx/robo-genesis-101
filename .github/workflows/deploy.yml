@@ -32,6 +32,24 @@ jobs:
         uses: actions/checkout@v5
         with:
           fetch-depth: 0 # 如果未启用 lastUpdated，则不需要
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - name: Install Python validation environment
+        run: |
+          uv sync --only-group dev --locked
+          uv pip install --python .venv/bin/python --no-deps --editable .
+      - name: Validate bilingual course contracts
+        run: .venv/bin/python -m robo_genesis.course_validation
+      - name: Run Python tests
+        run: .venv/bin/python -m pytest
+      - name: Compile Python sources
+        run: .venv/bin/python -m compileall -q src scripts tests
       # - uses: pnpm/action-setup@v4 # 如果使用 pnpm，请取消此区域注释
       #   with:
       #     version: 9
