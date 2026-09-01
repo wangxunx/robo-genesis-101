@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import importlib.metadata as package_metadata
 from pathlib import Path
 
 import numpy as np
@@ -15,7 +16,10 @@ from ..course_utils import select_backend, to_numpy
 # NOTEBOOK_CONSTANTS_BEGIN
 TABLE_CENTER_Z = 0.70
 TABLE_HEIGHT = 0.05
+TABLE_SIZE = (2.0, 0.8, TABLE_HEIGHT)
+TABLE_POSITION = (0.0, 0.0, TABLE_CENTER_Z)
 CUBE_SIZE = 0.08
+CUBE_DENSITY = 500.0
 RESTING_CENTER_Z = TABLE_CENTER_Z + TABLE_HEIGHT / 2 + CUBE_SIZE / 2
 LOW_LANE_Y = -0.15
 HIGH_LANE_Y = 0.15
@@ -25,6 +29,7 @@ START_X = -0.60
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
+    parser.add_argument("--backend", choices=("auto", "cpu"), default="auto")
     parser.add_argument("--dt", type=float, default=0.01)
     parser.add_argument("--substeps", type=int, default=2)
     parser.add_argument("--settle-duration", type=float, default=0.30)
@@ -42,35 +47,96 @@ def parse_args() -> argparse.Namespace:
 # NOTEBOOK_HELPER_BEGIN
 def sustained_stop_index(speed: np.ndarray, threshold: float, hold_samples: int) -> int:
     """Return the first sample starting a sustained below-threshold interval."""
+    speed = np.asarray(speed, dtype=float)
+    if speed.ndim != 1 or speed.size == 0 or not np.isfinite(speed).all():
+        raise ValueError("speed must be a non-empty, finite 1-D array")
+    if threshold < 0:
+        raise ValueError("threshold must be non-negative")
+    if hold_samples < 1:
+        raise ValueError("hold_samples must be positive")
     below = np.abs(speed) < threshold
     for index in range(0, len(speed) - hold_samples + 1):
         if np.all(below[index : index + hold_samples]):
             return index
     return -1
+
+
+def validated_step_count(duration: float, dt: float, *, label: str) -> int:
+    """Return an exact step count for a positive duration and timestep."""
+    if duration <= 0 or dt <= 0:
+        raise ValueError(f"{label} and dt must be positive")
+    n_steps = round(duration / dt)
+    if n_steps < 1 or not np.isclose(n_steps * dt, duration, rtol=0.0, atol=1e-12):
+        raise ValueError(f"{label} must be an integer multiple of dt")
+    return n_steps
+
+
+def effective_pair_friction(table_friction: float, cube_friction: float) -> float:
+    """Return the Genesis 1.3.3 rigid-pair value for the default ratio of one."""
+    if table_friction < 0 or cube_friction < 0:
+        raise ValueError("friction values must be non-negative")
+    return max(table_friction, cube_friction)
+
+
+def friction_relationship_checks(
+    baseline_low_distance: float,
+    baseline_high_distance: float,
+    modified_low_distance: float,
+    modified_high_distance: float,
+    *,
+    unchanged_tolerance: float,
+) -> dict[str, bool]:
+    """Evaluate the directional L03 friction relationships without fixed outputs."""
+    values = (
+        baseline_low_distance,
+        baseline_high_distance,
+        modified_low_distance,
+        modified_high_distance,
+        unchanged_tolerance,
+    )
+    if not np.isfinite(values).all() or min(values) < 0:
+        raise ValueError("distances and tolerance must be finite and non-negative")
+    return {
+        "baseline_low_lane_travels_farther": baseline_low_distance > baseline_high_distance,
+        "modified_low_lane_travels_farther": modified_low_distance > baseline_low_distance,
+        "high_lane_approximately_unchanged": (
+            abs(modified_high_distance - baseline_high_distance) <= unchanged_tolerance
+        ),
+    }
 # NOTEBOOK_HELPER_END
 
 
 def main() -> int:
     args = parse_args()
-    positive = (args.dt, args.substeps, args.settle_duration, args.measure_duration, args.initial_vx)
-    if any(value <= 0 for value in positive):
-        raise ValueError("dt, substeps, durations, and initial_vx must be positive")
-    if min(args.table_friction, args.low_friction, args.high_friction, args.stop_speed, args.stop_hold) < 0:
-        raise ValueError("friction and stopping thresholds must be non-negative")
+    if args.substeps <= 0 or args.initial_vx <= 0:
+        raise ValueError("substeps and initial_vx must be positive")
+    if min(args.table_friction, args.low_friction, args.high_friction, args.stop_speed) < 0:
+        raise ValueError("friction and stop_speed must be non-negative")
+    if args.stop_hold <= 0:
+        raise ValueError("stop_hold must be positive")
 
     # NOTEBOOK_CORE_BEGIN
-    settle_steps = round(args.settle_duration / args.dt)
-    measure_steps = round(args.measure_duration / args.dt)
+    settle_steps = validated_step_count(args.settle_duration, args.dt, label="settle-duration")
+    measure_steps = validated_step_count(args.measure_duration, args.dt, label="measure-duration")
     hold_samples = max(1, round(args.stop_hold / args.dt))
-    if not np.isclose(settle_steps * args.dt, args.settle_duration):
-        raise ValueError("settle-duration must be an integer multiple of dt")
-    if not np.isclose(measure_steps * args.dt, args.measure_duration):
-        raise ValueError("measure-duration must be an integer multiple of dt")
 
     import genesis as gs
+    import torch
 
-    backend = select_backend(prefer_rocm=True)
+    if args.backend == "cpu":
+        backend = gs.cpu
+        print("Backend: CPU (explicit request)")
+    else:
+        backend = select_backend(prefer_rocm=True)
     gs.init(backend=backend, seed=0, precision="32", logging_level="warning")
+    if getattr(gs, "amdgpu", None) is not None and gs.backend == gs.amdgpu:
+        actual_backend = "amdgpu"
+    elif gs.backend == gs.cpu:
+        actual_backend = "cpu"
+    else:
+        actual_backend = str(gs.backend)
+    genesis_version = package_metadata.version("genesis-world")
+    torch_version = str(torch.__version__)
 
     scene = gs.Scene(
         sim_options=gs.options.SimOptions(dt=args.dt, substeps=args.substeps),
@@ -78,26 +144,19 @@ def main() -> int:
         show_viewer=False,
     )
     table = scene.add_entity(
-        gs.morphs.Box(size=(2.0, 0.8, TABLE_HEIGHT), pos=(0.0, 0.0, TABLE_CENTER_Z), fixed=True),
+        gs.morphs.Box(size=TABLE_SIZE, pos=TABLE_POSITION, fixed=True),
         material=gs.materials.Rigid(friction=args.table_friction),
         surface=gs.surfaces.Default(color=(0.55, 0.38, 0.22, 1.0)),
     )
     cube_low = scene.add_entity(
         gs.morphs.Box(size=(CUBE_SIZE,) * 3, pos=(START_X, LOW_LANE_Y, RESTING_CENTER_Z)),
-        material=gs.materials.Rigid(rho=500.0, friction=args.low_friction),
+        material=gs.materials.Rigid(rho=CUBE_DENSITY, friction=args.low_friction),
         surface=gs.surfaces.Default(color=(0.95, 0.50, 0.15, 1.0)),
     )
     cube_high = scene.add_entity(
         gs.morphs.Box(size=(CUBE_SIZE,) * 3, pos=(START_X, HIGH_LANE_Y, RESTING_CENTER_Z)),
-        material=gs.materials.Rigid(rho=500.0, friction=args.high_friction),
+        material=gs.materials.Rigid(rho=CUBE_DENSITY, friction=args.high_friction),
         surface=gs.surfaces.Default(color=(0.15, 0.45, 0.85, 1.0)),
-    )
-    camera = scene.add_camera(
-        res=(720, 400),
-        pos=(1.25, -1.55, 1.35),
-        lookat=(0.0, 0.0, 0.72),
-        fov=46,
-        GUI=False,
     )
     scene.build()
 
@@ -107,14 +166,6 @@ def main() -> int:
 
     start_low = to_numpy(cube_low.get_pos()).reshape(-1).copy()
     start_high = to_numpy(cube_high.get_pos()).reshape(-1).copy()
-    initial_rgb = np.empty((0,), dtype=np.uint8)
-    final_rgb = np.empty((0,), dtype=np.uint8)
-    render_error = ""
-    try:
-        initial_rgb = to_numpy(camera.render(rgb=True)[0])
-    except Exception as exc:
-        render_error = f"{type(exc).__name__}: {exc}"
-
     initial_dofs_velocity = np.array([args.initial_vx, 0.0, 0.0, 0.0, 0.0, 0.0])
     cube_low.set_dofs_velocity(initial_dofs_velocity)
     cube_high.set_dofs_velocity(initial_dofs_velocity)
@@ -144,13 +195,6 @@ def main() -> int:
         scene.step()
         record(index)
 
-    if not render_error:
-        try:
-            final_rgb = to_numpy(camera.render(rgb=True)[0])
-        except Exception as exc:
-            render_error = f"{type(exc).__name__}: {exc}"
-            initial_rgb = np.empty((0,), dtype=np.uint8)
-
     stop_index_low = sustained_stop_index(vx_low, args.stop_speed, hold_samples)
     stop_index_high = sustained_stop_index(vx_high, args.stop_speed, hold_samples)
     stop_time_low = time_values[stop_index_low] if stop_index_low >= 0 else np.nan
@@ -162,6 +206,13 @@ def main() -> int:
     args.output.parent.mkdir(parents=True, exist_ok=True)
     np.savez_compressed(
         args.output,
+        requested_backend=np.asarray(args.backend),
+        actual_backend=np.asarray(actual_backend),
+        genesis_version=np.asarray(genesis_version),
+        torch_version=np.asarray(torch_version),
+        torch_hip=np.asarray(torch.version.hip or "none"),
+        seed=np.asarray(0),
+        precision=np.asarray("32"),
         dt=np.asarray(args.dt),
         substeps=np.asarray(args.substeps),
         substep_dt=np.asarray(args.dt / args.substeps),
@@ -173,6 +224,23 @@ def main() -> int:
         high_friction=np.asarray(args.high_friction),
         stop_speed=np.asarray(args.stop_speed),
         stop_hold=np.asarray(args.stop_hold),
+        settle_steps=np.asarray(settle_steps),
+        measure_steps=np.asarray(measure_steps),
+        hold_samples=np.asarray(hold_samples),
+        table_size=np.asarray(TABLE_SIZE),
+        table_position=np.asarray(TABLE_POSITION),
+        cube_size=np.asarray(CUBE_SIZE),
+        cube_density=np.asarray(CUBE_DENSITY),
+        resting_center_z=np.asarray(RESTING_CENTER_Z),
+        low_lane_y=np.asarray(LOW_LANE_Y),
+        high_lane_y=np.asarray(HIGH_LANE_Y),
+        start_x=np.asarray(START_X),
+        effective_low_friction=np.asarray(
+            effective_pair_friction(args.table_friction, args.low_friction)
+        ),
+        effective_high_friction=np.asarray(
+            effective_pair_friction(args.table_friction, args.high_friction)
+        ),
         time=time_values,
         x_low=x_low,
         x_high=x_high,
@@ -192,12 +260,11 @@ def main() -> int:
         stop_distance_high=np.asarray(stop_distance_high),
         final_distance_low=np.asarray(x_low[-1] - x_low[0]),
         final_distance_high=np.asarray(x_high[-1] - x_high[0]),
-        initial_rgb=initial_rgb,
-        final_rgb=final_rgb,
-        render_error=np.asarray(render_error),
     )
     print(
-        f"saved {args.output} | low-μ stop={stop_time_low:.3f} s, {stop_distance_low:.3f} m | "
+        f"saved {args.output} | requested={args.backend}, actual={actual_backend}, "
+        f"genesis={genesis_version}, torch={torch_version} | "
+        f"low-μ stop={stop_time_low:.3f} s, {stop_distance_low:.3f} m | "
         f"high-μ stop={stop_time_high:.3f} s, {stop_distance_high:.3f} m"
     )
     return 0

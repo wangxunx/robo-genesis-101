@@ -9,6 +9,8 @@ to restart the notebook kernel between cases.
 from __future__ import annotations
 
 import argparse
+import importlib.metadata as package_metadata
+from collections.abc import Mapping
 from pathlib import Path
 
 import numpy as np
@@ -20,13 +22,20 @@ from ..course_utils import select_backend, to_numpy
 # NOTEBOOK_CONSTANTS_BEGIN
 TABLE_CENTER_Z = 0.70
 TABLE_HEIGHT = 0.05
+TABLE_SIZE = (0.9, 0.6, TABLE_HEIGHT)
+TABLE_POSITION = (0.35, 0.0, TABLE_CENTER_Z)
+TABLE_FRICTION = 0.8
 CUBE_SIZE = 0.08
+CUBE_INITIAL_POSITION = (0.35, 0.0, 1.0)
+CUBE_DENSITY = 500.0
+CUBE_FRICTION = 0.5
 EXPECTED_CENTER_Z = TABLE_CENTER_Z + TABLE_HEIGHT / 2 + CUBE_SIZE / 2
 # NOTEBOOK_CONSTANTS_END
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
+    parser.add_argument("--backend", choices=("auto", "cpu"), default="auto")
     parser.add_argument("--dt", type=float, required=True)
     parser.add_argument("--substeps", type=int, required=True)
     parser.add_argument("--duration", type=float, default=1.5)
@@ -38,23 +47,97 @@ def parse_args() -> argparse.Namespace:
 def first_true_index(mask: np.ndarray) -> int:
     indices = np.flatnonzero(mask)
     return int(indices[0]) if indices.size else -1
+
+
+def validated_step_count(duration: float, dt: float) -> int:
+    """Return an exact outer-step count for a positive duration and timestep."""
+    if duration <= 0 or dt <= 0:
+        raise ValueError("duration and dt must be positive")
+    n_steps = round(duration / dt)
+    if n_steps < 1 or not np.isclose(n_steps * dt, duration, rtol=0.0, atol=1e-12):
+        raise ValueError("duration must be an integer multiple of dt")
+    return n_steps
+
+
+def shared_sample_indices(
+    left_time: np.ndarray,
+    right_time: np.ndarray,
+    *,
+    decimals: int = 12,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Return indices for common timestamps in two increasing 1-D timelines."""
+    timelines = []
+    for name, values in (("left_time", left_time), ("right_time", right_time)):
+        timeline = np.asarray(values, dtype=float)
+        if timeline.ndim != 1 or timeline.size == 0:
+            raise ValueError(f"{name} must be a non-empty 1-D array")
+        if not np.isfinite(timeline).all() or np.any(np.diff(timeline) <= 0):
+            raise ValueError(f"{name} must contain finite, strictly increasing timestamps")
+        timelines.append(np.round(timeline, decimals=decimals))
+
+    _, left_indices, right_indices = np.intersect1d(
+        timelines[0], timelines[1], assume_unique=True, return_indices=True
+    )
+    if left_indices.size == 0:
+        raise ValueError("timelines have no common sample timestamps")
+    return left_indices, right_indices
+
+
+def contact_relationship_checks(
+    penetrations: Mapping[str, float],
+    shared_z_difference: float,
+    shared_vz_difference: float,
+    *,
+    shared_z_tolerance: float,
+    shared_vz_tolerance: float,
+) -> dict[str, bool]:
+    """Evaluate the directional L03 contact relationships without fixed outputs."""
+    required = {"N1", "N2", "N3", "N4"}
+    if set(penetrations) != required:
+        raise ValueError(f"penetrations must contain exactly {sorted(required)}")
+    numeric_values = [
+        *penetrations.values(),
+        shared_z_difference,
+        shared_vz_difference,
+        shared_z_tolerance,
+        shared_vz_tolerance,
+    ]
+    if not np.isfinite(numeric_values).all() or min(numeric_values) < 0:
+        raise ValueError("contact metrics and tolerances must be finite and non-negative")
+    return {
+        "N1_to_N2_penetration_decreased": penetrations["N2"] < penetrations["N1"],
+        "N3_to_N4_penetration_decreased": penetrations["N4"] < penetrations["N3"],
+        "N1_N4_shared_z_within_tolerance": shared_z_difference <= shared_z_tolerance,
+        "N1_N4_shared_vz_within_tolerance": shared_vz_difference <= shared_vz_tolerance,
+    }
 # NOTEBOOK_HELPER_END
 
 
 def main() -> int:
     args = parse_args()
-    if args.dt <= 0 or args.substeps <= 0 or args.duration <= 0:
-        raise ValueError("dt, substeps, and duration must be positive")
+    if args.substeps <= 0:
+        raise ValueError("substeps must be positive")
 
     # NOTEBOOK_CORE_BEGIN
-    n_steps = round(args.duration / args.dt)
-    if not np.isclose(n_steps * args.dt, args.duration):
-        raise ValueError("duration must be an integer multiple of dt")
+    n_steps = validated_step_count(args.duration, args.dt)
 
     import genesis as gs
+    import torch
 
-    backend = select_backend(prefer_rocm=True)
+    if args.backend == "cpu":
+        backend = gs.cpu
+        print("Backend: CPU (explicit request)")
+    else:
+        backend = select_backend(prefer_rocm=True)
     gs.init(backend=backend, seed=0, precision="32", logging_level="warning")
+    if getattr(gs, "amdgpu", None) is not None and gs.backend == gs.amdgpu:
+        actual_backend = "amdgpu"
+    elif gs.backend == gs.cpu:
+        actual_backend = "cpu"
+    else:
+        actual_backend = str(gs.backend)
+    genesis_version = package_metadata.version("genesis-world")
+    torch_version = str(torch.__version__)
 
     scene = gs.Scene(
         sim_options=gs.options.SimOptions(dt=args.dt, substeps=args.substeps),
@@ -63,32 +146,17 @@ def main() -> int:
     )
     scene.add_entity(gs.morphs.Plane())
     table = scene.add_entity(
-        gs.morphs.Box(size=(0.9, 0.6, TABLE_HEIGHT), pos=(0.35, 0.0, TABLE_CENTER_Z), fixed=True),
-        material=gs.materials.Rigid(friction=0.8),
+        gs.morphs.Box(size=TABLE_SIZE, pos=TABLE_POSITION, fixed=True),
+        material=gs.materials.Rigid(friction=TABLE_FRICTION),
         surface=gs.surfaces.Default(color=(0.55, 0.38, 0.22, 1.0)),
     )
     cube = scene.add_entity(
-        gs.morphs.Box(size=(CUBE_SIZE, CUBE_SIZE, CUBE_SIZE), pos=(0.35, 0.0, 1.0)),
-        material=gs.materials.Rigid(rho=500.0, friction=0.5),
+        gs.morphs.Box(size=(CUBE_SIZE,) * 3, pos=CUBE_INITIAL_POSITION),
+        material=gs.materials.Rigid(rho=CUBE_DENSITY, friction=CUBE_FRICTION),
         surface=gs.surfaces.Default(color=(0.15, 0.70, 0.45, 1.0)),
-    )
-    camera = scene.add_camera(
-        res=(640, 360),
-        pos=(1.45, -1.35, 1.25),
-        lookat=(0.35, 0.0, 0.78),
-        fov=42,
-        GUI=False,
     )
     scene.build()
     initial_cube_pos = to_numpy(cube.get_pos()).reshape(-1).copy()
-
-    initial_rgb = np.empty((0,), dtype=np.uint8)
-    final_rgb = np.empty((0,), dtype=np.uint8)
-    render_error = ""
-    try:
-        initial_rgb = to_numpy(camera.render(rgb=True)[0])
-    except Exception as exc:  # numerical evidence remains useful without camera output
-        render_error = f"{type(exc).__name__}: {exc}"
 
     # Record state once after each outer scene.step(). Event times are therefore
     # quantized by dt rather than resolved continuously at substep_dt.
@@ -103,13 +171,6 @@ def main() -> int:
         vz_history[index] = float(to_numpy(cube.get_vel()).reshape(-1)[2])
         contacts = cube.get_contacts(with_entity=table)
         contact_counts[index] = int(contacts["position"].shape[0])
-
-    if not render_error:
-        try:
-            final_rgb = to_numpy(camera.render(rgb=True)[0])
-        except Exception as exc:
-            render_error = f"{type(exc).__name__}: {exc}"
-            initial_rgb = np.empty((0,), dtype=np.uint8)
 
     contact_mask = contact_counts > 0
     first_contact_index = first_true_index(contact_mask)
@@ -153,11 +214,25 @@ def main() -> int:
     args.output.parent.mkdir(parents=True, exist_ok=True)
     np.savez_compressed(
         args.output,
+        requested_backend=np.asarray(args.backend),
+        actual_backend=np.asarray(actual_backend),
+        genesis_version=np.asarray(genesis_version),
+        torch_version=np.asarray(torch_version),
+        torch_hip=np.asarray(torch.version.hip or "none"),
+        seed=np.asarray(0),
+        precision=np.asarray("32"),
         dt=np.asarray(args.dt),
         substeps=np.asarray(args.substeps),
         substep_dt=np.asarray(args.dt / args.substeps),
         duration=np.asarray(args.duration),
         n_steps=np.asarray(n_steps),
+        table_size=np.asarray(TABLE_SIZE),
+        table_position=np.asarray(TABLE_POSITION),
+        table_friction=np.asarray(TABLE_FRICTION),
+        cube_size=np.asarray(CUBE_SIZE),
+        cube_initial_position=np.asarray(CUBE_INITIAL_POSITION),
+        cube_density=np.asarray(CUBE_DENSITY),
+        cube_friction=np.asarray(CUBE_FRICTION),
         time=time_values,
         z=z_history,
         vz=vz_history,
@@ -174,12 +249,11 @@ def main() -> int:
         settling_error=np.asarray(settling_error),
         initial_cube_pos=initial_cube_pos,
         final_cube_pos=to_numpy(cube.get_pos()).reshape(-1),
-        initial_rgb=initial_rgb,
-        final_rgb=final_rgb,
-        render_error=np.asarray(render_error),
     )
     print(
-        f"saved {args.output} | dt={args.dt:g}, substeps={args.substeps}, "
+        f"saved {args.output} | requested={args.backend}, actual={actual_backend}, "
+        f"genesis={genesis_version}, torch={torch_version} | "
+        f"dt={args.dt:g}, substeps={args.substeps}, "
         f"substep_dt={args.dt / args.substeps:g}, "
         f"penetration={penetration * 1000:.3f} mm"
     )
