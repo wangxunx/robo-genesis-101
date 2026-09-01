@@ -5,13 +5,15 @@ locale: en
 title: "Rigid-Body Physics and Stable Simulation"
 duration_minutes: 90
 hardware: cpu-ok
-status: planned
+status: cpu-verified
 ---
 
 # L03 · Rigid-Body Physics and Stable Simulation
 
-> **Course status:** L03 is still `planned`. The complete bilingual lesson and
-> executable notebook have not been published yet.
+> **Course status:** the lecture and executable notebook are available. The
+> notebook has passed clean-kernel verification on CPU and on the reference AMD
+> ROCm platform. L03 is `cpu-verified` because CPU remains its minimum hardware
+> contract.
 
 ## Where this lesson fits
 

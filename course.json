@@ -68,7 +68,7 @@
         "zh": "docs/zh/lessons/l03-rigid-body-physics-and-stable-simulation.md",
         "en": "docs/en/lessons/l03-rigid-body-physics-and-stable-simulation.md"
       },
-      "status": "planned"
+      "status": "cpu-verified"
     },
     {
       "id": "L04",

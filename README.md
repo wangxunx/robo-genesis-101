@@ -48,7 +48,7 @@ RoboGenesis 101 是一门 Datawhale 开源课程，面向具备 Python 基础、
 |---|---|---:|---|---|
 | L01 | [导论、运行平台与环境诊断](docs/zh/lessons/l01-introduction-and-environment-diagnostics.md) | 30 分钟 | `cpu-ok` | `cpu-verified` |
 | L02 | [场景、实体与仿真生命周期](docs/zh/lessons/l02-scenes-entities-and-simulation-lifecycle.md) | 90 分钟 | `cpu-ok` | `cpu-verified` |
-| L03 | [刚体物理与稳定仿真](docs/zh/lessons/l03-rigid-body-physics-and-stable-simulation.md) | 90 分钟 | `cpu-ok` | `planned` |
+| L03 | [刚体物理与稳定仿真](docs/zh/lessons/l03-rigid-body-physics-and-stable-simulation.md) | 90 分钟 | `cpu-ok` | `cpu-verified` |
 | L04 | [机器人模型、DOF 与关节控制](docs/zh/lessons/l04-robot-models-dofs-and-joint-control.md) | 90 分钟 | `cpu-ok` | `planned` |
 | L05 | [逆运动学、末端位姿与相机](docs/zh/lessons/l05-inverse-kinematics-end-effector-poses-and-cameras.md) | 120 分钟 | `cpu-ok` | `planned` |
 | L06 | [抓取任务场景搭建](docs/zh/lessons/l06-building-a-grasping-task-scene.md) | 120 分钟 | `cpu-ok` | `planned` |

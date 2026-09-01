@@ -5,12 +5,14 @@ locale: zh
 title: "刚体物理与稳定仿真"
 duration_minutes: 90
 hardware: cpu-ok
-status: planned
+status: cpu-verified
 ---
 
 # L03 · 刚体物理与稳定仿真
 
-> **课程状态：** L03 仍为 `planned`，完整的双语讲义和可执行 notebook 尚未发布。
+> **课程状态：** 讲义和可执行 notebook 均已提供。notebook 已在 CPU 和参考 AMD
+> ROCm 平台上通过干净 kernel 验证；由于 CPU 仍是本讲的最低硬件要求，L03 状态为
+> `cpu-verified`。
 
 ## 本讲定位
 

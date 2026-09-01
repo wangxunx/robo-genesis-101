@@ -49,7 +49,7 @@ Training loss or open-loop action prediction is not treated as task success. The
 |---|---|---:|---|---|
 | L01 | [Introduction, Runtime Platforms, and Environment Diagnostics](docs/en/lessons/l01-introduction-and-environment-diagnostics.md) | 30 min | `cpu-ok` | `cpu-verified` |
 | L02 | [Scenes, Entities, and the Simulation Lifecycle](docs/en/lessons/l02-scenes-entities-and-simulation-lifecycle.md) | 90 min | `cpu-ok` | `cpu-verified` |
-| L03 | [Rigid-Body Physics and Stable Simulation](docs/en/lessons/l03-rigid-body-physics-and-stable-simulation.md) | 90 min | `cpu-ok` | `planned` |
+| L03 | [Rigid-Body Physics and Stable Simulation](docs/en/lessons/l03-rigid-body-physics-and-stable-simulation.md) | 90 min | `cpu-ok` | `cpu-verified` |
 | L04 | [Robot Models, Degrees of Freedom, and Joint Control](docs/en/lessons/l04-robot-models-dofs-and-joint-control.md) | 90 min | `cpu-ok` | `planned` |
 | L05 | [Inverse Kinematics, End-Effector Poses, and Cameras](docs/en/lessons/l05-inverse-kinematics-end-effector-poses-and-cameras.md) | 120 min | `cpu-ok` | `planned` |
 | L06 | [Building a Grasping Task Scene](docs/en/lessons/l06-building-a-grasping-task-scene.md) | 120 min | `cpu-ok` | `planned` |
