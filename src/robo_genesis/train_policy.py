@@ -18,10 +18,12 @@ Usage:
         --repo-id genesis/banana_pick \
         --dataset-root datasets/banana_pick_50ep
 
-    # SmolVLA (fine-tuned from the pretrained base), fewer steps
+    # SmolVLA (fine-tuned from pinned local base and VLM snapshots), fewer steps
     uv run python -m robo_genesis.train_policy smolvla \
         --repo-id genesis/banana_pick \
         --dataset-root datasets/banana_pick_50ep \
+        --policy-path /path/to/smolvla_base/snapshots/<base-commit> \
+        --smolvla-vlm-path /path/to/SmolVLM2/snapshots/<vlm-commit> \
         --steps 20000
 
     # Just print the command without running it
@@ -36,10 +38,16 @@ from __future__ import annotations
 
 import argparse
 import json
+import shlex
 import subprocess
 import sys
 
 from .paths import DATASETS_DIR, TRAIN_OUTPUTS_DIR, resolve_cli_path
+from .training_contract import (
+    SMOLVLA_CAMERA_RENAME,
+    SmolVLASnapshotEvidence,
+    audit_smolvla_snapshots,
+)
 
 # Per-preset defaults. `type` -> `--policy.type=<t>` (train from scratch);
 # `path` -> `--policy.path=<p>` (fine-tune from a pretrained checkpoint/base).
@@ -56,16 +64,34 @@ PRESETS: dict[str, dict] = {
     "smolvla": {
         "policy_arg": ("path", "lerobot/smolvla_base"),
         "batch_size": 4,
-        "rename_map": {
-            "observation.images.world": "observation.images.camera1",
-            "observation.images.wrist": "observation.images.camera2",
-        },
+        "rename_map": SMOLVLA_CAMERA_RENAME,
     },
 }
 
 
+def _smolvla_snapshot_evidence(
+    args: argparse.Namespace,
+    passthrough: list[str],
+) -> SmolVLASnapshotEvidence | None:
+    vlm_path = getattr(args, "smolvla_vlm_path", None)
+    if vlm_path is None:
+        return None
+    if args.policy != "smolvla":
+        raise ValueError("--smolvla-vlm-path is only valid with the smolvla preset")
+    if not args.policy_path:
+        raise ValueError("--smolvla-vlm-path requires --policy-path with the pinned base snapshot")
+    if any(value.startswith("--policy.vlm_model_name") for value in passthrough):
+        raise ValueError(
+            "Do not combine --smolvla-vlm-path with a forwarded --policy.vlm_model_name override"
+        )
+    return audit_smolvla_snapshots(args.policy_path, vlm_path)
+
+
 def build_command(args: argparse.Namespace, passthrough: list[str]) -> list[str]:
-    if args.policy_path:
+    snapshot_evidence = _smolvla_snapshot_evidence(args, passthrough)
+    if snapshot_evidence is not None:
+        policy_flag = f"--policy.path={snapshot_evidence.base.path}"
+    elif args.policy_path:
         policy_flag = f"--policy.path={args.policy_path}"
     elif args.policy_type:
         policy_flag = f"--policy.type={args.policy_type}"
@@ -104,6 +130,9 @@ def build_command(args: argparse.Namespace, passthrough: list[str]) -> list[str]
     # override in `passthrough` takes precedence (appended after, last wins).
     if args.video_backend:
         cmd.append(f"--dataset.video_backend={args.video_backend}")
+
+    if snapshot_evidence is not None:
+        cmd.append(f"--policy.vlm_model_name={snapshot_evidence.vlm.path}")
 
     # Camera-key rename (see PRESETS docstring). Explicit --rename-map wins; else
     # fall back to the preset default unless the user already passed one through.
@@ -169,6 +198,12 @@ def main() -> None:
         default=None,
         help="Override: fine-tune from this pretrained checkpoint/base. Ignores the preset.",
     )
+    parser.add_argument(
+        "--smolvla-vlm-path",
+        default=None,
+        help="Pinned local SmolVLM snapshot used with a pinned --policy-path. The wrapper "
+        "verifies both course revisions and forwards this path as policy.vlm_model_name.",
+    )
     parser.add_argument("--dry-run", action="store_true", help="Print the command and exit.")
     args, passthrough = parser.parse_known_args()
 
@@ -178,7 +213,16 @@ def main() -> None:
 
     cmd = build_command(args, passthrough)
 
-    print("[train] " + " ".join(cmd))
+    snapshot_evidence = _smolvla_snapshot_evidence(args, passthrough)
+    if args.policy == "smolvla":
+        if snapshot_evidence is None:
+            print(
+                "[train:model] UNPINNED -- provide both --policy-path and "
+                "--smolvla-vlm-path before a reproducible training run"
+            )
+        else:
+            print("[train:model] " + json.dumps(snapshot_evidence.as_dict(), sort_keys=True))
+    print("[train] " + shlex.join(cmd))
     if args.dry_run:
         return
 

@@ -332,7 +332,7 @@ wrapper 当前控制：
 - steps、batch size、checkpoint/log frequency、workers、seed 和 device；
 - 默认使用 PyAV 作为视频后端；
 - 可选的 W&B 与 Hub 发布，两者默认关闭；
-- SmolVLA 的相机键重命名。
+- SmolVLA 的相机键重命名，以及可选的固定版本本地 base/VLM snapshot。
 
 独立的 `--` 之后的参数会被继续传给 `lerobot-train`，例如：
 
@@ -399,6 +399,12 @@ Hub 仓库名指向的内容可能变化。已验证的参考内容为：
 在需要复现的运行开始前，应把两个仓库都解析到上述 commit，或使用一份记录了这些来源
 的预先准备好的本地 snapshot。当前 wrapper 默认的裸 `lerobot/smolvla_base` 便于探索
 命令，却不能单独冻结模型内容。命中 cache 也不能证明全新 cache 下的下载路径经过验证。
+
+若要进行可审计的本地运行，通过 `--policy-path` 传入 base snapshot，并通过
+`--smolvla-vlm-path` 传入 VLM snapshot。wrapper 接受 Hugging Face 中精确的
+`snapshots/<40 位十六进制 commit>` 目录，或带 `robo_genesis_snapshot.json` 来源记录的
+复制目录。它会在本地核验两个 revision 和必要文件，再把 VLM 目录作为
+`policy.vlm_model_name` 传给 LeRobot；审计过程不会下载模型。
 
 ## 第一级实验：审计两个 dry-run 命令
 
@@ -481,24 +487,27 @@ uv run python -m robo_genesis.train_policy act \
 
 ### SmolVLA 微调 smoke
 
-让策略覆盖项指向 revision 门禁阶段准备好的、已经验证的本地 base snapshot：
+让两个策略组件分别指向 revision 门禁阶段准备好的本地 snapshot。请把
+`/path/to/huggingface/hub` 替换为你机器上的 cache 根目录：
 
 ```sh
-RG101_SMOLVLA_SNAPSHOT=outputs/model-cache/smolvla_base-c83c3163
+RG101_SMOLVLA_BASE_SNAPSHOT=/path/to/huggingface/hub/models--lerobot--smolvla_base/snapshots/c83c3163b8ca9b7e67c509fffd9121e66cb96205
+RG101_SMOLVLA_VLM_SNAPSHOT=/path/to/huggingface/hub/models--HuggingFaceTB--SmolVLM2-500M-Video-Instruct/snapshots/7b375e1b73b11138ff12fe22c8f2822d8fe03467
 
 uv run python -m robo_genesis.train_policy smolvla \
   --repo-id "$RG101_REPO_ID" \
   --dataset-root "$RG101_DATASET_ROOT" \
-  --policy-path "$RG101_SMOLVLA_SNAPSHOT" \
+  --policy-path "$RG101_SMOLVLA_BASE_SNAPSHOT" \
+  --smolvla-vlm-path "$RG101_SMOLVLA_VLM_SNAPSHOT" \
   --name l11-smolvla-smoke \
   --output-dir outputs/train/l11-smolvla-smoke \
   --steps 1 --batch-size 1 --save-freq 1 --log-freq 1 \
   --num-workers 0 --seed 1000 --device cuda --video-backend pyav
 ```
 
-`outputs/model-cache/...` 是本地生成的模型内容，不得提交。目录名称只是一条给人看的
-提示，并不是 revision 证据：运行前应记录 snapshot 及其 VLM 依赖如何解析，并核验完整
-commit ID。使用 `--policy-path` 不会关闭 SmolVLA preset 中的相机键重命名。
+模型 snapshot 属于本地生成内容，不得提交。wrapper 不会接受一个仅仅看起来像 revision
+的目录名：它要求精确 cache 路径或匹配的来源记录，并核验两个完整 commit ID。使用
+`--policy-path` 不会关闭 SmolVLA preset 中的相机键重命名。
 
 ### 通过单步 smoke 应包含哪些证据
 
@@ -623,6 +632,8 @@ uv run python -m robo_genesis.train_policy act \
 
 ```sh
 # Set every ALL_CAPS value from the run record before executing.
+RG101_SMOLVLA_BASE_SNAPSHOT=CHOOSE_PINNED_BASE_SNAPSHOT
+RG101_SMOLVLA_VLM_SNAPSHOT=CHOOSE_PINNED_VLM_SNAPSHOT
 RG101_SMOLVLA_STEPS=CHOOSE_INTEGER
 RG101_SMOLVLA_BATCH=CHOOSE_INTEGER
 RG101_SMOLVLA_CHUNK=CHOOSE_INTEGER
@@ -638,7 +649,8 @@ RG101_SEED=CHOOSE_INTEGER
 uv run python -m robo_genesis.train_policy smolvla \
   --repo-id "$RG101_REPO_ID" \
   --dataset-root "$RG101_DATASET_ROOT" \
-  --policy-path "$RG101_SMOLVLA_SNAPSHOT" \
+  --policy-path "$RG101_SMOLVLA_BASE_SNAPSHOT" \
+  --smolvla-vlm-path "$RG101_SMOLVLA_VLM_SNAPSHOT" \
   --name smolvla-fruit-pick \
   --output-dir outputs/train/smolvla-fruit-pick \
   --steps "$RG101_SMOLVLA_STEPS" \

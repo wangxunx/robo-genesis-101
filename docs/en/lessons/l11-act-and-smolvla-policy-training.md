@@ -385,7 +385,7 @@ The wrapper currently controls:
 - steps, batch size, checkpoint/log frequency, workers, seed, and device;
 - PyAV as the default video backend;
 - optional W&B and Hub publishing, both off by default; and
-- the SmolVLA camera rename.
+- the SmolVLA camera rename and optional pinned local base/VLM snapshots.
 
 Arguments after a standalone `--` are forwarded to `lerobot-train`, for example:
 
@@ -458,6 +458,13 @@ pre-provisioned local snapshot whose provenance records them. The current
 wrapper's bare `lerobot/smolvla_base` default is convenient for command
 discovery but does not, by itself, freeze content. A cache hit also does not
 prove that a clean-cache download path was tested.
+
+For an auditable local run, pass the base snapshot through `--policy-path` and
+the VLM snapshot through `--smolvla-vlm-path`. The wrapper accepts an exact
+Hugging Face `snapshots/<40-hex-commit>` directory, or a copied directory with a
+`robo_genesis_snapshot.json` provenance record. It verifies both revisions and
+required files locally, then forwards the VLM directory as
+`policy.vlm_model_name`. No model is downloaded by this audit.
 
 ## Level 1 lab: audit both dry-run commands
 
@@ -541,27 +548,30 @@ task evaluation.
 
 ### SmolVLA fine-tuning smoke
 
-Point the policy override at the verified local base snapshot prepared during
-the revision gate:
+Point both policy components at the verified local snapshots prepared during
+the revision gate. Replace `/path/to/huggingface/hub` with the cache root on
+your machine:
 
 ```sh
-RG101_SMOLVLA_SNAPSHOT=outputs/model-cache/smolvla_base-c83c3163
+RG101_SMOLVLA_BASE_SNAPSHOT=/path/to/huggingface/hub/models--lerobot--smolvla_base/snapshots/c83c3163b8ca9b7e67c509fffd9121e66cb96205
+RG101_SMOLVLA_VLM_SNAPSHOT=/path/to/huggingface/hub/models--HuggingFaceTB--SmolVLM2-500M-Video-Instruct/snapshots/7b375e1b73b11138ff12fe22c8f2822d8fe03467
 
 uv run python -m robo_genesis.train_policy smolvla \
   --repo-id "$RG101_REPO_ID" \
   --dataset-root "$RG101_DATASET_ROOT" \
-  --policy-path "$RG101_SMOLVLA_SNAPSHOT" \
+  --policy-path "$RG101_SMOLVLA_BASE_SNAPSHOT" \
+  --smolvla-vlm-path "$RG101_SMOLVLA_VLM_SNAPSHOT" \
   --name l11-smolvla-smoke \
   --output-dir outputs/train/l11-smolvla-smoke \
   --steps 1 --batch-size 1 --save-freq 1 --log-freq 1 \
   --num-workers 0 --seed 1000 --device cuda --video-backend pyav
 ```
 
-`outputs/model-cache/...` is local, generated model content and must not be
-committed. The directory name is a human cue, not revision evidence: record how
-the snapshot and its VLM dependency were resolved, and verify the full commit
-IDs before running. Using `--policy-path` does not disable the SmolVLA preset's
-camera rename.
+Model snapshots are local generated content and must not be committed. The
+wrapper rejects a directory name that merely resembles a revision: it requires
+an exact cache path or a matching provenance record and checks both complete
+commit IDs. Using `--policy-path` does not disable the SmolVLA preset's camera
+rename.
 
 ### What a passing one-step smoke contains
 
@@ -697,6 +707,8 @@ fine-tuning boundary:
 
 ```sh
 # Set every ALL_CAPS value from the run record before executing.
+RG101_SMOLVLA_BASE_SNAPSHOT=CHOOSE_PINNED_BASE_SNAPSHOT
+RG101_SMOLVLA_VLM_SNAPSHOT=CHOOSE_PINNED_VLM_SNAPSHOT
 RG101_SMOLVLA_STEPS=CHOOSE_INTEGER
 RG101_SMOLVLA_BATCH=CHOOSE_INTEGER
 RG101_SMOLVLA_CHUNK=CHOOSE_INTEGER
@@ -712,7 +724,8 @@ RG101_SEED=CHOOSE_INTEGER
 uv run python -m robo_genesis.train_policy smolvla \
   --repo-id "$RG101_REPO_ID" \
   --dataset-root "$RG101_DATASET_ROOT" \
-  --policy-path "$RG101_SMOLVLA_SNAPSHOT" \
+  --policy-path "$RG101_SMOLVLA_BASE_SNAPSHOT" \
+  --smolvla-vlm-path "$RG101_SMOLVLA_VLM_SNAPSHOT" \
   --name smolvla-fruit-pick \
   --output-dir outputs/train/smolvla-fruit-pick \
   --steps "$RG101_SMOLVLA_STEPS" \
