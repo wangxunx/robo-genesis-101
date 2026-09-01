@@ -373,3 +373,83 @@ ROCR_VISIBLE_DEVICES=1 ROBO_GENESIS_OUTPUTS_DIR=<tmp>/zh-outputs \
 这些结果支持 L01 的 `cpu-verified` 最低能力状态，并额外证明同一简明 notebook 能在
 参考 R9700 环境自动选择 AMD backend。L01 没有运行相机渲染、资产加载、ACT/SmolVLA
 训练、模型收敛、机器人控制、抓取或闭环任务；这些能力由后续讲次在首次需要时验证。
+
+## 12. L03 / M3.L03.5 刚体物理 clean-kernel 验证
+
+> 验证日期：2026-09-01（Asia/Shanghai）
+>
+> 范围：L03 双语 notebook 的 CPU 最低路径、参考 AMD 后端、N1–N4 接触关系、
+> 两组摩擦实验和输出目录合同。本轮不涉及渲染、机器人、资产、训练或闭环评估。
+
+本轮复用已按本文基线安装的仓库 `.venv`，没有重新安装环境或下载
+PyTorch。实测环境为 Python 3.12.3、Genesis 1.3.3、PyTorch distribution
+`2.9.1+rocm7.2.1.lw.gitff65f5bc`、`torch.__version__`
+`2.9.1+rocm7.2.1.gitff65f5bc` 和 HIP `7.2.53211-e1a6bc5663`。
+
+AMD 路径只暴露物理 GPU 0，它被进程映射为 `cuda:0`。运行前张量探针确认：
+
+- `torch.cuda.is_available()` 为真，且仅一张卡可见；
+- 设备名为 `AMD Radeon AI PRO R9700`；
+- `arange(8).square() + 1` 在 `cuda` 上返回
+  `[1, 2, 5, 10, 17, 26, 37, 50]`，因此未发生 CPU fallback。
+
+### 12.1 执行方式
+
+三次最终执行都由 `jupyter nbconvert --execute` 启动新 kernel，并从首个
+code cell 顺序运行。`<repo>` 和 `<tmp>` 分别代表仓库根目录与本轮临时目录：
+
+```sh
+ROBO_GENESIS_BACKEND=cpu ROBO_GENESIS_OUTPUTS_DIR=<tmp>/en-cpu \
+  <repo>/.venv/bin/jupyter nbconvert --execute --to notebook \
+  --ExecutePreprocessor.timeout=1200 --output l03-en-cpu.ipynb \
+  --output-dir <tmp> \
+  notebooks/en/l03-rigid-body-physics-and-stable-simulation.ipynb
+
+ROBO_GENESIS_BACKEND=cpu ROBO_GENESIS_OUTPUTS_DIR=<tmp>/zh-cpu \
+  <repo>/.venv/bin/jupyter nbconvert --execute --to notebook \
+  --ExecutePreprocessor.timeout=1200 --output l03-zh-cpu.ipynb \
+  --output-dir <tmp> \
+  notebooks/zh/l03-rigid-body-physics-and-stable-simulation.ipynb
+
+ROCR_VISIBLE_DEVICES=0 ROBO_GENESIS_BACKEND=auto \
+ROBO_GENESIS_OUTPUTS_DIR=<tmp>/en-amd \
+  <repo>/.venv/bin/jupyter nbconvert --execute --to notebook \
+  --ExecutePreprocessor.timeout=1200 --output l03-en-amd.ipynb \
+  --output-dir <tmp> \
+  notebooks/en/l03-rigid-body-physics-and-stable-simulation.ipynb
+```
+
+执行后的 notebook、`.npz`、PNG 和缓存全部写入 `<tmp>`；提交的 notebook
+保持 `execution_count: null` 且没有 output。
+
+### 12.2 运行结果
+
+| Notebook / 路径 | 请求后端 → 实际后端 | 结果 |
+| --- | --- | --- |
+| EN / CPU | `cpu` → `cpu` | 四个接触 case、baseline 摩擦和单变量摩擦实验全部完成；`L03 CHECK: PASSED` |
+| ZH / CPU | `cpu` → `cpu` | 独立 clean kernel 完成同样的六组实验，结果与英文 CPU 路径一致；`L03 CHECK: PASSED` |
+| EN / AMD | `auto` → `amdgpu` | 六个 runner 都在 R9700 上运行，没有 CPU fallback；`L03 CHECK: PASSED` |
+
+Part A 的 CPU 与 AMD 观测一致：
+
+| Case | `dt` | substeps | 穿透代理值 |
+| --- | ---: | ---: | ---: |
+| N1 | 0.01 s | 1 | 13.193 mm |
+| N2 | 0.01 s | 2 | 7.797 mm |
+| N3 | 0.02 s | 1 | 23.984 mm |
+| N4 | 0.02 s | 2 | 13.193 mm |
+
+N1→N2 与 N3→N4 均下降。N1/N4 共有 75 个采样时刻，对齐后的最大
+`z` 与 `vz` 差异在本轮显示精度下均为 0。N2 同时观测到 70 ms 几何分离，
+其他三组为 0 ms；这正好说明更小穿透不等于所有稳定性指标都单调改善。
+
+Part B 在两种后端都满足相同关系。CPU 的 baseline 停止距离为
+0.4104 m / 0.2241 m（低/高摩擦 lane）；桌面摩擦由 0.50 降到 0.30 后为
+0.6746 m / 0.2240 m。AMD 对应数值为 0.4104 m / 0.2239 m 和
+0.6746 m / 0.2239 m。高摩擦 lane 的 CPU/AMD 持续停止时刻相差一个 0.02 s
+采样间隔，但停止距离和已审定关系均通过；这些数值是本轮观测，不是跨平台标准答案。
+
+双语 notebook 的 code-cell ID/source 规范化 SHA-256 均为
+`c15baafec459ab85a2eb74cc26eec1c5753d576aa751cb5965f1203c8c8498e0`。本节证据只支持
+L03 的 `cpu-ok` 最低能力和额外 AMD 可运行性；课程状态仍由 M3.L03.6 验收后同步，
+不在 M3.L03.5 提前更新。
