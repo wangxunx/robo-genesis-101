@@ -126,7 +126,7 @@ ACT 和 SmolVLA 的 checkpoint 都由 M0.7 干净环境生成，随后通过源�
 | Linux x86_64 / R9700 / 系统 ROCm 7.2.0 / 本文 wheel | **已验证** | 完整训练参考平台。 |
 | 其他 AMD GPU 或 ROCm 组合 | **未验证** | 不能从 R9700 结果外推；欢迎后续补充实测矩阵。 |
 | NVIDIA CUDA | **未验证** | 解析器出现 CUDA 包不构成验证；V1 不承诺完整链路支持。 |
-| CPU-only 完整链路 | **未验证** | L01–L06 仍计划提供 CPU 最小实验，但训练全链路未在 CPU-only 环境验证。 |
+| CPU-only 完整链路 | **部分验证** | L01–L02 的 CPU 最小实验已验证；L03–L06 尚未完成，训练全链路也未在 CPU-only 环境验证。 |
 | Apple Silicon / macOS | **未验证** | 本轮没有执行 MPS、Genesis 或 LeRobot 兼容性测试。 |
 | Windows | **未验证** | 本轮没有执行原生 Windows 或 WSL 测试。 |
 | Python 3.11、3.13 或其他版本 | **不支持** | V1 的可复现环境限定为 Python 3.12.x。 |
@@ -326,3 +326,50 @@ ACT 保存 9 维输出、`chunk_size=10`、`n_action_steps=10`；SmolVLA 保存 
 这只是 **open-loop single-sample probe**。本轮没有执行完整长训练，没有证明 loss
 收敛，也没有在 Genesis 中施加动作、运行闭环 rollout 或计算抓放成功率；这些证据仍
 属于 L12。执行后的 notebook、临时数据、checkpoint、训练日志和缓存均不提交到 Git。
+
+## 11. L01 / M3.1 简明环境自检
+
+> 验证日期：2026-09-01（Asia/Shanghai）
+>
+> 范围：简化版 L01 notebook 的 Python/包摘要、PyTorch tensor、自动 backend 选择与
+> 最小 Genesis `build/step`。本讲不检查渲染、YCB/Franka 资产、训练或闭环评估。
+
+本轮按项目负责人要求复用已经按本文基线安装的仓库 `.venv`，没有重新安装环境或下载
+PyTorch。英文 notebook 隐藏 GPU 后验证 CPU 最低路径；中文 notebook 暴露物理 GPU 1，
+验证同一份代码能自动选择 AMD backend。执行后的 notebook 和环境摘要均写入临时目录：
+
+```sh
+ROCR_VISIBLE_DEVICES=-1 ROBO_GENESIS_OUTPUTS_DIR=<tmp>/en-outputs \
+  <repo>/.venv/bin/jupyter nbconvert --execute --to notebook \
+  --ExecutePreprocessor.timeout=600 --output l01-en-cpu.ipynb \
+  --output-dir <tmp> \
+  notebooks/en/l01-introduction-and-environment-diagnostics.ipynb
+
+ROCR_VISIBLE_DEVICES=-1 ROBO_GENESIS_OUTPUTS_DIR=<tmp>/zh-cpu-outputs \
+  <repo>/.venv/bin/jupyter nbconvert --execute --to notebook \
+  --ExecutePreprocessor.timeout=600 --output l01-zh-cpu.ipynb \
+  --output-dir <tmp> \
+  notebooks/zh/l01-introduction-and-environment-diagnostics.ipynb
+
+ROCR_VISIBLE_DEVICES=1 ROBO_GENESIS_OUTPUTS_DIR=<tmp>/zh-outputs \
+  <repo>/.venv/bin/jupyter nbconvert --execute --to notebook \
+  --ExecutePreprocessor.timeout=600 --output l01-zh-amd.ipynb \
+  --output-dir <tmp> \
+  notebooks/zh/l01-introduction-and-environment-diagnostics.ipynb
+```
+
+| Notebook / 路径 | 实际 backend 与设备 | 最小运行证据 |
+| --- | --- | --- |
+| EN / 强制隐藏 GPU | `gs.cpu`；tensor 位于 CPU | Python 3.12.3、Genesis 1.3.3 和 PyTorch 导入成功；tensor 为 `[1, 2, 5, 10]`；球体经过 20 步从 `z=0.5 m` 降至约 `0.298895 m`。 |
+| ZH / 强制隐藏 GPU | `gs.cpu`；tensor 位于 CPU | 独立 clean kernel 从头执行相同必需检查，结果与英文 CPU 路径一致。 |
+| ZH / AMD 自动选择 | `gs.amdgpu`；AMD Radeon AI PRO R9700 映射为 `cuda:0` | HIP 为 `7.2.53211-e1a6bc5663`；相同 tensor 和 20 步 Genesis smoke 通过，球体高度结果与 CPU 路径一致。 |
+
+两次执行的最终摘要均为 `ENVIRONMENT CHECK: PASSED`。当前环境还观察到 LeRobot
+0.6.0，但该项只是后续训练提示，不属于 L01–L06 的通过条件。两份提交 notebook 都只有
+4 个 code cell，其源码和 ID 的规范化 SHA-256 均为
+`68dfad0c9af76db3e6f904781c536833829594b72f5068f2da076515cacecf4b`；提交文件保持
+`execution_count: null` 且没有 output。
+
+这些结果支持 L01 的 `cpu-verified` 最低能力状态，并额外证明同一简明 notebook 能在
+参考 R9700 环境自动选择 AMD backend。L01 没有运行相机渲染、资产加载、ACT/SmolVLA
+训练、模型收敛、机器人控制、抓取或闭环任务；这些能力由后续讲次在首次需要时验证。

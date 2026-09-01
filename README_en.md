@@ -2,11 +2,12 @@
 
 [简体中文](README.md)
 
-> **Project status: Alpha / course development.** L02 is `cpu-verified` after
-> clean-kernel CPU verification. L11 is `gpu-verified` after ACT and SmolVLA GPU
-> smoke and checkpoint-reload verification on an AMD Radeon AI PRO R9700. The
-> other 10 lessons remain `planned`; an existing page or notebook is not evidence
-> that its lesson has been verified.
+> **Project status: Alpha / course development.** L01 and L02 are
+> `cpu-verified` after clean-kernel CPU verification; the same concise L01
+> self-check also selected and passed the AMD backend on the reference R9700. L11 is `gpu-verified`
+> after ACT and SmolVLA GPU smoke and checkpoint-reload verification. The other
+> 9 lessons remain `planned`; an existing page or notebook is not evidence that
+> its lesson has been verified.
 
 RoboGenesis 101 is a Datawhale open-source course for learners with basic Python experience who want a structured, hands-on introduction to robot learning. Using Genesis as its simulation platform, the course connects environment diagnostics, scenes, and rigid-body physics with robot control, inverse kinematics, grasping, demonstration data, imitation learning, policy training, and closed-loop evaluation.
 
@@ -46,7 +47,7 @@ Training loss or open-loop action prediction is not treated as task success. The
 
 | Lesson | Topic | Planned duration | Hardware | Status |
 |---|---|---:|---|---|
-| L01 | [Introduction, Runtime Platforms, and Environment Diagnostics](docs/en/lessons/l01-introduction-and-environment-diagnostics.md) | 60 min | `cpu-ok` | `planned` |
+| L01 | [Introduction, Runtime Platforms, and Environment Diagnostics](docs/en/lessons/l01-introduction-and-environment-diagnostics.md) | 30 min | `cpu-ok` | `cpu-verified` |
 | L02 | [Scenes, Entities, and the Simulation Lifecycle](docs/en/lessons/l02-scenes-entities-and-simulation-lifecycle.md) | 90 min | `cpu-ok` | `cpu-verified` |
 | L03 | [Rigid-Body Physics and Stable Simulation](docs/en/lessons/l03-rigid-body-physics-and-stable-simulation.md) | 90 min | `cpu-ok` | `planned` |
 | L04 | [Robot Models, Degrees of Freedom, and Joint Control](docs/en/lessons/l04-robot-models-dofs-and-joint-control.md) | 90 min | `cpu-ok` | `planned` |
@@ -113,7 +114,24 @@ This command uses the repository's portable dependency resolution; by itself it 
 uv run python -m robo_genesis.setup_assets
 ```
 
-The lesson notebooks and full experiments have not been published yet. The current placeholders show the planned course structure and are not finished tutorials.
+Lessons with a verified status are ready to follow from the course table. The
+remaining `planned` pages and notebooks are structural placeholders, not
+finished tutorials.
+
+### Run the L01 environment self-check
+
+Start Jupyter from the project environment, open the L01 notebook, and use
+`Run All` once:
+
+```sh
+uv run jupyter lab
+```
+
+The notebook prints the core versions, prefers an available AMD ROCm backend
+and otherwise uses CPU, then runs one minimal Genesis scene. CPU fallback does
+not block L01–L06. See the [L01 lecture](docs/en/lessons/l01-introduction-and-environment-diagnostics.md)
+and [compatibility matrix](COMPATIBILITY.md) for training requirements and the
+reference platform.
 
 ## Repository layout
 

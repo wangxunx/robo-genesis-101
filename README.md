@@ -2,10 +2,11 @@
 
 [English](README_en.md)
 
-> **项目状态：Alpha / 课程开发阶段。** L02 已通过 CPU clean-kernel 验证，状态为
-> `cpu-verified`；L11 已在 AMD Radeon AI PRO R9700 上通过 ACT 与 SmolVLA 的 GPU
-> smoke 和 checkpoint 重载验证，状态为 `gpu-verified`；其余 10 讲仍为 `planned`。
-> 页面和 notebook 已建立不代表对应课程已经完成验证。
+> **项目状态：Alpha / 课程开发阶段。** L01 与 L02 已通过 CPU clean-kernel 验证，
+> 状态为 `cpu-verified`；L01 的同一份简明自检也已在参考 R9700 环境选择 AMD 后端通过。
+> L11 已通过 ACT 与 SmolVLA 的 GPU smoke 和 checkpoint 重载验证，状态为
+> `gpu-verified`；其余 9 讲仍为 `planned`。页面和 notebook 已建立不代表对应课程
+> 已经完成验证。
 
 RoboGenesis 101 是一门 Datawhale 开源课程，面向具备 Python 基础、希望系统进入机器人学习实践的学习者。课程以 Genesis 为仿真平台，从环境诊断、场景和刚体物理出发，逐步连接机器人控制、逆运动学、抓取、演示数据、模仿学习、策略训练与闭环评估。
 
@@ -45,7 +46,7 @@ RoboGenesis 101 是一门 Datawhale 开源课程，面向具备 Python 基础、
 
 | 讲次 | 主题 | 预计时长 | 硬件 | 状态 |
 |---|---|---:|---|---|
-| L01 | [导论、运行平台与环境诊断](docs/zh/lessons/l01-introduction-and-environment-diagnostics.md) | 60 分钟 | `cpu-ok` | `planned` |
+| L01 | [导论、运行平台与环境诊断](docs/zh/lessons/l01-introduction-and-environment-diagnostics.md) | 30 分钟 | `cpu-ok` | `cpu-verified` |
 | L02 | [场景、实体与仿真生命周期](docs/zh/lessons/l02-scenes-entities-and-simulation-lifecycle.md) | 90 分钟 | `cpu-ok` | `cpu-verified` |
 | L03 | [刚体物理与稳定仿真](docs/zh/lessons/l03-rigid-body-physics-and-stable-simulation.md) | 90 分钟 | `cpu-ok` | `planned` |
 | L04 | [机器人模型、DOF 与关节控制](docs/zh/lessons/l04-robot-models-dofs-and-joint-control.md) | 90 分钟 | `cpu-ok` | `planned` |
@@ -112,7 +113,21 @@ uv sync --locked --all-extras
 uv run python -m robo_genesis.setup_assets
 ```
 
-课程 notebook 和完整实验尚未发布。当前占位文件只展示计划中的课程结构，请勿将其作为完整教程使用。
+已达到验证状态的讲次可以按课程表进入学习；其余 `planned` 页面和 notebook 仍是课程
+结构占位，不应当作完整教程使用。
+
+### 运行 L01 环境自检
+
+使用项目环境启动 Jupyter，打开 L01 notebook 并执行一次 `Run All`：
+
+```sh
+uv run jupyter lab
+```
+
+notebook 会打印核心版本，自动优先选择可用的 AMD ROCm 后端，否则使用 CPU，然后运行
+一个最小 Genesis 场景。CPU fallback 不阻止继续 L01–L06；训练环境要求和参考平台见
+[L01 讲义](docs/zh/lessons/l01-introduction-and-environment-diagnostics.md)与
+[兼容性矩阵](COMPATIBILITY.md)。
 
 ## 仓库结构
 

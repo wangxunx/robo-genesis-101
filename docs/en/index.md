@@ -25,14 +25,15 @@ features:
 
 ## Course status
 
-> L02 is `cpu-verified` after clean-kernel CPU verification. L11 is
+> L01 and L02 are `cpu-verified` after clean-kernel CPU verification; the same
+> concise L01 self-check also selected and passed the AMD backend on the reference R9700. L11 is
 > `gpu-verified` after ACT and SmolVLA GPU smoke and checkpoint-reload
-> verification on an AMD Radeon AI PRO R9700. The other 10 lessons remain
-> `planned`; an existing page does not mean that lesson has been verified.
+> verification. The other 9 lessons remain `planned`; an existing page does not
+> mean that lesson has been verified.
 
 | Lesson | Topic | Planned duration | Hardware | Status |
 |---|---|---:|---|---|
-| L01 | [Introduction, Runtime Platforms, and Environment Diagnostics](/en/lessons/l01-introduction-and-environment-diagnostics) | 60 min | `cpu-ok` | `planned` |
+| L01 | [Introduction, Runtime Platforms, and Environment Diagnostics](/en/lessons/l01-introduction-and-environment-diagnostics) | 30 min | `cpu-ok` | `cpu-verified` |
 | L02 | [Scenes, Entities, and the Simulation Lifecycle](/en/lessons/l02-scenes-entities-and-simulation-lifecycle) | 90 min | `cpu-ok` | `cpu-verified` |
 | L03 | [Rigid-Body Physics and Stable Simulation](/en/lessons/l03-rigid-body-physics-and-stable-simulation) | 90 min | `cpu-ok` | `planned` |
 | L04 | [Robot Models, Degrees of Freedom, and Joint Control](/en/lessons/l04-robot-models-dofs-and-joint-control) | 90 min | `cpu-ok` | `planned` |

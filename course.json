@@ -20,7 +20,7 @@
         "zh": "导论、运行平台与环境诊断",
         "en": "Introduction, Runtime Platforms, and Environment Diagnostics"
       },
-      "duration_minutes": 60,
+      "duration_minutes": 30,
       "hardware": "cpu-ok",
       "notebook": {
         "zh": "notebooks/zh/l01-introduction-and-environment-diagnostics.ipynb",
@@ -30,7 +30,7 @@
         "zh": "docs/zh/lessons/l01-introduction-and-environment-diagnostics.md",
         "en": "docs/en/lessons/l01-introduction-and-environment-diagnostics.md"
       },
-      "status": "planned"
+      "status": "cpu-verified"
     },
     {
       "id": "L02",
