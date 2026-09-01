@@ -25,7 +25,10 @@ features:
 
 ## Course status
 
-> L02 now has bilingual lecture and notebook content and has passed clean-kernel CPU verification, so its status is `cpu-verified`; the other 11 lessons remain `planned`. An existing page does not mean that lesson has been verified.
+> L02 is `cpu-verified` after clean-kernel CPU verification. L11 is
+> `gpu-verified` after ACT and SmolVLA GPU smoke and checkpoint-reload
+> verification on an AMD Radeon AI PRO R9700. The other 10 lessons remain
+> `planned`; an existing page does not mean that lesson has been verified.
 
 | Lesson | Topic | Planned duration | Hardware | Status |
 |---|---|---:|---|---|
@@ -39,5 +42,5 @@ features:
 | L08 | [Synthetic Data Recording and Collection Throughput](/en/lessons/l08-synthetic-data-recording-and-throughput) | 120 min | `gpu-recommended` | `planned` |
 | L09 | [Dataset Anatomy and Imitation Learning 101](/en/lessons/l09-dataset-anatomy-and-imitation-learning) | 90 min | `gpu-recommended` | `planned` |
 | L10 | [Domain Randomization](/en/lessons/l10-domain-randomization) | 90 min | `gpu-recommended` | `planned` |
-| L11 | [Training ACT and SmolVLA Policies](/en/lessons/l11-act-and-smolvla-policy-training) | 150 min | `gpu-required` | `planned` |
+| L11 | [Training ACT and SmolVLA Policies](/en/lessons/l11-act-and-smolvla-policy-training) | 150 min | `gpu-required` | `gpu-verified` |
 | L12 | [Closed-Loop Evaluation and Capstone](/en/lessons/l12-closed-loop-evaluation-and-capstone) | 120 min | `gpu-required` | `planned` |

@@ -25,8 +25,9 @@ features:
 
 ## 课程状态
 
-> L02 已完成双语讲义与 notebook，并在隔离环境中通过 CPU clean-kernel 验证，
-> 状态为 `cpu-verified`；其余 11 讲仍为 `planned`。页面已经存在不代表对应课程已经完成验证。
+> L02 已通过 CPU clean-kernel 验证，状态为 `cpu-verified`；L11 已在 AMD Radeon
+> AI PRO R9700 上通过 ACT 与 SmolVLA 的 GPU smoke 和 checkpoint 重载验证，状态为
+> `gpu-verified`；其余 10 讲仍为 `planned`。页面已经存在不代表对应课程已经完成验证。
 
 | 讲次 | 主题 | 预计时长 | 硬件 | 状态 |
 |---|---|---:|---|---|
@@ -40,5 +41,5 @@ features:
 | L08 | [合成数据录制与采数吞吐](/zh/lessons/l08-synthetic-data-recording-and-throughput) | 120 分钟 | `gpu-recommended` | `planned` |
 | L09 | [数据集解剖与模仿学习 101](/zh/lessons/l09-dataset-anatomy-and-imitation-learning) | 90 分钟 | `gpu-recommended` | `planned` |
 | L10 | [域随机化](/zh/lessons/l10-domain-randomization) | 90 分钟 | `gpu-recommended` | `planned` |
-| L11 | [ACT 与 SmolVLA 策略训练](/zh/lessons/l11-act-and-smolvla-policy-training) | 150 分钟 | `gpu-required` | `planned` |
+| L11 | [ACT 与 SmolVLA 策略训练](/zh/lessons/l11-act-and-smolvla-policy-training) | 150 分钟 | `gpu-required` | `gpu-verified` |
 | L12 | [闭环评估与 Capstone](/zh/lessons/l12-closed-loop-evaluation-and-capstone) | 120 分钟 | `gpu-required` | `planned` |

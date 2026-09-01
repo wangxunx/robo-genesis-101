@@ -2,10 +2,11 @@
 
 [简体中文](README.md)
 
-> **Project status: Alpha / course development.** L02 now has bilingual lecture
-> and notebook content and has passed clean-kernel CPU verification, so its
-> status is `cpu-verified`; the other 11 lessons remain `planned`. The presence
-> of a page or notebook does not mean that lesson has been verified.
+> **Project status: Alpha / course development.** L02 is `cpu-verified` after
+> clean-kernel CPU verification. L11 is `gpu-verified` after ACT and SmolVLA GPU
+> smoke and checkpoint-reload verification on an AMD Radeon AI PRO R9700. The
+> other 10 lessons remain `planned`; an existing page or notebook is not evidence
+> that its lesson has been verified.
 
 RoboGenesis 101 is a Datawhale open-source course for learners with basic Python experience who want a structured, hands-on introduction to robot learning. Using Genesis as its simulation platform, the course connects environment diagnostics, scenes, and rigid-body physics with robot control, inverse kinematics, grasping, demonstration data, imitation learning, policy training, and closed-loop evaluation.
 
@@ -55,7 +56,7 @@ Training loss or open-loop action prediction is not treated as task success. The
 | L08 | [Synthetic Data Recording and Collection Throughput](docs/en/lessons/l08-synthetic-data-recording-and-throughput.md) | 120 min | `gpu-recommended` | `planned` |
 | L09 | [Dataset Anatomy and Imitation Learning 101](docs/en/lessons/l09-dataset-anatomy-and-imitation-learning.md) | 90 min | `gpu-recommended` | `planned` |
 | L10 | [Domain Randomization](docs/en/lessons/l10-domain-randomization.md) | 90 min | `gpu-recommended` | `planned` |
-| L11 | [Training ACT and SmolVLA Policies](docs/en/lessons/l11-act-and-smolvla-policy-training.md) | 150 min | `gpu-required` | `planned` |
+| L11 | [Training ACT and SmolVLA Policies](docs/en/lessons/l11-act-and-smolvla-policy-training.md) | 150 min | `gpu-required` | `gpu-verified` |
 | L12 | [Closed-Loop Evaluation and Capstone](docs/en/lessons/l12-closed-loop-evaluation-and-capstone.md) | 120 min | `gpu-required` | `planned` |
 
 Statuses progress from `planned` to `draft`, `reviewed`, `cpu-verified` or

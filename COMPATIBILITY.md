@@ -228,3 +228,101 @@ M2.5 验收后，L02 增加了运行前预测问题、状态分支的初始/最�
 | EN / AMD 初始/最终 RGB | `auto` → `gs.amdgpu` | 51.20 秒 | 初始和最终 RGB 均为 `(360, 640, 3)` `uint8`；各自范围为 `[10, 206]` 和 `[10, 204]`，并排对比图生成成功。 |
 
 三次复验中的状态值仍为初始 `z=0.5 m`、20 步后约 `z=0.298895 m`。仓库中的双语 notebook 继续保持无 output、`execution_count: null`，所有图像仍只写入已忽略的 `outputs/`。
+
+## 10. L11 / M2.10 GPU kernel 验证
+
+> 验证日期：2026-09-01（Asia/Shanghai）
+>
+> 范围：L11 的真实数据门禁、ACT/SmolVLA 命令审计、双策略 1 step GPU
+> smoke、checkpoint 审计和同一样本开环重载。完整训练、收敛和 Genesis 闭环评估
+> 均未运行。
+
+本轮按项目负责人要求复用 M1.5 已按当前兼容性基线建立的仓库 `.venv`，而不是重复
+下载 PyTorch。环境原有四个第 3.2 节列出的 ROCm wheel；补齐当前项目 `training`
+extra 后，`uv pip check` 检查 221 个包并返回
+`All installed packages are compatible`。notebook 仍由 `nbconvert --execute` 启动
+独立 kernel，从首个 code cell 顺序执行，不复用交互式 notebook 状态。
+
+| 项目 | 本轮实测值 |
+| --- | --- |
+| Python | `3.12.3` |
+| LeRobot | `0.6.0` |
+| PyTorch distribution | `2.9.1+rocm7.2.1.lw.gitff65f5bc` |
+| `torch.__version__` | `2.9.1+rocm7.2.1.gitff65f5bc` |
+| PyTorch HIP / CUDA runtime | `7.2.53211-e1a6bc5663` / `None` |
+| 系统 ROCm | `7.2.0` |
+| 参考设备 | 物理 GPU 1：AMD Radeon AI PRO R9700，映射为进程内 `cuda:0`；仅一张设备可见 |
+| 运行前显存 | 总计 `30576 MB`，空闲 `30519 MB` |
+| 模型缓存模式 | `HF_HUB_OFFLINE=1`、`TRANSFORMERS_OFFLINE=1`；未验证空缓存联网下载 |
+
+先用最小张量检查拒绝 CPU fallback。`torch.cuda.is_available()` 为真，设备名精确为
+`AMD Radeon AI PRO R9700`，张量 `arange(8).square() + 1` 的结果为
+`[1, 2, 5, 10, 17, 26, 37, 50]`。
+
+### 10.1 数据与模型身份
+
+验收数据是 M0.6 通过课程脚本专家与录制入口生成的真实临时 LeRobot 数据集，不是
+随机 tensor，也不是发布数据 artifact：
+
+| 字段 | 值 |
+| --- | --- |
+| repo ID / 本地路径 | `local/m06_g133` / `/tmp/rg101-m06.n7DcFk/dataset-g133` |
+| 规模 | 1 episode、42 frames、5 FPS |
+| state / action | 均为 `(9,) float32`，关节顺序与课程合同一致 |
+| 图像 | `observation.images.world` 与 `observation.images.wrist`；均解码为 `(3, 120, 160)` 有限值 |
+| task | `pick the banana and place it in the bowl` |
+
+SmolVLA 从已有离线缓存读取并核对两个固定 revision：
+
+- `lerobot/smolvla_base@c83c3163b8ca9b7e67c509fffd9121e66cb96205`；
+- `HuggingFaceTB/SmolVLM2-500M-Video-Instruct@7b375e1b73b11138ff12fe22c8f2822d8fe03467`。
+
+### 10.2 执行方式与结果
+
+英文 notebook 使用如下命令结构完成全部 GPU 路径；`<repo>`、`<run-root>`、
+`<base-snapshot>` 和 `<vlm-snapshot>` 代表本轮已记录的实际本地路径：
+
+```sh
+ROCR_VISIBLE_DEVICES=1 \
+RG101_REPO_ID=local/m06_g133 \
+RG101_DATASET_ROOT=/tmp/rg101-m06.n7DcFk/dataset-g133 \
+RG101_OUTPUT_ROOT=<run-root>/train RG101_SEED=1000 RG101_RUN_SMOKE=1 \
+RG101_SMOLVLA_BASE_SNAPSHOT=<base-snapshot> \
+RG101_SMOLVLA_VLM_SNAPSHOT=<vlm-snapshot> \
+HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 TOKENIZERS_PARALLELISM=false \
+<repo>/.venv/bin/jupyter nbconvert --execute --to notebook \
+  --ExecutePreprocessor.timeout=3600 \
+  --output l11-en-executed.ipynb --output-dir <run-root> \
+  notebooks/en/l11-act-and-smolvla-policy-training.ipynb
+```
+
+中文 notebook 随后在另一独立 GPU kernel 中以 `RG101_RUN_SMOKE=0` 从头执行，完成
+相同的数据门禁、配置读取、双 snapshot 审计、双 dry-run 和 smoke 命令 preflight；
+双语 code cell 源码与 ID 的规范化 SHA-256 均为
+`1ccfae76827291e0214ce39651b7111dd8343179b9263a49f8096e8812e03409`。
+训练没有重复执行，因为两种语言共用完全相同的可执行单元。
+
+状态同步为 `gpu-verified` 后，最终 EN/ZH notebook 又各自在新的 R9700 kernel 中
+以 `RG101_RUN_SMOKE=0` 自上而下执行一次；两次都通过最终状态断言、真实数据门禁、
+snapshot 审计和双 dry-run，确认提交版本不依赖先前 kernel 状态。
+
+| 策略 | 训练配置 | 本轮日志观察 | checkpoint 证据 |
+| --- | --- | --- | --- |
+| ACT | pipeline-only 缩小配置，batch 1、seed 1000、1 step | loss `20.499`、gradient norm `208.584`、update `1.013 s`、报告显存 `0.36 GB` | 数字目录 `000001`；权重 `45384956` bytes；`last → 000001` |
+| SmolVLA | 固定 base/VLM、默认冻结策略、batch 1、seed 1000、1 step | loss `6.305`、gradient norm `42.467`、update `1.402 s`、报告显存 `1.81 GB` | 数字目录 `000001`；权重 `906712520` bytes；`last → 000001` |
+
+两次日志都明确报告真实数据的 42 frames / 1 episode、有限 loss 与 gradient norm、一次
+optimizer update 和 checkpoint 保存。上述 loss、耗时与显存只是本次 smoke 的观察值，
+不是跨环境阈值，也不用于比较两种策略的质量。
+
+两个 checkpoint 均包含 `config.json`、`train_config.json`、非空
+`model.safetensors`、preprocessor/postprocessor 配置及各自的 processor state 文件。
+ACT 保存 9 维输出、`chunk_size=10`、`n_action_steps=10`；SmolVLA 保存 9 维输出、
+`chunk_size=50`、`n_action_steps=50`，并恢复
+`world/wrist → camera1/camera2` 映射和固定 VLM snapshot。两者都由当前项目的
+`robo_genesis.eval_policy.load_policy()` 对同一真实样本重新加载，在 `cuda` 设备上返回
+`(9,) float32` 且全部有限的动作。
+
+这只是 **open-loop single-sample probe**。本轮没有执行完整长训练，没有证明 loss
+收敛，也没有在 Genesis 中施加动作、运行闭环 rollout 或计算抓放成功率；这些证据仍
+属于 L12。执行后的 notebook、临时数据、checkpoint、训练日志和缓存均不提交到 Git。

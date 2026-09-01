@@ -5,7 +5,7 @@ locale: zh
 title: "ACT 与 SmolVLA 策略训练"
 duration_minutes: 150
 hardware: gpu-required
-status: planned
+status: gpu-verified
 ---
 
 # L11 · ACT 与 SmolVLA 策略训练

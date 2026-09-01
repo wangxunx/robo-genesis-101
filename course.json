@@ -220,7 +220,7 @@
         "zh": "docs/zh/lessons/l11-act-and-smolvla-policy-training.md",
         "en": "docs/en/lessons/l11-act-and-smolvla-policy-training.md"
       },
-      "status": "planned"
+      "status": "gpu-verified"
     },
     {
       "id": "L12",

@@ -5,7 +5,7 @@ locale: en
 title: "Training ACT and SmolVLA Policies"
 duration_minutes: 150
 hardware: gpu-required
-status: planned
+status: gpu-verified
 ---
 
 # L11 · Training ACT and SmolVLA Policies
