@@ -450,15 +450,19 @@ duration, initial velocity, seed, and measurement duration remain fixed.
 
 The companion notebook, when published, follows this sequence:
 
-1. report versions, requested backend mode, actual child-process backend, and
-   output directory;
+1. report versions, requested backend mode, rendering mode, actual child-process
+   backend, and output directory;
 2. display the N1–N4 configurations and collect predictions;
 3. run each contact configuration in an isolated process;
 4. validate and load the structured `.npz` results;
-5. display a metric table and aligned height, velocity, and contact plots;
+5. display real initial/final Genesis camera frames when rendering is enabled,
+   or explicitly labelled state schematics otherwise, beside the metric table
+   and aligned height, velocity, and contact plots;
 6. run the baseline two-lane friction experiment;
-7. compare displacement, velocity, angular velocity, and sustained stopping;
-8. change only table friction to 0.30 and repeat the comparison; and
+7. compare real scene frames, displacement, velocity, angular velocity, and
+   sustained stopping;
+8. change only table friction to 0.30 and repeat the numerical and final-frame
+   comparison; and
 9. print either `L03 CHECK: PASSED` or the specific failed condition.
 
 Genesis initialization is process-wide. Separate processes allow multiple
@@ -467,10 +471,14 @@ restart the kernel between cases. This is an execution detail, not the subject
 of the lesson: focus on the configuration passed to each process and the
 evidence returned from it.
 
-The core path is state-based and does not require camera rendering. Initial and
-final schematics are drawn from measured positions, while trajectory plots use
-the saved arrays. They must be labelled as state-derived figures, not Genesis
-camera images.
+The simulation backend and rendering capability are independent. The core path
+remains state-based and works with `ROBO_GENESIS_RENDER=0`; that branch prints
+an explicit rendering `SKIP` and draws initial/final schematics from measured
+positions. With `ROBO_GENESIS_RENDER=1`, each isolated process adds its camera
+before `build()` and returns validated initial/final RGB frames. An enabled
+camera or rendering failure stops the run instead of silently falling back.
+Trajectory plots remain the quantitative evidence in both branches, while
+camera frames show what the Genesis scene actually looked like.
 
 The learner-facing default uses the verified AMD backend when it is available
 and otherwise uses CPU. The explicit CPU mode provides the course's `cpu-ok`
@@ -484,6 +492,9 @@ one exact set of floating-point values:
 
 - every child process reports its requested mode and actual backend and exits
   successfully;
+- every child process reports the requested rendering mode; enabled runs return
+  non-empty, finite RGB frames, while disabled runs return explicit empty frame
+  fields and a rendering `SKIP`;
 - all required arrays have the expected length and contain finite values;
 - every contact case covers 1.5 seconds, so sample count changes with `dt`;
 - computed `substep_dt` and internal update counts match the case table;

@@ -39,6 +39,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--dt", type=float, required=True)
     parser.add_argument("--substeps", type=int, required=True)
     parser.add_argument("--duration", type=float, default=1.5)
+    parser.add_argument("--render", action="store_true")
     parser.add_argument("--output", type=Path, required=True)
     return parser.parse_args()
 
@@ -156,8 +157,29 @@ def main() -> int:
         material=gs.materials.Rigid(rho=CUBE_DENSITY, friction=CUBE_FRICTION),
         surface=gs.surfaces.Default(color=(0.15, 0.70, 0.45, 1.0)),
     )
+    camera = None
+    if args.render:
+        camera = scene.add_camera(
+            res=(640, 360),
+            pos=(1.45, -1.35, 1.25),
+            lookat=(0.35, 0.0, 0.78),
+            fov=42,
+            GUI=False,
+        )
     scene.build()
     initial_cube_pos = to_numpy(cube.get_pos()).reshape(-1).copy()
+
+    def render_rgb(label: str) -> np.ndarray:
+        if camera is None:
+            return np.empty((0,), dtype=np.uint8)
+        rgb = to_numpy(camera.render(rgb=True)[0])
+        if rgb.ndim != 3 or rgb.shape[0] == 0 or rgb.shape[1] == 0 or rgb.shape[2] not in (3, 4):
+            raise AssertionError(f"{label}: expected a non-empty HxWx3/4 image, got {rgb.shape}")
+        if not np.isfinite(rgb).all():
+            raise AssertionError(f"{label}: image contains non-finite values")
+        return rgb.copy()
+
+    initial_rgb = render_rgb("initial_rgb")
 
     # Record state once after each outer scene.step(). Event times are therefore
     # quantized by dt rather than resolved continuously at substep_dt.
@@ -172,6 +194,7 @@ def main() -> int:
         vz_history[index] = float(to_numpy(cube.get_vel()).reshape(-1)[2])
         contacts = cube.get_contacts(with_entity=table)
         contact_counts[index] = int(contacts["position"].shape[0])
+    final_rgb = render_rgb("final_rgb")
     # NOTEBOOK_SIMULATION_CORE_END
 
     contact_mask = contact_counts > 0
@@ -221,6 +244,7 @@ def main() -> int:
         genesis_version=np.asarray(genesis_version),
         torch_version=np.asarray(torch_version),
         torch_hip=np.asarray(torch.version.hip or "none"),
+        render_enabled=np.asarray(args.render),
         seed=np.asarray(0),
         precision=np.asarray("32"),
         dt=np.asarray(args.dt),
@@ -251,10 +275,13 @@ def main() -> int:
         settling_error=np.asarray(settling_error),
         initial_cube_pos=initial_cube_pos,
         final_cube_pos=to_numpy(cube.get_pos()).reshape(-1),
+        initial_rgb=initial_rgb,
+        final_rgb=final_rgb,
     )
     print(
         f"saved {args.output} | requested={args.backend}, actual={actual_backend}, "
-        f"genesis={genesis_version}, torch={torch_version} | "
+        f"genesis={genesis_version}, torch={torch_version}, "
+        f"render={'captured' if args.render else 'disabled'} | "
         f"dt={args.dt:g}, substeps={args.substeps}, "
         f"substep_dt={args.dt / args.substeps:g}, "
         f"penetration={penetration * 1000:.3f} mm"

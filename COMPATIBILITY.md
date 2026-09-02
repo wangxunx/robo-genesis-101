@@ -502,3 +502,61 @@ interpretation`，核对唯一改动、两个有效摩擦值、停止距离方�
 `auto → amdgpu` 仿真证据仍适用于当前 runner，但不能把本次 CPU 复验表述成新的 GPU
 notebook 运行证据。执行后 notebook 和产物只写入 `/tmp`，提交版 EN/ZH notebook 均为
 20 个 cell、10 个 code cell，且无 output 或 execution count。
+
+### 12.4 Genesis 相机关键帧恢复后的复验
+
+> 复验日期：2026-09-02（Asia/Shanghai）
+
+L03 验收后的迁移复查发现，原课程一在接触与摩擦 runner 中通过 `add_camera` 保存真实
+初始/最终场景画面，而当前 L03 只保留了基于状态的 Matplotlib 示意图。双语 notebook
+因此恢复显式的 `ROBO_GENESIS_RENDER=0/1` 能力分支：两个 runner 只在 `--render`
+启用时于 `build()` 前加入相机，启用后的相机或 RGB 校验错误会使运行失败；关闭时保存
+明确的空画面字段并打印 `SKIP`，不把状态示意图称为 Genesis 渲染结果。
+
+三次最终执行继续使用独立 clean kernel。命令结构如下，其中 `<tmp>` 表示本轮位于
+`/tmp` 的隔离输出与缓存目录：
+
+```sh
+PYOPENGL_PLATFORM=egl ROCR_VISIBLE_DEVICES=0 \
+ROBO_GENESIS_BACKEND=auto ROBO_GENESIS_RENDER=1 \
+ROBO_GENESIS_OUTPUTS_DIR=<tmp>/amd-outputs \
+  <repo>/.venv/bin/jupyter nbconvert --execute --to notebook \
+  --ExecutePreprocessor.timeout=1200 --output l03-en-amd-render.ipynb \
+  --output-dir <tmp> \
+  notebooks/en/l03-rigid-body-physics-and-stable-simulation.ipynb
+
+ROBO_GENESIS_BACKEND=cpu ROBO_GENESIS_RENDER=0 \
+ROBO_GENESIS_OUTPUTS_DIR=<tmp>/en-cpu-outputs \
+  <repo>/.venv/bin/jupyter nbconvert --execute --to notebook \
+  --ExecutePreprocessor.timeout=1200 --output l03-en-cpu-no-render.ipynb \
+  --output-dir <tmp> \
+  notebooks/en/l03-rigid-body-physics-and-stable-simulation.ipynb
+
+ROBO_GENESIS_BACKEND=cpu ROBO_GENESIS_RENDER=0 \
+ROBO_GENESIS_OUTPUTS_DIR=<tmp>/zh-cpu-outputs \
+  <repo>/.venv/bin/jupyter nbconvert --execute --to notebook \
+  --ExecutePreprocessor.timeout=1200 --output l03-zh-cpu-no-render.ipynb \
+  --output-dir <tmp> \
+  notebooks/zh/l03-rigid-body-physics-and-stable-simulation.ipynb
+```
+
+| Notebook / 能力路径 | 请求后端 → 实际后端 | 渲染结果 | code cell 执行时长 | 最终结果 |
+| --- | --- | --- | ---: | --- |
+| EN / AMD + EGL | `auto` → `amdgpu` | 四组接触和两组摩擦均返回真实 RGB | 186.41 秒 | `L03 CHECK: PASSED` |
+| EN / CPU | `cpu` → `cpu` | 明确 `SKIP`；六个结果均含空画面字段 | 103.33 秒 | `L03 CHECK: PASSED` |
+| ZH / CPU | `cpu` → `cpu` | 明确 `SKIP`；六个结果均含空画面字段 | 52.06 秒 | `L03 CHECK: PASSED` |
+
+AMD 路径中，N1–N4 的初始与最终图像均为 `(360, 640, 3)` `uint8`，像素范围分别落在
+`[10, 165]` 与 `[10, 163]`；两组摩擦实验的图像均为 `(400, 720, 3)` `uint8`，初始
+范围为 `[10, 214]`，最终范围为 `[10, 213]`。所有图像非空且数值有限。人工检查生成的
+组合图后，接触实验能看到共享初始场景及 N1–N4 的最终场景；摩擦实验能看到沉降后和
+测量结束后的双通道状态；桌面摩擦单变量对照中，橙色低摩擦方块的最终位移变化清楚，
+蓝色控制通道近似不变。Matplotlib 轨迹仍作为定量证据，与相机画面并列而不是被替换。
+
+三条路径继续得到第 12.2 节记录的接触与摩擦关系，新增渲染没有改变物理参数或最终
+断言。执行后 notebook、`.npz`、PNG 和渲染缓存均只写入 `/tmp`。提交版双语 notebook
+仍为 20 个 cell、10 个 code cell，无 output 或 execution count；两份 notebook 的
+code-cell ID/source 规范化 SHA-256 均为
+`bd5db9c7c3427f1ba9b13fc0f0f3786b51497077e4da36f1cd533e718734e955`。这些证据新增的是
+参考 AMD 环境的 L03 离屏渲染能力，不改变 L03 以 CPU 为最低合同的 `cpu-verified`
+状态。

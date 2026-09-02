@@ -40,6 +40,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--high-friction", type=float, default=0.80)
     parser.add_argument("--stop-speed", type=float, default=0.01)
     parser.add_argument("--stop-hold", type=float, default=0.10)
+    parser.add_argument("--render", action="store_true")
     parser.add_argument("--output", type=Path, required=True)
     return parser.parse_args()
 
@@ -159,6 +160,15 @@ def main() -> int:
         material=gs.materials.Rigid(rho=CUBE_DENSITY, friction=args.high_friction),
         surface=gs.surfaces.Default(color=(0.15, 0.45, 0.85, 1.0)),
     )
+    camera = None
+    if args.render:
+        camera = scene.add_camera(
+            res=(720, 400),
+            pos=(1.25, -1.55, 1.35),
+            lookat=(0.0, 0.0, 0.72),
+            fov=46,
+            GUI=False,
+        )
     scene.build()
 
     # Establish the contact manifold before defining the horizontal-motion t=0.
@@ -167,6 +177,18 @@ def main() -> int:
 
     start_low = to_numpy(cube_low.get_pos()).reshape(-1).copy()
     start_high = to_numpy(cube_high.get_pos()).reshape(-1).copy()
+
+    def render_rgb(label: str) -> np.ndarray:
+        if camera is None:
+            return np.empty((0,), dtype=np.uint8)
+        rgb = to_numpy(camera.render(rgb=True)[0])
+        if rgb.ndim != 3 or rgb.shape[0] == 0 or rgb.shape[1] == 0 or rgb.shape[2] not in (3, 4):
+            raise AssertionError(f"{label}: expected a non-empty HxWx3/4 image, got {rgb.shape}")
+        if not np.isfinite(rgb).all():
+            raise AssertionError(f"{label}: image contains non-finite values")
+        return rgb.copy()
+
+    initial_rgb = render_rgb("initial_rgb")
     initial_dofs_velocity = np.array([args.initial_vx, 0.0, 0.0, 0.0, 0.0, 0.0])
     cube_low.set_dofs_velocity(initial_dofs_velocity)
     cube_high.set_dofs_velocity(initial_dofs_velocity)
@@ -195,6 +217,7 @@ def main() -> int:
     for index in range(1, measure_steps + 1):
         scene.step()
         record(index)
+    final_rgb = render_rgb("final_rgb")
     # NOTEBOOK_SIMULATION_CORE_END
 
     stop_index_low = sustained_stop_index(vx_low, args.stop_speed, hold_samples)
@@ -213,6 +236,7 @@ def main() -> int:
         genesis_version=np.asarray(genesis_version),
         torch_version=np.asarray(torch_version),
         torch_hip=np.asarray(torch.version.hip or "none"),
+        render_enabled=np.asarray(args.render),
         seed=np.asarray(0),
         precision=np.asarray("32"),
         dt=np.asarray(args.dt),
@@ -262,10 +286,13 @@ def main() -> int:
         stop_distance_high=np.asarray(stop_distance_high),
         final_distance_low=np.asarray(x_low[-1] - x_low[0]),
         final_distance_high=np.asarray(x_high[-1] - x_high[0]),
+        initial_rgb=initial_rgb,
+        final_rgb=final_rgb,
     )
     print(
         f"saved {args.output} | requested={args.backend}, actual={actual_backend}, "
-        f"genesis={genesis_version}, torch={torch_version} | "
+        f"genesis={genesis_version}, torch={torch_version}, "
+        f"render={'captured' if args.render else 'disabled'} | "
         f"low-μ stop={stop_time_low:.3f} s, {stop_distance_low:.3f} m | "
         f"high-μ stop={stop_time_high:.3f} s, {stop_distance_high:.3f} m"
     )

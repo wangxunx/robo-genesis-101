@@ -134,6 +134,29 @@ def test_friction_relationships_check_both_changed_and_control_lanes() -> None:
     )["high_lane_approximately_unchanged"]
 
 
+@pytest.mark.parametrize(
+    "module_name",
+    ("rigid_contact.py", "rigid_friction.py"),
+)
+def test_l03_render_paths_are_explicit_and_fail_loudly(module_name: str) -> None:
+    path = PROJECT_ROOT / "src" / "robo_genesis" / "experiments" / module_name
+    source = path.read_text(encoding="utf-8")
+    core = _marked_source(
+        path,
+        "# NOTEBOOK_SIMULATION_CORE_BEGIN",
+        "# NOTEBOOK_SIMULATION_CORE_END",
+    )
+
+    assert 'parser.add_argument("--render", action="store_true")' in source
+    assert "if args.render:" in core
+    assert core.index("scene.add_camera(") < core.index("scene.build()")
+    assert 'camera.render(rgb=True)[0]' in core
+    assert 'render_rgb("initial_rgb")' in core
+    assert 'render_rgb("final_rgb")' in core
+    assert "except Exception" not in core
+    assert "render_enabled=np.asarray(args.render)" in source
+
+
 def test_l03_notebooks_keep_the_lesson_title_and_expose_key_logic() -> None:
     expected_titles = {
         "en": "# L03 · Rigid-Body Physics and Stable Simulation",
@@ -142,6 +165,10 @@ def test_l03_notebooks_keep_the_lesson_title_and_expose_key_logic() -> None:
     gpu_first_text = {
         "en": "GPU is the preferred backend for this course.",
         "zh": "GPU 是本课程的首选后端。",
+    }
+    render_contract_text = {
+        "en": "Set `ROBO_GENESIS_RENDER=1` before starting the kernel",
+        "zh": "在启动 kernel 前设置 `ROBO_GENESIS_RENDER=1`",
     }
     exposed_definitions = (
         "def validated_step_count(",
@@ -215,12 +242,15 @@ def test_l03_notebooks_keep_the_lesson_title_and_expose_key_logic() -> None:
 
         assert "".join(first_markdown["source"]).splitlines()[0] == expected_titles[locale]
         assert gpu_first_text[locale] in markdown_source
+        assert render_contract_text[locale] in markdown_source
         assert len(contact_core_cells) == 1
         assert cell_ids.index("l03-part-a-core") < cell_ids.index("l03-part-a-run")
         assert _python_fence("".join(contact_core_cells[0]["source"])) == contact_runner_core
+        assert "scene.add_camera(" in contact_runner_core
         assert len(friction_core_cells) == 1
         assert cell_ids.index("l03-part-b-core") < cell_ids.index("l03-part-b-run")
         assert _python_fence("".join(friction_core_cells[0]["source"])) == friction_runner_core
+        assert "scene.add_camera(" in friction_runner_core
         assert "### Evidence-based interpretation" not in code_source
         for section in guided_interpretation_sections:
             assert section in code_source
@@ -240,6 +270,11 @@ def test_l03_notebooks_keep_the_lesson_title_and_expose_key_logic() -> None:
             "modified_stop_measurements",
             "part_b_checks",
             "HIGH_LANE_UNCHANGED_TOLERANCE",
+            "ROBO_GENESIS_RENDER",
+            "validate_render_frames",
+            "initial_rgb",
+            "final_rgb",
+            "friction_table_final_states.png",
         ):
             assert runtime_evidence in code_source
         assert "from robo_genesis.experiments" not in code_source
