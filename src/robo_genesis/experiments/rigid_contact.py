@@ -119,6 +119,7 @@ def main() -> int:
         raise ValueError("substeps must be positive")
 
     # NOTEBOOK_CORE_BEGIN
+    # NOTEBOOK_SIMULATION_CORE_BEGIN
     n_steps = validated_step_count(args.duration, args.dt)
 
     import genesis as gs
@@ -171,6 +172,7 @@ def main() -> int:
         vz_history[index] = float(to_numpy(cube.get_vel()).reshape(-1)[2])
         contacts = cube.get_contacts(with_entity=table)
         contact_counts[index] = int(contacts["position"].shape[0])
+    # NOTEBOOK_SIMULATION_CORE_END
 
     contact_mask = contact_counts > 0
     first_contact_index = first_true_index(contact_mask)

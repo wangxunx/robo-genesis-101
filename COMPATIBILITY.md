@@ -453,3 +453,52 @@ Part B 在两种后端都满足相同关系。CPU 的 baseline 停止距离为
 `c15baafec459ab85a2eb74cc26eec1c5753d576aa751cb5965f1203c8c8498e0`。本节证据只支持
 L03 的 `cpu-ok` 最低能力和额外 AMD 可运行性；课程状态仍由 M3.L03.6 验收后同步，
 不在 M3.L03.5 提前更新。
+
+### 12.3 接触与摩擦 runner 核心代码展示调整后的复验
+
+> 复验日期：2026-09-02（Asia/Shanghai）
+
+M3.L03.6 review 指出，notebook 虽然已经展开物理常量、case 配置、指标重算和关系检查，
+但在运行 N1–N4 前只显示 `robo_genesis.experiments.rigid_contact` 的模块调用，学习者无法
+直接看到 Scene 构建与逐步采样。双语 notebook 因此在子进程调用前增加同构 Markdown
+单元，展示 runner 实际执行的后端初始化、`SimOptions`、实体创建、`build()` 和
+`scene.step()` 后的高度、竖直速度及接触数量采样。可执行实现仍只保留在公共模块；测试
+会把 notebook 中的 Python 代码块与 runner 标记区域逐字核对，防止两者漂移。
+
+后续 review 指出 Part B 的 `robo_genesis.experiments.rigid_friction` 调用存在相同断点。
+双语 notebook 又在该调用前增加同构 Markdown 单元，展示桌面与两方块的创建、沉降以
+建立接触、相同六自由度初速度的设置，以及位移、线速度、角速度和接触数量的同步采样。
+持续停止指标仍在后续 notebook 单元中从原始轨迹重算；测试同样逐字核对该展示片段与
+`rigid_friction.py` 的标记区域。
+
+第三轮 review 确认原课程一的四段式 `Guided interpretation` 在当前 notebook 中被压缩
+成较弱的 `Evidence-based interpretation` 摘要。双语 notebook 因此恢复基于当前实测
+数组动态生成的四段式引导：固定 `dt` 比较 substeps、匹配 `substep_dt` 比较外层边界、
+限定结论范围，以及联合几何净空、竖直速度、contact count 和沉降误差判断反弹。文案会
+根据实际关系选择 `decreased`/`did not decrease` 与 `within`/`outside`，不预设结果，
+也不写死本机数值。
+
+第四轮 review 指出 Part B 同样缺少原课程一的运行后解释。基准摩擦实验现在动态生成
+四段式 `Guided friction interpretation`，说明受控变量、有效接触对摩擦、持续停止、
+角速度/contact 证据和结论边界；桌面摩擦练习动态生成四段式 `Guided one-factor
+interpretation`，核对唯一改动、两个有效摩擦值、停止距离方向及高摩擦控制通道容差。
+未停止、方向不符或超出容差时都会显示对应失败措辞，不把预测写成观察结果。
+
+前两轮返工只新增教学展示、源码范围标记和同步测试；后两轮修改了 notebook 的纯 NumPy
+结果解释 code cell。四轮都没有改变 runner 可执行语句、实验参数、指标定义或最终状态
+断言。仍使用第 12.1 节的命令结构，在独立 kernel 中重新执行两条受影响的 CPU 路径：
+
+| Notebook / 路径 | 请求后端 → 实际后端 | 复验结果 |
+| --- | --- | --- |
+| EN / CPU | `cpu` → `cpu` | 四个接触 case 与两组摩擦实验通过；`L03 CHECK: PASSED` |
+| ZH / CPU | `cpu` → `cpu` | 独立 kernel 完成相同实验；`L03 CHECK: PASSED` |
+
+两次运行继续得到 N1–N4 穿透代理值 13.193、7.797、23.984、13.193 mm；baseline
+低/高摩擦 lane 停止距离约为 0.410/0.224 m，桌面摩擦改为 0.30 后约为
+0.675/0.224 m。方向关系与 M3.L03.5 证据一致。这些绝对数值仍只是本机观察。
+
+本次没有重跑 AMD，因为 runner 可执行语句、物理参数和数据 schema 均未变化，而新增的
+四段式解释只消费已经通过有限性与 shape 检查的 NumPy 结果。第 12.2 节已验收的 R9700
+`auto → amdgpu` 仿真证据仍适用于当前 runner，但不能把本次 CPU 复验表述成新的 GPU
+notebook 运行证据。执行后 notebook 和产物只写入 `/tmp`，提交版 EN/ZH notebook 均为
+20 个 cell、10 个 code cell，且无 output 或 execution count。

@@ -1,4 +1,6 @@
 import json
+import re
+import textwrap
 from pathlib import Path
 
 import numpy as np
@@ -19,6 +21,19 @@ from robo_genesis.experiments.rigid_friction import (
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
+
+def _marked_source(path: Path, start_marker: str, end_marker: str) -> str:
+    source = path.read_text(encoding="utf-8")
+    marked = source.split(start_marker, 1)[1].split(end_marker, 1)[0]
+    return textwrap.dedent(marked).strip()
+
+
+def _python_fence(markdown: str) -> str:
+    match = re.search(r"```python\n(.*?)\n```", markdown, flags=re.DOTALL)
+    if match is None:
+        raise AssertionError("expected one fenced Python block")
+    return match.group(1).strip()
 
 
 def test_contact_time_grid_requires_an_exact_positive_step_count() -> None:
@@ -135,6 +150,36 @@ def test_l03_notebooks_keep_the_lesson_title_and_expose_key_logic() -> None:
         "def effective_pair_friction(",
         "def sustained_stop_index(",
         "def stop_measurement(",
+        "def format_distance(",
+    )
+    guided_interpretation_sections = (
+        "### Guided interpretation",
+        "**1. Hold `dt` fixed and change `substeps`.**",
+        "**2. Match `substep_dt` and change the external step boundary.**",
+        "**3. Scope the conclusion.**",
+        "**4. Do not infer rebound from contact count alone.**",
+    )
+    guided_friction_sections = (
+        "### Guided friction interpretation",
+        "**1. Read the controlled comparison.**",
+        "**2. Interpret sustained stopping, not one low-speed sample.**",
+        "**3. Keep rotation and contact in the evidence chain.**",
+        "**4. Bound the conclusion.**",
+        "### Guided one-factor interpretation",
+        "**1. Verify the intervention.**",
+        "**2. Follow the effective pair values.**",
+        "**3. Compare measured stopping distances.**",
+        "**4. State only what this one-factor experiment supports.**",
+    )
+    contact_runner_core = _marked_source(
+        PROJECT_ROOT / "src" / "robo_genesis" / "experiments" / "rigid_contact.py",
+        "# NOTEBOOK_SIMULATION_CORE_BEGIN",
+        "# NOTEBOOK_SIMULATION_CORE_END",
+    )
+    friction_runner_core = _marked_source(
+        PROJECT_ROOT / "src" / "robo_genesis" / "experiments" / "rigid_friction.py",
+        "# NOTEBOOK_SIMULATION_CORE_BEGIN",
+        "# NOTEBOOK_SIMULATION_CORE_END",
     )
 
     for locale in ("en", "zh"):
@@ -160,9 +205,43 @@ def test_l03_notebooks_keep_the_lesson_title_and_expose_key_logic() -> None:
             if cell["cell_type"] == "code"
             for line in cell["source"]
         )
+        cell_ids = [cell["id"] for cell in notebook["cells"]]
+        contact_core_cells = [
+            cell for cell in notebook["cells"] if cell["id"] == "l03-part-a-core"
+        ]
+        friction_core_cells = [
+            cell for cell in notebook["cells"] if cell["id"] == "l03-part-b-core"
+        ]
 
         assert "".join(first_markdown["source"]).splitlines()[0] == expected_titles[locale]
         assert gpu_first_text[locale] in markdown_source
+        assert len(contact_core_cells) == 1
+        assert cell_ids.index("l03-part-a-core") < cell_ids.index("l03-part-a-run")
+        assert _python_fence("".join(contact_core_cells[0]["source"])) == contact_runner_core
+        assert len(friction_core_cells) == 1
+        assert cell_ids.index("l03-part-b-core") < cell_ids.index("l03-part-b-run")
+        assert _python_fence("".join(friction_core_cells[0]["source"])) == friction_runner_core
+        assert "### Evidence-based interpretation" not in code_source
+        for section in guided_interpretation_sections:
+            assert section in code_source
+        for section in guided_friction_sections:
+            assert section in code_source
+        for runtime_evidence in (
+            "first_contact_time",
+            "real_separation_duration",
+            "zero_contact_duration",
+            "max_rebound_clearance",
+            "max_upward_vz",
+            "contact_count_changes",
+            "settling_error",
+            "baseline_stop_measurements",
+            "max_abs_omega_low",
+            "contact_fraction_low",
+            "modified_stop_measurements",
+            "part_b_checks",
+            "HIGH_LANE_UNCHANGED_TOLERANCE",
+        ):
+            assert runtime_evidence in code_source
         assert "from robo_genesis.experiments" not in code_source
         assert "import robo_genesis.experiments" not in code_source
         assert "from robo_genesis.course_utils import notebook_mode" in code_source

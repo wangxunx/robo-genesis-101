@@ -116,6 +116,7 @@ def main() -> int:
         raise ValueError("stop_hold must be positive")
 
     # NOTEBOOK_CORE_BEGIN
+    # NOTEBOOK_SIMULATION_CORE_BEGIN
     settle_steps = validated_step_count(args.settle_duration, args.dt, label="settle-duration")
     measure_steps = validated_step_count(args.measure_duration, args.dt, label="measure-duration")
     hold_samples = max(1, round(args.stop_hold / args.dt))
@@ -194,6 +195,7 @@ def main() -> int:
     for index in range(1, measure_steps + 1):
         scene.step()
         record(index)
+    # NOTEBOOK_SIMULATION_CORE_END
 
     stop_index_low = sustained_stop_index(vx_low, args.stop_speed, hold_samples)
     stop_index_high = sustained_stop_index(vx_high, args.stop_speed, hold_samples)
