@@ -87,7 +87,7 @@
         "zh": "docs/zh/lessons/l04-robot-models-dofs-and-joint-control.md",
         "en": "docs/en/lessons/l04-robot-models-dofs-and-joint-control.md"
       },
-      "status": "planned"
+      "status": "cpu-verified"
     },
     {
       "id": "L05",

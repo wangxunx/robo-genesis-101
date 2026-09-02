@@ -126,7 +126,7 @@ ACT 和 SmolVLA 的 checkpoint 都由 M0.7 干净环境生成，随后通过源�
 | Linux x86_64 / R9700 / 系统 ROCm 7.2.0 / 本文 wheel | **已验证** | 完整训练参考平台。 |
 | 其他 AMD GPU 或 ROCm 组合 | **未验证** | 不能从 R9700 结果外推；欢迎后续补充实测矩阵。 |
 | NVIDIA CUDA | **未验证** | 解析器出现 CUDA 包不构成验证；V1 不承诺完整链路支持。 |
-| CPU-only 完整链路 | **部分验证** | L01–L02 的 CPU 最小实验已验证；L03–L06 尚未完成，训练全链路也未在 CPU-only 环境验证。 |
+| CPU-only 完整链路 | **部分验证** | L01–L04 的 CPU 最小实验已验证；L05–L06 尚未完成，训练全链路也未在 CPU-only 环境验证。 |
 | Apple Silicon / macOS | **未验证** | 本轮没有执行 MPS、Genesis 或 LeRobot 兼容性测试。 |
 | Windows | **未验证** | 本轮没有执行原生 Windows 或 WSL 测试。 |
 | Python 3.11、3.13 或其他版本 | **不支持** | V1 的可复现环境限定为 Python 3.12.x。 |
@@ -560,3 +560,71 @@ code-cell ID/source 规范化 SHA-256 均为
 `bd5db9c7c3427f1ba9b13fc0f0f3786b51497077e4da36f1cd533e718734e955`。这些证据新增的是
 参考 AMD 环境的 L03 离屏渲染能力，不改变 L03 以 CPU 为最低合同的 `cpu-verified`
 状态。
+
+## 13. L04 / M3.L04.5 机器人模型与关节控制 clean-kernel 验证
+
+> 验证日期：2026-09-02（Asia/Shanghai）
+
+L04 使用 Genesis 1.3.3 内置 Franka，在同一固定初态上完成 joint4 基准位置阶跃及三组
+KP/KV 单变量对照。双语 CPU 路径和英文参考 AMD + EGL camera 路径均由
+`jupyter nbconvert --execute --to notebook` 启动独立 kernel；执行后 notebook、PNG 和
+缓存只写入 `/tmp`，提交版 notebook 保持无 output、`execution_count: null`。
+
+命令结构如下，其中 `<tmp>` 表示本轮隔离输出与缓存目录：
+
+```sh
+ROBO_GENESIS_BACKEND=cpu ROBO_GENESIS_RENDER=0 \
+ROBO_GENESIS_OUTPUTS_DIR=<tmp>/en-cpu-outputs \
+  <repo>/.venv/bin/jupyter nbconvert --execute --to notebook \
+  --ExecutePreprocessor.timeout=1200 --output l04-en-cpu.ipynb \
+  --output-dir <tmp> \
+  notebooks/en/l04-robot-models-dofs-and-joint-control.ipynb
+
+ROBO_GENESIS_BACKEND=cpu ROBO_GENESIS_RENDER=0 \
+ROBO_GENESIS_OUTPUTS_DIR=<tmp>/zh-cpu-outputs \
+  <repo>/.venv/bin/jupyter nbconvert --execute --to notebook \
+  --ExecutePreprocessor.timeout=1200 --output l04-zh-cpu.ipynb \
+  --output-dir <tmp> \
+  notebooks/zh/l04-robot-models-dofs-and-joint-control.ipynb
+
+PYOPENGL_PLATFORM=egl ROCR_VISIBLE_DEVICES=0 \
+ROBO_GENESIS_BACKEND=auto ROBO_GENESIS_RENDER=1 \
+ROBO_GENESIS_OUTPUTS_DIR=<tmp>/en-amd-render-outputs \
+  <repo>/.venv/bin/jupyter nbconvert --execute --to notebook \
+  --ExecutePreprocessor.timeout=1200 --output l04-en-amd-render.ipynb \
+  --output-dir <tmp> \
+  notebooks/en/l04-robot-models-dofs-and-joint-control.ipynb
+```
+
+| Notebook / 能力路径 | 请求后端 → 实际后端 | 姿态证据 | code cell 执行时长 | 最终结果 |
+| --- | --- | --- | ---: | --- |
+| EN / CPU | `cpu` → `cpu` | render 明确 `SKIP`；实测 Link 位置示意 | 49.26 秒 | `L04 CHECK: PASSED` |
+| ZH / CPU | `cpu` → `cpu` | render 明确 `SKIP`；实测 Link 位置示意 | 45.78 秒 | `L04 CHECK: PASSED` |
+| EN / AMD + EGL | `auto` → `amdgpu` | Genesis camera 初始/最终 RGB | 90.40 秒 | `L04 CHECK: PASSED` |
+
+三条路径都解析到 11 Links、9 Joints、9 DOFs 和 9 qpos，并按名称得到 7 个 arm DOF 与
+2 个 finger DOF。joint4 的目标是 `-1.7500 rad`；基准误差从 `0.250000 rad` 降至
+`0.006180 rad`，观测窗末速度约为 `0.000012 rad/s`。三组运行结果一致：
+
+| case | joint4 KP | joint4 KV | rise | overshoot | settling | final error | peak speed | peak control | saturation |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| G1 | 3500 | 100 | 0.120 s | 0 rad | 0.130 s | 0.00618 rad | 3.234 rad/s | 87.00 N·m | 70 ms |
+| G2 | 7000 | 100 | 0.110 s | 0.0447 rad | 0.190 s | 0.00309 rad | 3.670 rad/s | 87.00 N·m | 190 ms |
+| G3 | 7000 | 300 | 0.170 s | 0 rad | 0.210 s | 0.00309 rad | 2.471 rad/s | 87.00 N·m | 100 ms |
+
+因此 G1→G2 的提高 KP 对照满足“90% rise 不更晚且过冲增大”，G2→G3 的提高 KV 对照
+满足“过冲和峰值速度下降”。三组都触及配置的 `±87 N·m` force range，所以这些曲线
+同时验证了 notebook 对饱和边界的解释，不能当作无限制理想 PD 响应。
+
+AMD 渲染路径在 `build()` 前创建分辨率为 `720 × 540` 的 camera；初始和最终返回值均
+通过非空 H×W×3/4、有限数值检查，没有触发 fallback。保存的双帧组合图为可读的
+1511 × 624 RGBA PNG。人工检查确认 Franka 完整位于画面中，初末视角一致，joint4 运动
+带来的手臂和末端姿态差异可见，标题没有重叠。两张定量图也经人工检查：baseline 的
+目标、q、qdot、控制力和上下限可区分；G1–G3 图能看出 G2 过冲、G3 阻尼变化及力矩饱和。
+camera 图只作为场景和姿态证据，瞬态结论仍由数组、曲线和动态指标支撑。
+
+两条 CPU 路径生成的三张 PNG 哈希逐项相同，且都明确把姿态图标为 measured-Link
+schematic、不是 camera frame。三条运行均保留 Genesis 1.3.3 的 tendon approximation、
+neutral qpos、constraint time constant adjustment 和 neutral self-collision filtering
+warning；这些已知 warning 没有代替结构、shape、有限性、limit、受控变量和最终关系
+检查。L04 的最低课程合同仍是 CPU；本节新增的 R9700 证据不把 GPU 变成学习门槛。

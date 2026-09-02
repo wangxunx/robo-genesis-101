@@ -5,15 +5,15 @@ locale: en
 title: "Robot Models, Degrees of Freedom, and Joint Control"
 duration_minutes: 90
 hardware: cpu-ok
-status: planned
+status: cpu-verified
 ---
 
 # L04 · Robot Models, Degrees of Freedom, and Joint Control
 
-> **Course status:** L04 remains `planned`. This lecture defines the model and
-> experiment contract, but the companion notebook has not yet completed the
-> course's clean-run verification. Treat the lab relationships below as
-> hypotheses to measure, not as published runtime results.
+> **Course status:** the lecture and executable notebook are available. The
+> notebook has passed clean-kernel verification on CPU and on the reference AMD
+> ROCm platform, including the Genesis camera path. L04 is `cpu-verified`
+> because CPU remains its minimum hardware contract.
 
 ## Where this lesson fits
 

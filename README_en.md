@@ -2,11 +2,11 @@
 
 [简体中文](README.md)
 
-> **Project status: Alpha / course development.** L01 and L02 are
-> `cpu-verified` after clean-kernel CPU verification; the same concise L01
-> self-check also selected and passed the AMD backend on the reference R9700. L11 is `gpu-verified`
-> after ACT and SmolVLA GPU smoke and checkpoint-reload verification. The other
-> 9 lessons remain `planned`; an existing page or notebook is not evidence that
+> **Project status: Alpha / course development.** L01–L04 are `cpu-verified`
+> after their clean-kernel CPU verification; their additional AMD paths also passed
+> their respective contracts on the reference R9700. L11 is `gpu-verified` after
+> ACT and SmolVLA GPU smoke and checkpoint-reload verification. The other
+> 7 lessons remain `planned`; an existing page or notebook is not evidence that
 > its lesson has been verified.
 
 RoboGenesis 101 is a Datawhale open-source course for learners with basic Python experience who want a structured, hands-on introduction to robot learning. Using Genesis as its simulation platform, the course connects environment diagnostics, scenes, and rigid-body physics with robot control, inverse kinematics, grasping, demonstration data, imitation learning, policy training, and closed-loop evaluation.
@@ -50,7 +50,7 @@ Training loss or open-loop action prediction is not treated as task success. The
 | L01 | [Introduction, Runtime Platforms, and Environment Diagnostics](docs/en/lessons/l01-introduction-and-environment-diagnostics.md) | 30 min | `cpu-ok` | `cpu-verified` |
 | L02 | [Scenes, Entities, and the Simulation Lifecycle](docs/en/lessons/l02-scenes-entities-and-simulation-lifecycle.md) | 90 min | `cpu-ok` | `cpu-verified` |
 | L03 | [Rigid-Body Physics and Stable Simulation](docs/en/lessons/l03-rigid-body-physics-and-stable-simulation.md) | 90 min | `cpu-ok` | `cpu-verified` |
-| L04 | [Robot Models, Degrees of Freedom, and Joint Control](docs/en/lessons/l04-robot-models-dofs-and-joint-control.md) | 90 min | `cpu-ok` | `planned` |
+| L04 | [Robot Models, Degrees of Freedom, and Joint Control](docs/en/lessons/l04-robot-models-dofs-and-joint-control.md) | 90 min | `cpu-ok` | `cpu-verified` |
 | L05 | [Inverse Kinematics, End-Effector Poses, and Cameras](docs/en/lessons/l05-inverse-kinematics-end-effector-poses-and-cameras.md) | 120 min | `cpu-ok` | `planned` |
 | L06 | [Building a Grasping Task Scene](docs/en/lessons/l06-building-a-grasping-task-scene.md) | 120 min | `cpu-ok` | `planned` |
 | L07 | [Demonstration Acquisition and Scripted Experts](docs/en/lessons/l07-demonstration-acquisition-and-scripted-experts.md) | 120 min | `gpu-recommended` | `planned` |

@@ -5,14 +5,14 @@ locale: zh
 title: "机器人模型、DOF 与关节控制"
 duration_minutes: 90
 hardware: cpu-ok
-status: planned
+status: cpu-verified
 ---
 
 # L04 · 机器人模型、DOF 与关节控制
 
-> **课程状态：** L04 仍处于 `planned` 状态。本讲义已经给出模型和实验合同，但配套
-> notebook 尚未完成课程要求的干净运行验证。因此，下文中的实验关系应当作为需要测量
-> 的假设，而不是已经发布的运行结果。
+> **课程状态：** 讲义和可执行 notebook 均已提供。notebook 已在 CPU 和参考 AMD
+> ROCm 平台上通过干净 kernel 验证，其中包括 Genesis camera 路径；由于 CPU 仍是本讲
+> 的最低硬件要求，L04 状态为 `cpu-verified`。
 
 ## 本讲定位
 
