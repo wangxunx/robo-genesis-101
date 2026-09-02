@@ -25,7 +25,7 @@ npm ci
 npm run docs:dev
 ```
 
-轻量 Python 验证环境不安装仿真和训练依赖：
+轻量 Python 验证环境不安装 Genesis、渲染和训练依赖，只包含 pytest 和纯逻辑测试所需的 numpy：
 
 ```sh
 UV_PROJECT_ENVIRONMENT=.venv uv sync --only-group dev --locked
@@ -107,7 +107,7 @@ npm ci
 npm run docs:dev
 ```
 
-The lightweight Python validation environment omits simulation and training dependencies:
+The lightweight Python validation environment omits Genesis, rendering, and training dependencies. It carries only pytest and the numpy that the pure-logic tests need:
 
 ```sh
 UV_PROJECT_ENVIRONMENT=.venv uv sync --only-group dev --locked

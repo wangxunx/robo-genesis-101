@@ -91,7 +91,7 @@ npm run docs:build
 
 ### Run the lightweight quality gates
 
-This environment installs only pytest and the current project. It does not install Genesis, PyTorch, or the training stack:
+This environment installs only pytest, the numpy that the pure-logic tests need, and the current project. It does not install Genesis, PyTorch, or the training stack:
 
 ```sh
 UV_PROJECT_ENVIRONMENT=.venv uv sync --only-group dev --locked

@@ -90,7 +90,7 @@ npm run docs:build
 
 ### 运行轻量质量门禁
 
-以下环境只安装 pytest 和当前项目，不安装 Genesis、PyTorch 或训练栈：
+以下环境只安装 pytest、纯逻辑测试所需的 numpy 和当前项目，不安装 Genesis、PyTorch 或训练栈：
 
 ```sh
 UV_PROJECT_ENVIRONMENT=.venv uv sync --only-group dev --locked
