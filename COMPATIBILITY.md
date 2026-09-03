@@ -743,3 +743,8 @@ RGB/depth shape 输出，并增加 dtype、像素范围、有效深度数量和�
 time constant adjustment 和 neutral self-collision filtering warning；它们没有导致非有限
 状态、shape、limit、residual、tracking、camera 或 batch 检查失败。本节证明 L05 的 CPU
 最低路径和参考 R9700 附加路径，不把 GPU 变成课程门槛，也不外推到其他平台。
+
+基于以上已经验收的 M3.L05.5 运行证据，M3.L05.6 将 L05 的公开状态同步为
+`cpu-verified`：该状态对应本讲的最低 `cpu-ok` 合同，参考 R9700 的 AMD+EGL 结果是附加
+兼容性证据，不把本讲改为 GPU 必修。状态同步本身仍等待项目负责人验收，且不表示课程
+已经进入 `published` 状态。

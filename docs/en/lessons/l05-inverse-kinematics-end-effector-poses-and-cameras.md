@@ -5,15 +5,16 @@ locale: en
 title: "Inverse Kinematics, End-Effector Poses, and Cameras"
 duration_minutes: 120
 hardware: cpu-ok
-status: planned
+status: cpu-verified
 ---
 
 # L05 · Inverse Kinematics, End-Effector Poses, and Cameras
 
-> **Course status:** the English lecture text is present. The paired Chinese
-> lecture and the executable notebooks are still being developed, so L05
-> remains `planned`; this page does not claim runtime verification or
-> publication of the complete bilingual lesson.
+> **Course status:** the paired English/Chinese lectures and notebooks are
+> complete. Both CPU clean-kernel paths passed; the English CPU+EGL and reference
+> AMD+EGL camera paths also passed. L05 is `cpu-verified` under its minimum
+> `cpu-ok` contract—the additional AMD evidence does not make a GPU a learner
+> requirement. The lesson is not yet `published`.
 
 ## Where this lesson fits
 

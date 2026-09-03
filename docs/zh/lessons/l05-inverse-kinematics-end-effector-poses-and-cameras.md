@@ -5,14 +5,15 @@ locale: zh
 title: "逆运动学、末端位姿与相机"
 duration_minutes: 120
 hardware: cpu-ok
-status: planned
+status: cpu-verified
 ---
 
 # L05 · 逆运动学、末端位姿与相机
 
-> **课程状态：** 英文讲义正文已经完成，当前中文讲义也已形成；可执行 notebook 仍在
-> 开发中，因此 L05 继续保持 `planned`。本页不代表完整双语课程已经发布，也不代表
-> 运行验证已经完成。
+> **课程状态：** 中英文讲义与 notebook 均已完成；双语 CPU clean-kernel 路径已经通过，
+> 英文 CPU+EGL 与参考 AMD+EGL 相机路径也已通过。L05 按最低 `cpu-ok` 合同记录为
+> `cpu-verified`；附加 AMD 证据不表示学习者必须使用 GPU。本讲尚未进入 `published`
+> 状态。
 
 ## 本讲定位
 

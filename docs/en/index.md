@@ -25,10 +25,10 @@ features:
 
 ## Course status
 
-> L01–L04 are `cpu-verified` after their clean-kernel CPU verification; their
+> L01–L05 are `cpu-verified` after their clean-kernel CPU verification; their
 > additional AMD paths also passed their respective contracts on the reference R9700.
 > L11 is `gpu-verified` after ACT and SmolVLA GPU smoke and checkpoint-reload
-> verification. The other 7 lessons remain `planned`; an existing page does not
+> verification. The other 6 lessons remain `planned`; an existing page does not
 > mean that lesson has been verified.
 
 | Lesson | Topic | Planned duration | Hardware | Status |
@@ -37,7 +37,7 @@ features:
 | L02 | [Scenes, Entities, and the Simulation Lifecycle](/en/lessons/l02-scenes-entities-and-simulation-lifecycle) | 90 min | `cpu-ok` | `cpu-verified` |
 | L03 | [Rigid-Body Physics and Stable Simulation](/en/lessons/l03-rigid-body-physics-and-stable-simulation) | 90 min | `cpu-ok` | `cpu-verified` |
 | L04 | [Robot Models, Degrees of Freedom, and Joint Control](/en/lessons/l04-robot-models-dofs-and-joint-control) | 90 min | `cpu-ok` | `cpu-verified` |
-| L05 | [Inverse Kinematics, End-Effector Poses, and Cameras](/en/lessons/l05-inverse-kinematics-end-effector-poses-and-cameras) | 120 min | `cpu-ok` | `planned` |
+| L05 | [Inverse Kinematics, End-Effector Poses, and Cameras](/en/lessons/l05-inverse-kinematics-end-effector-poses-and-cameras) | 120 min | `cpu-ok` | `cpu-verified` |
 | L06 | [Building a Grasping Task Scene](/en/lessons/l06-building-a-grasping-task-scene) | 120 min | `cpu-ok` | `planned` |
 | L07 | [Demonstration Acquisition and Scripted Experts](/en/lessons/l07-demonstration-acquisition-and-scripted-experts) | 120 min | `gpu-recommended` | `planned` |
 | L08 | [Synthetic Data Recording and Collection Throughput](/en/lessons/l08-synthetic-data-recording-and-throughput) | 120 min | `gpu-recommended` | `planned` |

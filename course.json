@@ -106,7 +106,7 @@
         "zh": "docs/zh/lessons/l05-inverse-kinematics-end-effector-poses-and-cameras.md",
         "en": "docs/en/lessons/l05-inverse-kinematics-end-effector-poses-and-cameras.md"
       },
-      "status": "planned"
+      "status": "cpu-verified"
     },
     {
       "id": "L06",
