@@ -629,68 +629,68 @@ neutral qpos、constraint time constant adjustment 和 neutral self-collision fi
 warning；这些已知 warning 没有代替结构、shape、有限性、limit、受控变量和最终关系
 检查。L04 的最低课程合同仍是 CPU；本节新增的 R9700 证据不把 GPU 变成学习门槛。
 
-## 14. L05 / M3.L05.5 IK、末端位姿与相机 clean-kernel 验证
+## 14. L05 / M3.L05R.5 FK、IK、末端位姿与 fixed camera clean-kernel 验证
 
-> 验证日期：2026-09-03（Asia/Shanghai）
+> 验证日期：2026-09-04（Asia/Shanghai）
 
-L05 使用 Genesis 1.3.3 内置 Franka，验证 world-frame reachable/unreachable IK、显式
-FK prediction、full/arm Jacobian、180-step 动态控制、fixed/wrist camera，以及 B=4
-baseline 和 `envs_idx=[1,3]` selective update。四条最终路径都由
-`jupyter nbconvert --execute --to notebook` 启动独立 kernel；执行后 notebook、PNG 和
-缓存只写入 `/tmp`，提交版 notebook 保持无 output、`execution_count: null`。
+重构后的 L05 使用 Genesis 1.3.3 内置 Franka，沿一条单环境主线验证 world-frame hand
+pose、reachable/unreachable IK、显式 FK prediction、180-step 关节位置控制，以及一个
+fixed camera 的 RGB/depth。新版 notebook 不再包含 Jacobian/SVD、DLS、wrist camera、
+intrinsics/extrinsics、diagnostic override、B=4 batched control 或 selective update。
+
+四条最终路径都由 `jupyter nbconvert --execute --to notebook` 启动独立 kernel；执行副本、
+PNG 和缓存只写入 `/tmp`，提交版 EN/ZH notebook 继续保持无 output、
+`execution_count: null`。每份提交版 notebook 为 15 个 cell，其中 7 个 code cell、330 行
+code source；双语 code-cell ID/source 逐字一致。
 
 ### 14.1 环境与执行矩阵
 
-本轮继续复用仓库 `.venv`：Python 3.12.3、Genesis 1.3.3、PyTorch distribution
-`2.9.1+rocm7.2.1.lw.gitff65f5bc`、`torch.__version__`
-`2.9.1+rocm7.2.1.gitff65f5bc` 和 HIP `7.2.53211-e1a6bc5663`。AMD 路径只暴露物理
-GPU 1；运行前探针确认只见一张 `AMD Radeon AI PRO R9700`、显存 30576 MB，且
-`arange(8).square()+1` 在进程内 `cuda:0` 返回 `[1,2,5,10,17,26,37,50]`。
+本轮复用仓库 `.venv`：Python 3.12.3、Genesis 1.3.3、PyTorch
+`2.9.1+rocm7.2.1.gitff65f5bc` 和 HIP `7.2.53211-e1a6bc5663`。系统可见 4 张
+AMD Radeon AI PRO R9700；AMD notebook 路径使用运行前基本空闲的物理 GPU 0，进程内
+实际 backend 报告为 `amdgpu`。
 
 命令结构如下，其中 `<tmp>` 是本轮隔离目录：
 
 ```sh
 ROBO_GENESIS_BACKEND=cpu ROBO_GENESIS_RENDER=0 \
-ROBO_GENESIS_OUTPUTS_DIR=<tmp>/en-cpu-outputs \
-  <repo>/.venv/bin/jupyter nbconvert --execute --to notebook \
-  --ExecutePreprocessor.timeout=1200 --output l05-en-cpu.ipynb \
+  .venv/bin/jupyter nbconvert --execute --to notebook \
+  --ExecutePreprocessor.timeout=600 --output l05-en-cpu-render0.ipynb \
   --output-dir <tmp> \
   notebooks/en/l05-inverse-kinematics-end-effector-poses-and-cameras.ipynb
 
 ROBO_GENESIS_BACKEND=cpu ROBO_GENESIS_RENDER=0 \
-ROBO_GENESIS_OUTPUTS_DIR=<tmp>/zh-cpu-outputs \
-  <repo>/.venv/bin/jupyter nbconvert --execute --to notebook \
-  --ExecutePreprocessor.timeout=1200 --output l05-zh-cpu.ipynb \
+  .venv/bin/jupyter nbconvert --execute --to notebook \
+  --ExecutePreprocessor.timeout=600 --output l05-zh-cpu-render0.ipynb \
   --output-dir <tmp> \
   notebooks/zh/l05-inverse-kinematics-end-effector-poses-and-cameras.ipynb
 
 PYOPENGL_PLATFORM=egl ROBO_GENESIS_BACKEND=cpu ROBO_GENESIS_RENDER=1 \
-ROBO_GENESIS_OUTPUTS_DIR=<tmp>/en-cpu-render-outputs \
-  <repo>/.venv/bin/jupyter nbconvert --execute --to notebook \
-  --ExecutePreprocessor.timeout=1200 --output l05-en-cpu-render.ipynb \
+  .venv/bin/jupyter nbconvert --execute --to notebook \
+  --ExecutePreprocessor.timeout=900 --output l05-en-cpu-egl-render1.ipynb \
   --output-dir <tmp> \
   notebooks/en/l05-inverse-kinematics-end-effector-poses-and-cameras.ipynb
 
-PYOPENGL_PLATFORM=egl ROCR_VISIBLE_DEVICES=1 \
-ROBO_GENESIS_BACKEND=auto ROBO_GENESIS_RENDER=1 \
-ROBO_GENESIS_OUTPUTS_DIR=<tmp>/en-amd-render-outputs \
-  <repo>/.venv/bin/jupyter nbconvert --execute --to notebook \
-  --ExecutePreprocessor.timeout=1200 --output l05-en-amd-render.ipynb \
+PYOPENGL_PLATFORM=egl ROCR_VISIBLE_DEVICES=0 HIP_VISIBLE_DEVICES=0 \
+CUDA_VISIBLE_DEVICES=0 ROBO_GENESIS_BACKEND=auto ROBO_GENESIS_RENDER=1 \
+  .venv/bin/jupyter nbconvert --execute --to notebook \
+  --ExecutePreprocessor.timeout=900 --output l05-en-amd-egl-render1.ipynb \
   --output-dir <tmp> \
   notebooks/en/l05-inverse-kinematics-end-effector-poses-and-cameras.ipynb
 ```
 
-| Notebook / 能力路径 | 请求后端 → 实际后端 | camera 证据 | code cell 执行时长 | 最终结果 |
-| --- | --- | --- | ---: | --- |
-| EN / CPU | `cpu` → `cpu` | 明确 `SKIP`；measured-state fallback | 53.71 秒 | `L05 CHECK: PASSED` |
-| ZH / CPU | `cpu` → `cpu` | 明确 `SKIP`；measured-state fallback | 54.50 秒 | `L05 CHECK: PASSED` |
-| EN / CPU + EGL | `cpu` → `cpu` | fixed/wrist RGB、fixed depth | 67.22 秒 | `L05 CHECK: PASSED` |
-| EN / AMD + EGL | `auto` → `amdgpu` | fixed/wrist RGB、fixed depth | 123.75 秒 | `L05 CHECK: PASSED` |
+| Notebook / 能力路径 | 请求后端 → 实际后端 | camera 证据 | 最终结果 |
+| --- | --- | --- | --- |
+| EN / CPU | `cpu` → `cpu` | 明确 `SKIP`；没有伪 camera frame | `L05 CHECK: PASSED` |
+| ZH / CPU | `cpu` → `cpu` | 明确 `SKIP`；没有伪 camera frame | `L05 CHECK: PASSED` |
+| EN / CPU + EGL | `cpu` → `cpu` | 一个 fixed-camera RGB/depth | `L05 CHECK: PASSED` |
+| EN / AMD + EGL | `auto` → `amdgpu` | 一个 fixed-camera RGB/depth | `L05 CHECK: PASSED` |
 
-四份执行后 notebook 都没有 error output，并且各含一次最终通过标记。英文与中文 CPU
-结果一致；英文 CPU+EGL 与 AMD+EGL 都实际进入严格 render 分支，没有 fallback。
+四份执行后 notebook 的 7 个 code cell 均取得 execution count，没有 error output，并且
+各含一次最终通过标记。英文与中文 CPU 数值结果一致；英文 CPU+EGL 与 AMD+EGL 都实际
+进入 render 分支。执行副本 code source 与提交版逐项一致，运行证据不是来自临时改写。
 
-### 14.2 IK、FK、动态与 batch 证据
+### 14.2 IK、FK、动态与负例证据
 
 CPU 的 reachable position/rotation solver residual 为约 0.000110217 m /
 0.000002741 rad，AMD 为约 0.000110271 m / 0.000002465 rad；相应 FK prediction error
@@ -700,51 +700,38 @@ CPU 的 reachable position/rotation solver residual 为约 0.000110217 m /
 中分别报告，不能相互替代。
 
 unreachable `[2,0,2]` 在 CPU 的 position/rotation residual 约为 2.062891 m /
-1.088002 rad，AMD 约为 2.055613 m / 1.120848 rad；两条路径都正常拒绝 candidate，随后
-仅在显式 diagnostic override 下执行有限 best-effort q，且最终 summary 仍标记为 rejected。
+1.088002 rad，AMD 约为 2.055613 m / 1.120848 rad。两条路径都得到 finite q，但 residual
+超过 tolerance，因此 `IK valid: False`；notebook 明确记录 `command sent: no`，不再提供
+会执行 rejected q 的 diagnostic override。
 
-B=4 baseline 的 CPU/AMD 结果在显示精度下相同，四行末态位置误差为 0.004860、0.005578、
-0.005593、0.005106 m，全部低于 0.08 m 且小于各自初态。selective env 1/3 的末态误差
-分别约为 0.005276/0.006059 m（AMD 的 env 1 为 0.005275 m）；env 0/2 的 untouched
-motion 和 retained-error change 在本轮显示精度下均为 0。所有结论来自逐环境数组，没有
-使用 batch mean 掩盖失败行。
+本节证据保持三层边界：IK residual 只支持 candidate；FK 只预测 q 对应的 pose，不推进
+动态场景；最终到达质量来自 180-step 后读取的 measured hand pose。它们都不证明无碰撞
+路径、抓取成功或无限时域稳定性。
 
 ### 14.3 相机数组与人工视觉检查
 
-CPU+EGL 和 AMD+EGL 得到相同的相机数组合同：fixed initial/reached/rejected RGB 与 wrist
-initial/reached RGB 均为 `(360,640,3)` `uint8`，fixed 像素范围 `[10,255]`，wrist 为
-`[11,255]`；fixed reached depth 为 `(360,640)` `float32`，230400 个像素中有 208000 个
-位于 clipping interval 内，有效范围约为 `[1.277315,9.906994] m`。K 与 fixed/wrist
-extrinsics 均为有限矩阵；fixed extrinsics 保持不变，`move_to_attach()` 后 wrist fresh
-extrinsics 发生变化。
+CPU+EGL 和 AMD+EGL 得到相同的轻量相机数组合同：fixed-camera RGB 为
+`(360,640,3)` `uint8`，depth 为 `(360,640)` `float32`，全部像素 finite。Notebook 只检查
+shape、dtype 和 finite，不教授 K、intrinsics/extrinsics、clipping analysis 或 attached
+camera lifecycle。
 
-人工检查 CPU 和 AMD 的最终 PNG 后确认：fixed 初末帧视角一致，Franka 到达 marker
-附近的姿态变化可见，青色近场参照清楚；depth 图能区分机器人和平面；wrist 初末帧随
-hand 运动发生对应视野变化；rejected diagnostic 图标题明确红色球仍是 reachable baseline
-marker。position/orientation 曲线能看到初期瞬态及末态阈值，batch 图明确标成
-measured-state evidence、不是 camera frame。CPU 和 AMD 在本轮判据修正前后的五张 PNG
-分别保持相同 SHA-256，说明修正没有改变场景、动态或渲染结果。
+人工检查 CPU 和 AMD 的 RGB/depth 两联图后确认：RGB 中 Franka 与棋盘地面清晰可辨，
+没有空白、全黑、错位或损坏画面；depth 中机器人轮廓与 RGB 位置一致，并呈现合理的
+近远层次。误差图显示 position error 在 180 step 内降至阈值以下；orientation error 有
+短暂上升，但最终低于 `0.05 rad`。相机图只证明场景可观察，不替代 IK、FK 或 tracking
+数组证据。
 
-### 14.4 验证中发现的 float32 判据修正
+### 14.4 已知 warning、状态结论与限制
 
-第一次 AMD+EGL 正式运行在“hand orientation restored after IK”处失败：q、hand position、
-IK candidate 和 residual 均已通过，只有用 `2*arccos(abs(dot(q1,q2))) < 1e-7` 判断近零
-角度时返回 false。进一步复核发现旧代码还在第一次 IK 后调用 FK，之后才读取名为
-`hand_after_ik` 的状态，混入了第二次 GPU FK 重算。
+四条路径均观察到 Genesis 1.3.3 已知的 tendon approximation、neutral qpos、solver time
+constant adjustment 和 neutral self-collision filtering warning；它们没有导致非有限状态、
+shape、residual、tracking 或 camera 检查失败。沙箱内第一次启动 Jupyter kernel 还因
+本地 socket 权限返回 `Operation not permitted`，在获得授权后于沙箱外复跑同一命令并
+通过；这不是 notebook 行为失败。
 
-最终 notebook 改为在 IK 返回后、FK 调用前立即读取 solver state，并用 normalization 后
-考虑 `q/-q` 的最大 quaternion component distance 判断状态恢复；目标和轨迹姿态误差仍
-使用最短角距离，IK 与动态阈值均未放宽。AMD 最终实测 component distance 为
-`6.589e-08`，CPU 为 0，均低于适合 float32 状态对照的 `1e-6`；初态 FK 与 measured
-quaternion 的 component distance 在两种后端均为 0。相机 helper 同时恢复原课程已有的
-RGB/depth shape 输出，并增加 dtype、像素范围、有效深度数量和范围，严格断言保持不变。
+基于已经验收的 M3.L05R.5 证据，重构后的 L05 继续使用 `cpu-verified`：该状态对应本讲
+最低 `cpu-ok` 合同和已通过的 EN/ZH CPU clean-kernel。参考 R9700 的 AMD+EGL 结果是附加
+兼容性证据，不把本讲改成 GPU 必修，也不表示 L05 已经 `published`。
 
-四条最终路径均观察到 Genesis 1.3.3 已知的 tendon approximation、neutral qpos、solver
-time constant adjustment 和 neutral self-collision filtering warning；它们没有导致非有限
-状态、shape、limit、residual、tracking、camera 或 batch 检查失败。本节证明 L05 的 CPU
-最低路径和参考 R9700 附加路径，不把 GPU 变成课程门槛，也不外推到其他平台。
-
-基于以上已经验收的 M3.L05.5 运行证据，M3.L05.6 将 L05 的公开状态同步为
-`cpu-verified`：该状态对应本讲的最低 `cpu-ok` 合同，参考 R9700 的 AMD+EGL 结果是附加
-兼容性证据，不把本讲改为 GPU 必修。状态同步本身仍等待项目负责人验收，且不表示课程
-已经进入 `published` 状态。
+本轮没有验证其他 AMD/ROCm 组合、NVIDIA、Apple Silicon、Windows、viewer 模式、真实
+相机、抓取成功、碰撞安全或无限时域稳定性；当前结果不得外推到这些平台或能力。

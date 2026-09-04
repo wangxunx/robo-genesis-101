@@ -10,8 +10,10 @@ status: cpu-verified
 
 # L05 · 逆运动学、末端位姿与相机
 
-> **课程状态：** L05 正在修订，尚未发布。修订后的双语讲义和 notebook 必须重新经过
-> review 与运行验证，才能再次确认其运行状态。
+> **课程状态：** 重构后的双语讲义和可执行 notebook 均已提供。notebook 已在 CPU 和
+> 参考 AMD ROCm 平台上通过干净 kernel 验证，其中包括一个 fixed-camera RGB/depth
+> 路径；由于 CPU 仍是本讲的最低硬件要求，L05 状态为 `cpu-verified`，但这不表示本讲
+> 已经 `published`。
 
 ## 本讲定位
 

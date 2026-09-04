@@ -10,9 +10,11 @@ status: cpu-verified
 
 # L05 · Inverse Kinematics, End-Effector Poses, and Cameras
 
-> **Course status:** L05 is being revised and is not yet published. The revised
-> bilingual lecture and notebook must be reviewed and run again before their
-> runtime status is reaffirmed.
+> **Course status:** the revised bilingual lecture and executable notebook are
+> available. The notebook has passed clean-kernel verification on CPU and on
+> the reference AMD ROCm platform, including one fixed-camera RGB/depth path.
+> L05 is `cpu-verified` because CPU remains its minimum hardware contract; this
+> does not mean the lesson is `published`.
 
 ## Where this lesson fits
 
