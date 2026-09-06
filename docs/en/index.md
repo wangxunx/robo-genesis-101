@@ -27,10 +27,9 @@ features:
 
 > L01–L05 are `cpu-verified` after their clean-kernel CPU verification; their
 > additional AMD paths also passed their respective contracts on the reference R9700.
-> The renumbered L12 training content previously passed ACT and SmolVLA GPU smoke
-> and checkpoint-reload checks as L11; because its lesson-specific code changed,
-> it is temporarily `reviewed` pending targeted GPU revalidation. The other
-> 7 lessons remain `planned`.
+> The renumbered L12 training content has passed ACT and SmolVLA GPU smoke,
+> checkpoint audit, and reload checks against the current code and is
+> `gpu-verified`. The other 7 lessons remain `planned`.
 
 | Lesson | Topic | Planned duration | Hardware | Status |
 |---|---|---:|---|---|
@@ -45,5 +44,5 @@ features:
 | L09 | [Synthetic Data Recording and Collection Throughput](/en/lessons/l09-synthetic-data-recording-and-throughput) | 120 min | `gpu-recommended` | `planned` |
 | L10 | [Dataset Anatomy and Imitation Learning 101](/en/lessons/l10-dataset-anatomy-and-imitation-learning) | 90 min | `gpu-recommended` | `planned` |
 | L11 | [Domain Randomization](/en/lessons/l11-domain-randomization) | 90 min | `gpu-recommended` | `planned` |
-| L12 | [Training ACT and SmolVLA Policies](/en/lessons/l12-act-and-smolvla-policy-training) | 150 min | `gpu-required` | `reviewed` |
+| L12 | [Training ACT and SmolVLA Policies](/en/lessons/l12-act-and-smolvla-policy-training) | 150 min | `gpu-required` | `gpu-verified` |
 | L13 | [Closed-Loop Evaluation and Capstone](/en/lessons/l13-closed-loop-evaluation-and-capstone) | 120 min | `gpu-required` | `planned` |

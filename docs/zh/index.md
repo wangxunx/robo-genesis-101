@@ -26,9 +26,9 @@ features:
 ## 课程状态
 
 > L01–L05 已通过各自的 CPU clean-kernel 验证，状态均为 `cpu-verified`；这些讲次的
-> 附加 AMD 路径也已在参考 R9700 环境按各自合同通过。重编号后的 L12 训练内容曾以
-> L11 编号通过 ACT、SmolVLA GPU smoke 和 checkpoint 重载验证；因编号相关代码已变化，
-> 当前暂为 `reviewed`，等待针对性 GPU 复验。其余 7 讲仍为 `planned`。
+> 附加 AMD 路径也已在参考 R9700 环境按各自合同通过。重编号后的 L12 训练内容已针对
+> 当前代码通过 ACT、SmolVLA GPU smoke、checkpoint 审计和重载验证，状态为
+> `gpu-verified`。其余 7 讲仍为 `planned`。
 
 | 讲次 | 主题 | 预计时长 | 硬件 | 状态 |
 |---|---|---:|---|---|
@@ -43,5 +43,5 @@ features:
 | L09 | [合成数据录制与采数吞吐](/zh/lessons/l09-synthetic-data-recording-and-throughput) | 120 分钟 | `gpu-recommended` | `planned` |
 | L10 | [数据集解剖与模仿学习 101](/zh/lessons/l10-dataset-anatomy-and-imitation-learning) | 90 分钟 | `gpu-recommended` | `planned` |
 | L11 | [域随机化](/zh/lessons/l11-domain-randomization) | 90 分钟 | `gpu-recommended` | `planned` |
-| L12 | [ACT 与 SmolVLA 策略训练](/zh/lessons/l12-act-and-smolvla-policy-training) | 150 分钟 | `gpu-required` | `reviewed` |
+| L12 | [ACT 与 SmolVLA 策略训练](/zh/lessons/l12-act-and-smolvla-policy-training) | 150 分钟 | `gpu-required` | `gpu-verified` |
 | L13 | [闭环评估与 Capstone](/zh/lessons/l13-closed-loop-evaluation-and-capstone) | 120 分钟 | `gpu-required` | `planned` |

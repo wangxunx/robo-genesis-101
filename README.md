@@ -4,8 +4,8 @@
 
 > **项目状态：Alpha / 课程开发阶段。** L01–L05 已通过各自的 CPU clean-kernel 验证，
 > 状态为 `cpu-verified`；这些讲次的附加 AMD 路径也已在参考 R9700 环境按各自合同通过。
-> 重编号后的 L12 训练内容曾以 L11 编号通过 ACT、SmolVLA GPU smoke 和 checkpoint
-> 重载验证；因编号相关代码已经变化，当前暂为 `reviewed`，等待针对性 GPU 复验。
+> 重编号后的 L12 训练内容已针对当前代码通过 ACT、SmolVLA GPU smoke、checkpoint
+> 审计和重载验证，状态为 `gpu-verified`。
 > 其余 7 讲仍为 `planned`。页面和 notebook 已建立不代表对应课程已经完成验证。
 
 RoboGenesis 101 是一门 Datawhale 开源课程，面向具备 Python 基础、希望系统进入机器人学习实践的学习者。课程以 Genesis 为仿真平台，从环境诊断、场景和刚体物理出发，逐步连接机器人控制、逆运动学、抓取、演示数据、模仿学习、策略训练与闭环评估。
@@ -57,7 +57,7 @@ RoboGenesis 101 是一门 Datawhale 开源课程，面向具备 Python 基础、
 | L09 | [合成数据录制与采数吞吐](docs/zh/lessons/l09-synthetic-data-recording-and-throughput.md) | 120 分钟 | `gpu-recommended` | `planned` |
 | L10 | [数据集解剖与模仿学习 101](docs/zh/lessons/l10-dataset-anatomy-and-imitation-learning.md) | 90 分钟 | `gpu-recommended` | `planned` |
 | L11 | [域随机化](docs/zh/lessons/l11-domain-randomization.md) | 90 分钟 | `gpu-recommended` | `planned` |
-| L12 | [ACT 与 SmolVLA 策略训练](docs/zh/lessons/l12-act-and-smolvla-policy-training.md) | 150 分钟 | `gpu-required` | `reviewed` |
+| L12 | [ACT 与 SmolVLA 策略训练](docs/zh/lessons/l12-act-and-smolvla-policy-training.md) | 150 分钟 | `gpu-required` | `gpu-verified` |
 | L13 | [闭环评估与 Capstone](docs/zh/lessons/l13-closed-loop-evaluation-and-capstone.md) | 120 分钟 | `gpu-required` | `planned` |
 
 状态从 `planned` 依次推进到 `draft`、`reviewed`、`cpu-verified` 或

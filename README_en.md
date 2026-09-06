@@ -5,9 +5,8 @@
 > **Project status: Alpha / course development.** L01–L05 are `cpu-verified`
 > after their clean-kernel CPU verification; their additional AMD paths also passed
 > their respective contracts on the reference R9700. The renumbered L12 training
-> content previously passed ACT and SmolVLA GPU smoke and checkpoint-reload checks
-> as L11; because its lesson-specific code changed, it is temporarily `reviewed`
-> pending targeted GPU revalidation. The other 7 lessons remain `planned`.
+> content has passed ACT and SmolVLA GPU smoke, checkpoint audit, and reload checks
+> against the current code and is `gpu-verified`. The other 7 lessons remain `planned`.
 
 RoboGenesis 101 is a Datawhale open-source course for learners with basic Python experience who want a structured, hands-on introduction to robot learning. Using Genesis as its simulation platform, the course connects environment diagnostics, scenes, and rigid-body physics with robot control, inverse kinematics, grasping, demonstration data, imitation learning, policy training, and closed-loop evaluation.
 
@@ -58,7 +57,7 @@ Training loss or open-loop action prediction is not treated as task success. The
 | L09 | [Synthetic Data Recording and Collection Throughput](docs/en/lessons/l09-synthetic-data-recording-and-throughput.md) | 120 min | `gpu-recommended` | `planned` |
 | L10 | [Dataset Anatomy and Imitation Learning 101](docs/en/lessons/l10-dataset-anatomy-and-imitation-learning.md) | 90 min | `gpu-recommended` | `planned` |
 | L11 | [Domain Randomization](docs/en/lessons/l11-domain-randomization.md) | 90 min | `gpu-recommended` | `planned` |
-| L12 | [Training ACT and SmolVLA Policies](docs/en/lessons/l12-act-and-smolvla-policy-training.md) | 150 min | `gpu-required` | `reviewed` |
+| L12 | [Training ACT and SmolVLA Policies](docs/en/lessons/l12-act-and-smolvla-policy-training.md) | 150 min | `gpu-required` | `gpu-verified` |
 | L13 | [Closed-Loop Evaluation and Capstone](docs/en/lessons/l13-closed-loop-evaluation-and-capstone.md) | 120 min | `gpu-required` | `planned` |
 
 Statuses progress from `planned` to `draft`, `reviewed`, `cpu-verified` or

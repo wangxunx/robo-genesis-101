@@ -36,7 +36,7 @@ def test_repository_manifest_defines_the_canonical_learning_path() -> None:
         CourseStatus.CPU_VERIFIED,
         CourseStatus.CPU_VERIFIED,
         *([CourseStatus.PLANNED] * 6),
-        CourseStatus.REVIEWED,
+        CourseStatus.GPU_VERIFIED,
         CourseStatus.PLANNED,
     ]
     assert [lesson.hardware for lesson in manifest.lessons] == [

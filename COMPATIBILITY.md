@@ -753,3 +753,69 @@ M3.R13.2 只执行静态课程合同、单元测试、Python 编译和文档构�
 notebook、GPU 训练或 checkpoint 重载。M3.R13.3 将针对当前 L12 重跑 dry-run、
 ACT/SmolVLA 1-step GPU smoke 和 checkpoint audit/reload；只有该步通过后才能恢复
 `gpu-verified`。本次编号迁移不改变第 10 节的历史数值，也不扩大平台支持范围。
+
+## 16. L12 / M3.R13.3 重编号后的 GPU 复验
+
+> 验证日期：2026-09-06（Asia/Shanghai）
+>
+> 范围：当前 L12 的真实数据门禁、双策略命令审计、ACT/SmolVLA 1 step
+> GPU smoke、checkpoint 审计、同一样本开环重载，以及状态同步后的双语
+> clean-kernel。完整训练、收敛和 L13 Genesis 闭环评估均未运行。
+
+### 16.1 环境、数据与模型身份
+
+本轮复用已按本文基线安装的仓库 `.venv`。`uv pip check` 检查 221 个包并返回
+`All installed packages are compatible`。实测版本为 Python 3.12.3、LeRobot 0.6.0、
+PyTorch `2.9.1+rocm7.2.1.gitff65f5bc`、HIP `7.2.53211-e1a6bc5663`。训练前
+物理 GPU 2 为 AMD Radeon AI PRO R9700，空闲可见显存约 `30519 MB`；
+`ROCR_VISIBLE_DEVICES=2` 将它单独暴露为进程内 `cuda:0`。最小 ROCm tensor 运算返回
+`[1, 2, 5, 10, 17, 26, 37, 50]`，未回退到 CPU。
+
+复验数据仍是课程脚本专家生成的真实临时 LeRobot 数据集 `local/m06_g133`：
+1 episode、42 frames、5 FPS，`observation.state` 和 `action` 均为 9 维有限
+`float32`，`world`/`wrist` 视频均解码为 `(3, 120, 160)`，task 为
+`pick the banana and place it in the bowl`。SmolVLA 继续从本地离线缓存核对：
+
+- `lerobot/smolvla_base@c83c3163b8ca9b7e67c509fffd9121e66cb96205`；
+- `HuggingFaceTB/SmolVLM2-500M-Video-Instruct@7b375e1b73b11138ff12fe22c8f2822d8fe03467`。
+
+### 16.2 clean-kernel 执行顺序与 GPU 结果
+
+首先在独立中文 kernel 中以 `RG101_RUN_SMOKE=0` 执行当时仍为 `reviewed` 的
+notebook；数据门禁、安装配置读取、双 snapshot 审计、双 dry-run 和 smoke 命令
+preflight 全部通过，训练与 checkpoint 声明正确标为 `SKIP`。
+
+英文 notebook 随后在另一个独立 kernel 中以 `RG101_RUN_SMOKE=1` 从头执行，
+仅暴露物理 GPU 2。两种策略均读取上述 42-frame 数据集，完成前向、有限
+loss、反向、有限 gradient norm、一次 optimizer update 和 checkpoint 保存：
+
+| 策略 | 训练配置 | 本轮日志观察 | checkpoint 证据 |
+| --- | --- | --- | --- |
+| ACT | pipeline-only 缩小配置，batch 1、seed 1000、1 step | loss `20.499`、gradient norm `208.584`、update `0.872 s`、报告显存 `0.36 GB` | `000001`；权重 `45384956` bytes；`last → 000001` |
+| SmolVLA | 固定 base/VLM、默认冻结策略、batch 1、seed 1000、1 step | loss `6.305`、gradient norm `42.467`、update `1.328 s`、报告显存 `1.81 GB` | `000001`；权重 `906712520` bytes；`last → 000001` |
+
+上述数值是本次 smoke 观察，不是质量比较、收敛证据或跨环境阈值。两个数值
+checkpoint 都包含策略配置、训练配置、非空权重、预/后处理配置和必需状态文件。
+ACT 恢复 9 维 action 以及 `chunk_size=n_action_steps=10`；SmolVLA 恢复 9 维 action、
+`chunk_size=n_action_steps=50`、固定 VLM 以及
+`world/wrist → camera1/camera2` 映射。
+
+当前项目的通用 loader 在同一 GPU 上重载两个 checkpoint，并对同一真实数据样本
+各返回 `(9,) float32` 有限动作。这仍然只是 **open-loop single-sample probe**，
+没有把动作施加到 Genesis，也没有计算抓放成功率。
+
+### 16.3 状态同步后复验与结论
+
+完成上述 GPU 证据后，L12 在 manifest、双语讲义/notebook、README 和首页中同步
+为 `gpu-verified`。最终 EN/ZH notebook 又各自在新的 R9700 kernel 中以
+`RG101_RUN_SMOKE=0` 从头执行；两者都通过新状态断言、真实数据门禁、snapshot 审计、
+双 dry-run 和命令 preflight，且执行副本的 cell type、ID 和 source 与对应提交版
+完全一致。提交版 EN/ZH code cell 的 ID/source 也完全一致，并保持无 output、
+`execution_count: null`。
+
+本轮观察到非阻断的 Jupyter `IProgress not found` 提示和 Transformers `torch_dtype`
+弃用提示，均未影响数据、训练、checkpoint 或重载断言。所有执行后 notebook、
+checkpoint、日志和训练输出都位于 `/tmp/rg101-r133.sPlI2O`，未进入 Git。
+
+以上证据支持当前 L12 恢复 `gpu-verified`。它不证明长训练收敛、策略质量、空缓存
+联网下载、Genesis 闭环运行或任务成功率；后两项仍属于 L13。
