@@ -9,8 +9,8 @@
 
 ## 1. 当前 Git 快照
 
-- 当前分支：`M3.L05`。
-- 当前 HEAD：`06e39a2`，提交说明为 `verified refactored l05 notebooks`。该提交已包含
+- 当前分支：`main`；本地 `M3.L05`、`origin/main` 与 `origin/HEAD` 当前也指向同一提交。
+- 当前 HEAD：`0646277`，提交说明为 `verified refactored l05 notebooks`。该提交已包含
   M3.L05R.6 的双语 L05 状态说明、`COMPATIBILITY.md` 新版第 14 节和本 handoff 的
   重构后快照。
 - 当前 worktree 的 tracked 修改只有本 handoff 的验收日期与门禁同步；本地开发计划和
