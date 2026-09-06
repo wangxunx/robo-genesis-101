@@ -1,5 +1,5 @@
 ---
-lesson: L09
+lesson: L10
 slug: dataset-anatomy-and-imitation-learning
 locale: zh
 title: "数据集解剖与模仿学习 101"
@@ -8,6 +8,6 @@ hardware: gpu-recommended
 status: planned
 ---
 
-# L09 · 数据集解剖与模仿学习 101
+# L10 · 数据集解剖与模仿学习 101
 
 > 本讲尚未发布，完整讲义和配套 notebook 仍在准备中。

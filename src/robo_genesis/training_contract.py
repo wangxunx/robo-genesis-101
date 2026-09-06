@@ -1,4 +1,4 @@
-"""Dependency-light checks shared by the L11 training notebook and CLI.
+"""Dependency-light checks shared by the L12 training notebook and CLI.
 
 The helpers in this module inspect commands and on-disk artifacts. They do not
 import LeRobot, allocate a model, contact the Hugging Face Hub, or claim that a

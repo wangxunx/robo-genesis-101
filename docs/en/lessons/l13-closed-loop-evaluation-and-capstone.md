@@ -1,5 +1,5 @@
 ---
-lesson: L12
+lesson: L13
 slug: closed-loop-evaluation-and-capstone
 locale: en
 title: "Closed-Loop Evaluation and Capstone"
@@ -8,6 +8,6 @@ hardware: gpu-required
 status: planned
 ---
 
-# L12 · Closed-Loop Evaluation and Capstone
+# L13 · Closed-Loop Evaluation and Capstone
 
 > This lesson has not been published yet. The complete lecture and companion notebook are still being prepared.

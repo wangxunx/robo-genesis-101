@@ -16,7 +16,7 @@ hero:
 
 features:
   - title: Genesis 基础
-    details: 学习环境诊断、场景、刚体物理、机器人控制、逆运动学与相机。
+    details: 学习环境诊断、场景、刚体物理、机器人控制、逆运动学、相机与并行仿真。
   - title: 从控制到抓取
     details: 搭建抓取场景，理解脚本化专家和演示数据获取。
   - title: 从数据到策略
@@ -26,9 +26,9 @@ features:
 ## 课程状态
 
 > L01–L05 已通过各自的 CPU clean-kernel 验证，状态均为 `cpu-verified`；这些讲次的
-> 附加 AMD 路径也已在参考 R9700 环境按各自合同通过。L11 已通过 ACT 与 SmolVLA 的
-> GPU smoke 和 checkpoint 重载验证，状态为 `gpu-verified`；其余 6 讲仍为 `planned`。页面已经
-> 存在不代表对应课程已经完成验证。
+> 附加 AMD 路径也已在参考 R9700 环境按各自合同通过。重编号后的 L12 训练内容曾以
+> L11 编号通过 ACT、SmolVLA GPU smoke 和 checkpoint 重载验证；因编号相关代码已变化，
+> 当前暂为 `reviewed`，等待针对性 GPU 复验。其余 7 讲仍为 `planned`。
 
 | 讲次 | 主题 | 预计时长 | 硬件 | 状态 |
 |---|---|---:|---|---|
@@ -37,10 +37,11 @@ features:
 | L03 | [刚体物理与稳定仿真](/zh/lessons/l03-rigid-body-physics-and-stable-simulation) | 90 分钟 | `cpu-ok` | `cpu-verified` |
 | L04 | [机器人模型、DOF 与关节控制](/zh/lessons/l04-robot-models-dofs-and-joint-control) | 90 分钟 | `cpu-ok` | `cpu-verified` |
 | L05 | [逆运动学、末端位姿与相机](/zh/lessons/l05-inverse-kinematics-end-effector-poses-and-cameras) | 120 分钟 | `cpu-ok` | `cpu-verified` |
-| L06 | [抓取任务场景搭建](/zh/lessons/l06-building-a-grasping-task-scene) | 120 分钟 | `cpu-ok` | `planned` |
-| L07 | [演示数据获取与脚本化专家](/zh/lessons/l07-demonstration-acquisition-and-scripted-experts) | 120 分钟 | `gpu-recommended` | `planned` |
-| L08 | [合成数据录制与采数吞吐](/zh/lessons/l08-synthetic-data-recording-and-throughput) | 120 分钟 | `gpu-recommended` | `planned` |
-| L09 | [数据集解剖与模仿学习 101](/zh/lessons/l09-dataset-anatomy-and-imitation-learning) | 90 分钟 | `gpu-recommended` | `planned` |
-| L10 | [域随机化](/zh/lessons/l10-domain-randomization) | 90 分钟 | `gpu-recommended` | `planned` |
-| L11 | [ACT 与 SmolVLA 策略训练](/zh/lessons/l11-act-and-smolvla-policy-training) | 150 分钟 | `gpu-required` | `gpu-verified` |
-| L12 | [闭环评估与 Capstone](/zh/lessons/l12-closed-loop-evaluation-and-capstone) | 120 分钟 | `gpu-required` | `planned` |
+| L06 | [并行仿真与批量 Franka 控制](/zh/lessons/l06-parallel-simulation-and-batched-franka-control) | 90 分钟 | `cpu-ok` | `planned` |
+| L07 | [抓取任务场景搭建](/zh/lessons/l07-building-a-grasping-task-scene) | 120 分钟 | `cpu-ok` | `planned` |
+| L08 | [演示数据获取与脚本化专家](/zh/lessons/l08-demonstration-acquisition-and-scripted-experts) | 120 分钟 | `gpu-recommended` | `planned` |
+| L09 | [合成数据录制与采数吞吐](/zh/lessons/l09-synthetic-data-recording-and-throughput) | 120 分钟 | `gpu-recommended` | `planned` |
+| L10 | [数据集解剖与模仿学习 101](/zh/lessons/l10-dataset-anatomy-and-imitation-learning) | 90 分钟 | `gpu-recommended` | `planned` |
+| L11 | [域随机化](/zh/lessons/l11-domain-randomization) | 90 分钟 | `gpu-recommended` | `planned` |
+| L12 | [ACT 与 SmolVLA 策略训练](/zh/lessons/l12-act-and-smolvla-policy-training) | 150 分钟 | `gpu-required` | `reviewed` |
+| L13 | [闭环评估与 Capstone](/zh/lessons/l13-closed-loop-evaluation-and-capstone) | 120 分钟 | `gpu-required` | `planned` |

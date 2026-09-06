@@ -20,7 +20,7 @@ from .paths import PROJECT_ROOT, resolve_cli_path
 
 SCHEMA_VERSION = 1
 SUPPORTED_LOCALES = ("zh", "en")
-LESSON_COUNT = 12
+LESSON_COUNT = 13
 DEFAULT_MANIFEST_PATH = PROJECT_ROOT / "course.json"
 
 _COURSE_ID_PATTERN = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")

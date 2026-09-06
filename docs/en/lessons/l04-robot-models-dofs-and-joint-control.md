@@ -989,8 +989,8 @@ motion.
 
 L05 will use inverse kinematics to compute arm-joint targets from a desired
 end-effector pose and will treat cameras as sensors rather than only scene
-evidence. The target still needs the L04 control loop to become motion. L06 will
-place this controlled robot into the grasping scene. L07 will sequence the same
+evidence. The target still needs the L04 control loop to become motion. L07 will
+place this controlled robot into the grasping scene. L08 will sequence the same
 joint-control interface into a scripted expert and must continue to respect
 limits, timing, and measured state.
 

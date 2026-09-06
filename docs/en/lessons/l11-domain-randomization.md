@@ -1,5 +1,5 @@
 ---
-lesson: L10
+lesson: L11
 slug: domain-randomization
 locale: en
 title: "Domain Randomization"
@@ -8,6 +8,6 @@ hardware: gpu-recommended
 status: planned
 ---
 
-# L10 · Domain Randomization
+# L11 · Domain Randomization
 
 > This lesson has not been published yet. The complete lecture and companion notebook are still being prepared.

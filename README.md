@@ -4,9 +4,9 @@
 
 > **项目状态：Alpha / 课程开发阶段。** L01–L05 已通过各自的 CPU clean-kernel 验证，
 > 状态为 `cpu-verified`；这些讲次的附加 AMD 路径也已在参考 R9700 环境按各自合同通过。
-> L11 已通过 ACT 与 SmolVLA 的 GPU smoke 和 checkpoint 重载验证，状态为
-> `gpu-verified`；其余 6 讲仍为 `planned`。页面和 notebook 已建立不代表对应课程
-> 已经完成验证。
+> 重编号后的 L12 训练内容曾以 L11 编号通过 ACT、SmolVLA GPU smoke 和 checkpoint
+> 重载验证；因编号相关代码已经变化，当前暂为 `reviewed`，等待针对性 GPU 复验。
+> 其余 7 讲仍为 `planned`。页面和 notebook 已建立不代表对应课程已经完成验证。
 
 RoboGenesis 101 是一门 Datawhale 开源课程，面向具备 Python 基础、希望系统进入机器人学习实践的学习者。课程以 Genesis 为仿真平台，从环境诊断、场景和刚体物理出发，逐步连接机器人控制、逆运动学、抓取、演示数据、模仿学习、策略训练与闭环评估。
 
@@ -34,7 +34,7 @@ RoboGenesis 101 是一门 Datawhale 开源课程，面向具备 Python 基础、
 课程按以下依赖关系推进：
 
 1. Genesis 环境、场景、实体、物理和仿真生命周期；
-2. 机器人自由度、关节控制、逆运动学、末端位姿和相机；
+2. 机器人自由度、关节控制、逆运动学、末端位姿、相机和并行仿真；
 3. 抓取任务、脚本化专家、演示获取和数据录制；
 4. 数据集、模仿学习、域随机化、ACT/SmolVLA 训练和闭环评估。
 
@@ -51,13 +51,14 @@ RoboGenesis 101 是一门 Datawhale 开源课程，面向具备 Python 基础、
 | L03 | [刚体物理与稳定仿真](docs/zh/lessons/l03-rigid-body-physics-and-stable-simulation.md) | 90 分钟 | `cpu-ok` | `cpu-verified` |
 | L04 | [机器人模型、DOF 与关节控制](docs/zh/lessons/l04-robot-models-dofs-and-joint-control.md) | 90 分钟 | `cpu-ok` | `cpu-verified` |
 | L05 | [逆运动学、末端位姿与相机](docs/zh/lessons/l05-inverse-kinematics-end-effector-poses-and-cameras.md) | 120 分钟 | `cpu-ok` | `cpu-verified` |
-| L06 | [抓取任务场景搭建](docs/zh/lessons/l06-building-a-grasping-task-scene.md) | 120 分钟 | `cpu-ok` | `planned` |
-| L07 | [演示数据获取与脚本化专家](docs/zh/lessons/l07-demonstration-acquisition-and-scripted-experts.md) | 120 分钟 | `gpu-recommended` | `planned` |
-| L08 | [合成数据录制与采数吞吐](docs/zh/lessons/l08-synthetic-data-recording-and-throughput.md) | 120 分钟 | `gpu-recommended` | `planned` |
-| L09 | [数据集解剖与模仿学习 101](docs/zh/lessons/l09-dataset-anatomy-and-imitation-learning.md) | 90 分钟 | `gpu-recommended` | `planned` |
-| L10 | [域随机化](docs/zh/lessons/l10-domain-randomization.md) | 90 分钟 | `gpu-recommended` | `planned` |
-| L11 | [ACT 与 SmolVLA 策略训练](docs/zh/lessons/l11-act-and-smolvla-policy-training.md) | 150 分钟 | `gpu-required` | `gpu-verified` |
-| L12 | [闭环评估与 Capstone](docs/zh/lessons/l12-closed-loop-evaluation-and-capstone.md) | 120 分钟 | `gpu-required` | `planned` |
+| L06 | [并行仿真与批量 Franka 控制](docs/zh/lessons/l06-parallel-simulation-and-batched-franka-control.md) | 90 分钟 | `cpu-ok` | `planned` |
+| L07 | [抓取任务场景搭建](docs/zh/lessons/l07-building-a-grasping-task-scene.md) | 120 分钟 | `cpu-ok` | `planned` |
+| L08 | [演示数据获取与脚本化专家](docs/zh/lessons/l08-demonstration-acquisition-and-scripted-experts.md) | 120 分钟 | `gpu-recommended` | `planned` |
+| L09 | [合成数据录制与采数吞吐](docs/zh/lessons/l09-synthetic-data-recording-and-throughput.md) | 120 分钟 | `gpu-recommended` | `planned` |
+| L10 | [数据集解剖与模仿学习 101](docs/zh/lessons/l10-dataset-anatomy-and-imitation-learning.md) | 90 分钟 | `gpu-recommended` | `planned` |
+| L11 | [域随机化](docs/zh/lessons/l11-domain-randomization.md) | 90 分钟 | `gpu-recommended` | `planned` |
+| L12 | [ACT 与 SmolVLA 策略训练](docs/zh/lessons/l12-act-and-smolvla-policy-training.md) | 150 分钟 | `gpu-required` | `reviewed` |
+| L13 | [闭环评估与 Capstone](docs/zh/lessons/l13-closed-loop-evaluation-and-capstone.md) | 120 分钟 | `gpu-required` | `planned` |
 
 状态从 `planned` 依次推进到 `draft`、`reviewed`、`cpu-verified` 或
 `gpu-verified`，最终才是 `published`。详细证据要求见[课程内容规范](CONTENT_GUIDE.md)。
@@ -125,7 +126,7 @@ uv run jupyter lab
 ```
 
 notebook 会打印核心版本，自动优先选择可用的 AMD ROCm 后端，否则使用 CPU，然后运行
-一个最小 Genesis 场景。CPU fallback 不阻止继续 L01–L06；训练环境要求和参考平台见
+一个最小 Genesis 场景。CPU fallback 不阻止继续 L01–L07；训练环境要求和参考平台见
 [L01 讲义](docs/zh/lessons/l01-introduction-and-environment-diagnostics.md)与
 [兼容性矩阵](COMPATIBILITY.md)。
 

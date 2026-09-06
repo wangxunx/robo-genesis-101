@@ -352,7 +352,7 @@ effective_pair_friction = max(table_friction, cube_friction)
 
 This is a Genesis 1.3.3 implementation rule, not a universal law shared by every
 physics engine. If the engine version changes, the rule must be checked again.
-L10 will later use runtime friction ratios for domain randomization; the same
+L11 will later use runtime friction ratios for domain randomization; the same
 pair rule explains why changing only one contact surface may have no effect.
 
 The baseline values make that behavior testable:
@@ -643,8 +643,8 @@ not a universal convergence proof.
   and measurement window that support them.
 
 L04 will connect the outer timestep to joint-command cadence and compare target
-state with actual robot motion. L06 will apply pairwise contact reasoning to the
-table, object, and gripper. L10 will revisit friction through runtime domain
+state with actual robot motion. L07 will apply pairwise contact reasoning to the
+table, object, and gripper. L11 will revisit friction through runtime domain
 randomization and show why all relevant contact surfaces must be considered.
 
 ## Sources

@@ -110,6 +110,25 @@
     },
     {
       "id": "L06",
+      "slug": "parallel-simulation-and-batched-franka-control",
+      "title": {
+        "zh": "并行仿真与批量 Franka 控制",
+        "en": "Parallel Simulation and Batched Franka Control"
+      },
+      "duration_minutes": 90,
+      "hardware": "cpu-ok",
+      "notebook": {
+        "zh": "notebooks/zh/l06-parallel-simulation-and-batched-franka-control.ipynb",
+        "en": "notebooks/en/l06-parallel-simulation-and-batched-franka-control.ipynb"
+      },
+      "lecture": {
+        "zh": "docs/zh/lessons/l06-parallel-simulation-and-batched-franka-control.md",
+        "en": "docs/en/lessons/l06-parallel-simulation-and-batched-franka-control.md"
+      },
+      "status": "planned"
+    },
+    {
+      "id": "L07",
       "slug": "building-a-grasping-task-scene",
       "title": {
         "zh": "抓取任务场景搭建",
@@ -118,17 +137,17 @@
       "duration_minutes": 120,
       "hardware": "cpu-ok",
       "notebook": {
-        "zh": "notebooks/zh/l06-building-a-grasping-task-scene.ipynb",
-        "en": "notebooks/en/l06-building-a-grasping-task-scene.ipynb"
+        "zh": "notebooks/zh/l07-building-a-grasping-task-scene.ipynb",
+        "en": "notebooks/en/l07-building-a-grasping-task-scene.ipynb"
       },
       "lecture": {
-        "zh": "docs/zh/lessons/l06-building-a-grasping-task-scene.md",
-        "en": "docs/en/lessons/l06-building-a-grasping-task-scene.md"
+        "zh": "docs/zh/lessons/l07-building-a-grasping-task-scene.md",
+        "en": "docs/en/lessons/l07-building-a-grasping-task-scene.md"
       },
       "status": "planned"
     },
     {
-      "id": "L07",
+      "id": "L08",
       "slug": "demonstration-acquisition-and-scripted-experts",
       "title": {
         "zh": "演示数据获取与脚本化专家",
@@ -137,17 +156,17 @@
       "duration_minutes": 120,
       "hardware": "gpu-recommended",
       "notebook": {
-        "zh": "notebooks/zh/l07-demonstration-acquisition-and-scripted-experts.ipynb",
-        "en": "notebooks/en/l07-demonstration-acquisition-and-scripted-experts.ipynb"
+        "zh": "notebooks/zh/l08-demonstration-acquisition-and-scripted-experts.ipynb",
+        "en": "notebooks/en/l08-demonstration-acquisition-and-scripted-experts.ipynb"
       },
       "lecture": {
-        "zh": "docs/zh/lessons/l07-demonstration-acquisition-and-scripted-experts.md",
-        "en": "docs/en/lessons/l07-demonstration-acquisition-and-scripted-experts.md"
+        "zh": "docs/zh/lessons/l08-demonstration-acquisition-and-scripted-experts.md",
+        "en": "docs/en/lessons/l08-demonstration-acquisition-and-scripted-experts.md"
       },
       "status": "planned"
     },
     {
-      "id": "L08",
+      "id": "L09",
       "slug": "synthetic-data-recording-and-throughput",
       "title": {
         "zh": "合成数据录制与采数吞吐",
@@ -156,17 +175,17 @@
       "duration_minutes": 120,
       "hardware": "gpu-recommended",
       "notebook": {
-        "zh": "notebooks/zh/l08-synthetic-data-recording-and-throughput.ipynb",
-        "en": "notebooks/en/l08-synthetic-data-recording-and-throughput.ipynb"
+        "zh": "notebooks/zh/l09-synthetic-data-recording-and-throughput.ipynb",
+        "en": "notebooks/en/l09-synthetic-data-recording-and-throughput.ipynb"
       },
       "lecture": {
-        "zh": "docs/zh/lessons/l08-synthetic-data-recording-and-throughput.md",
-        "en": "docs/en/lessons/l08-synthetic-data-recording-and-throughput.md"
+        "zh": "docs/zh/lessons/l09-synthetic-data-recording-and-throughput.md",
+        "en": "docs/en/lessons/l09-synthetic-data-recording-and-throughput.md"
       },
       "status": "planned"
     },
     {
-      "id": "L09",
+      "id": "L10",
       "slug": "dataset-anatomy-and-imitation-learning",
       "title": {
         "zh": "数据集解剖与模仿学习 101",
@@ -175,17 +194,17 @@
       "duration_minutes": 90,
       "hardware": "gpu-recommended",
       "notebook": {
-        "zh": "notebooks/zh/l09-dataset-anatomy-and-imitation-learning.ipynb",
-        "en": "notebooks/en/l09-dataset-anatomy-and-imitation-learning.ipynb"
+        "zh": "notebooks/zh/l10-dataset-anatomy-and-imitation-learning.ipynb",
+        "en": "notebooks/en/l10-dataset-anatomy-and-imitation-learning.ipynb"
       },
       "lecture": {
-        "zh": "docs/zh/lessons/l09-dataset-anatomy-and-imitation-learning.md",
-        "en": "docs/en/lessons/l09-dataset-anatomy-and-imitation-learning.md"
+        "zh": "docs/zh/lessons/l10-dataset-anatomy-and-imitation-learning.md",
+        "en": "docs/en/lessons/l10-dataset-anatomy-and-imitation-learning.md"
       },
       "status": "planned"
     },
     {
-      "id": "L10",
+      "id": "L11",
       "slug": "domain-randomization",
       "title": {
         "zh": "域随机化",
@@ -194,17 +213,17 @@
       "duration_minutes": 90,
       "hardware": "gpu-recommended",
       "notebook": {
-        "zh": "notebooks/zh/l10-domain-randomization.ipynb",
-        "en": "notebooks/en/l10-domain-randomization.ipynb"
+        "zh": "notebooks/zh/l11-domain-randomization.ipynb",
+        "en": "notebooks/en/l11-domain-randomization.ipynb"
       },
       "lecture": {
-        "zh": "docs/zh/lessons/l10-domain-randomization.md",
-        "en": "docs/en/lessons/l10-domain-randomization.md"
+        "zh": "docs/zh/lessons/l11-domain-randomization.md",
+        "en": "docs/en/lessons/l11-domain-randomization.md"
       },
       "status": "planned"
     },
     {
-      "id": "L11",
+      "id": "L12",
       "slug": "act-and-smolvla-policy-training",
       "title": {
         "zh": "ACT 与 SmolVLA 策略训练",
@@ -213,17 +232,17 @@
       "duration_minutes": 150,
       "hardware": "gpu-required",
       "notebook": {
-        "zh": "notebooks/zh/l11-act-and-smolvla-policy-training.ipynb",
-        "en": "notebooks/en/l11-act-and-smolvla-policy-training.ipynb"
+        "zh": "notebooks/zh/l12-act-and-smolvla-policy-training.ipynb",
+        "en": "notebooks/en/l12-act-and-smolvla-policy-training.ipynb"
       },
       "lecture": {
-        "zh": "docs/zh/lessons/l11-act-and-smolvla-policy-training.md",
-        "en": "docs/en/lessons/l11-act-and-smolvla-policy-training.md"
+        "zh": "docs/zh/lessons/l12-act-and-smolvla-policy-training.md",
+        "en": "docs/en/lessons/l12-act-and-smolvla-policy-training.md"
       },
-      "status": "gpu-verified"
+      "status": "reviewed"
     },
     {
-      "id": "L12",
+      "id": "L13",
       "slug": "closed-loop-evaluation-and-capstone",
       "title": {
         "zh": "闭环评估与 Capstone",
@@ -232,12 +251,12 @@
       "duration_minutes": 120,
       "hardware": "gpu-required",
       "notebook": {
-        "zh": "notebooks/zh/l12-closed-loop-evaluation-and-capstone.ipynb",
-        "en": "notebooks/en/l12-closed-loop-evaluation-and-capstone.ipynb"
+        "zh": "notebooks/zh/l13-closed-loop-evaluation-and-capstone.ipynb",
+        "en": "notebooks/en/l13-closed-loop-evaluation-and-capstone.ipynb"
       },
       "lecture": {
-        "zh": "docs/zh/lessons/l12-closed-loop-evaluation-and-capstone.md",
-        "en": "docs/en/lessons/l12-closed-loop-evaluation-and-capstone.md"
+        "zh": "docs/zh/lessons/l13-closed-loop-evaluation-and-capstone.md",
+        "en": "docs/en/lessons/l13-closed-loop-evaluation-and-capstone.md"
       },
       "status": "planned"
     }

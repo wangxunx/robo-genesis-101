@@ -27,7 +27,7 @@ def test_repository_manifest_defines_the_canonical_learning_path() -> None:
     assert manifest.course.default_locale == "zh"
     assert manifest.course.locales == ("zh", "en")
     assert [lesson.id for lesson in manifest.lessons] == [
-        f"L{number:02d}" for number in range(1, 13)
+        f"L{number:02d}" for number in range(1, 14)
     ]
     assert [lesson.status for lesson in manifest.lessons] == [
         CourseStatus.CPU_VERIFIED,
@@ -35,12 +35,12 @@ def test_repository_manifest_defines_the_canonical_learning_path() -> None:
         CourseStatus.CPU_VERIFIED,
         CourseStatus.CPU_VERIFIED,
         CourseStatus.CPU_VERIFIED,
-        *([CourseStatus.PLANNED] * 5),
-        CourseStatus.GPU_VERIFIED,
+        *([CourseStatus.PLANNED] * 6),
+        CourseStatus.REVIEWED,
         CourseStatus.PLANNED,
     ]
     assert [lesson.hardware for lesson in manifest.lessons] == [
-        *([HardwareRequirement.CPU_OK] * 6),
+        *([HardwareRequirement.CPU_OK] * 7),
         *([HardwareRequirement.GPU_RECOMMENDED] * 4),
         *([HardwareRequirement.GPU_REQUIRED] * 2),
     ]

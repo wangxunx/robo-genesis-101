@@ -48,8 +48,8 @@ q goal  ──L04 位置控制 + scene.step()──>  实测末端位姿
 - 区分状态重置与位置控制目标；
 - 检查数组 shape、单位与数值有限性。
 
-本讲不需要桌子、抓取物体、状态机、数据集或学习策略。L06 会在这条关节空间/任务空间
-联系清晰以后，再加入抓取场景。
+本讲不需要桌子、抓取物体、状态机、数据集或学习策略。L06 会把这条关节空间/任务空间
+联系扩展到批量环境，L07 再加入抓取场景。
 
 ### 120 分钟学习路径
 
@@ -253,8 +253,8 @@ q，只有 residual 才能说明它没有达到目标 tolerance。
 ### IK 不是运动规划
 
 IK 产生的是 endpoint configuration，不是到该 endpoint 的无碰撞 trajectory。L05 场景
-刻意只包含 Plane、Franka 和不参与碰撞的 target marker。L06、L07 会加入任务几何与安全
-waypoint 逻辑；L05 的低 residual 不能被描述为抓取成功或安全路径。
+刻意只包含 Plane、Franka 和不参与碰撞的 target marker。L06 会将控制问题批量化，
+L07、L08 再加入任务几何与安全 waypoint 逻辑；L05 的低 residual 不能被描述为抓取成功或安全路径。
 
 ## 求解、预测、执行与测量
 
@@ -504,8 +504,9 @@ state reset 或 `scene.step()`。
 - 不可达目标仍可能返回有限的 best-effort q。应当拒绝它，不要发送给控制器。
 - 一个固定相机提供 RGB 与 depth；`res=(W, H)` 对应 RGB `(H, W, 3)` 和 depth `(H, W)`。
 
-L06 会把受控机器人放入桌面抓取场景。L07 会把多个位姿目标组织成脚本化专家。两讲都
-不能把 IK 当作无碰撞 path planner，也不能把低 residual 当作抓取成功。
+L06 会在并行环境中应用同一套 IK 和控制合同。L07 会把受控机器人放入桌面抓取场景，
+L08 再把多个位姿目标组织成脚本化专家。这些讲次都不能把 IK 当作无碰撞 path planner，
+也不能把低 residual 当作抓取成功。
 
 ## 参考资料
 

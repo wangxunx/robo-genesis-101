@@ -126,7 +126,7 @@ ACT 和 SmolVLA 的 checkpoint 都由 M0.7 干净环境生成，随后通过源�
 | Linux x86_64 / R9700 / 系统 ROCm 7.2.0 / 本文 wheel | **已验证** | 完整训练参考平台。 |
 | 其他 AMD GPU 或 ROCm 组合 | **未验证** | 不能从 R9700 结果外推；欢迎后续补充实测矩阵。 |
 | NVIDIA CUDA | **未验证** | 解析器出现 CUDA 包不构成验证；V1 不承诺完整链路支持。 |
-| CPU-only 完整链路 | **部分验证** | L01–L05 的 CPU 最小实验已验证；L06 尚未完成，训练全链路也未在 CPU-only 环境验证。 |
+| CPU-only 完整链路 | **部分验证** | L01–L05 的 CPU 最小实验已验证；L06–L07 尚未完成，训练全链路也未在 CPU-only 环境验证。 |
 | Apple Silicon / macOS | **未验证** | 本轮没有执行 MPS、Genesis 或 LeRobot 兼容性测试。 |
 | Windows | **未验证** | 本轮没有执行原生 Windows 或 WSL 测试。 |
 | Python 3.11、3.13 或其他版本 | **不支持** | V1 的可复现环境限定为 Python 3.12.x。 |
@@ -162,7 +162,7 @@ M1.1 应完成而 M0.7 不提前实现以下工作：
 
 - Genesis 加载 Franka 时出现 tendon 近似、neutral pose 关节限制、solver `timeconst` 调整和 neutral pose 自碰撞过滤等警告；M1.4 切换到最终资产路径后需要复核并重跑抓放 smoke。
 - ACT 和 SmolVLA 仅运行 1 step，结果不用于比较模型质量。
-- 闭环策略 rollout、成功判据、成功率和置信区间留到 M3.8/L12，不得由当前开环动作推断。
+- 闭环策略 rollout、成功判据、成功率和置信区间留到 L13，不得由当前开环动作推断。
 - 文档站构建验证只证明当前站点没有因本次 Markdown 文件变化而回归；`COMPATIBILITY.md` 尚未接入 VitePress 导航。
 - 本文件验收后成为 M1.1 的版本输入；后续若升级任一核心版本，必须重跑对应兼容性验证并更新本矩阵。
 
@@ -229,11 +229,11 @@ M2.5 验收后，L02 增加了运行前预测问题、状态分支的初始/最�
 
 三次复验中的状态值仍为初始 `z=0.5 m`、20 步后约 `z=0.298895 m`。仓库中的双语 notebook 继续保持无 output、`execution_count: null`，所有图像仍只写入已忽略的 `outputs/`。
 
-## 10. L11 / M2.10 GPU kernel 验证
+## 10. 当时 L11（当前 L12）/ M2.10 GPU kernel 验证
 
 > 验证日期：2026-09-01（Asia/Shanghai）
 >
-> 范围：L11 的真实数据门禁、ACT/SmolVLA 命令审计、双策略 1 step GPU
+> 范围：当时编号为 L11 的真实数据门禁、ACT/SmolVLA 命令审计、双策略 1 step GPU
 > smoke、checkpoint 审计和同一样本开环重载。完整训练、收敛和 Genesis 闭环评估
 > 均未运行。
 
@@ -324,8 +324,8 @@ ACT 保存 9 维输出、`chunk_size=10`、`n_action_steps=10`；SmolVLA 保存 
 `(9,) float32` 且全部有限的动作。
 
 这只是 **open-loop single-sample probe**。本轮没有执行完整长训练，没有证明 loss
-收敛，也没有在 Genesis 中施加动作、运行闭环 rollout 或计算抓放成功率；这些证据仍
-属于 L12。执行后的 notebook、临时数据、checkpoint、训练日志和缓存均不提交到 Git。
+收敛，也没有在 Genesis 中施加动作、运行闭环 rollout 或计算抓放成功率；这些证据在
+当时结构中属于 L12，13 讲结构中属于 L13。执行后的 notebook、临时数据、checkpoint、训练日志和缓存均不提交到 Git。
 
 ## 11. L01 / M3.1 简明环境自检
 
@@ -365,10 +365,12 @@ ROCR_VISIBLE_DEVICES=1 ROBO_GENESIS_OUTPUTS_DIR=<tmp>/zh-outputs \
 | ZH / AMD 自动选择 | `gs.amdgpu`；AMD Radeon AI PRO R9700 映射为 `cuda:0` | HIP 为 `7.2.53211-e1a6bc5663`；相同 tensor 和 20 步 Genesis smoke 通过，球体高度结果与 CPU 路径一致。 |
 
 两次执行的最终摘要均为 `ENVIRONMENT CHECK: PASSED`。当前环境还观察到 LeRobot
-0.6.0，但该项只是后续训练提示，不属于 L01–L06 的通过条件。两份提交 notebook 都只有
-4 个 code cell，其源码和 ID 的规范化 SHA-256 均为
+0.6.0，但该项只是后续训练提示，不属于当前 L01–L07 的通过条件。本次复验时两份提交 notebook 都只有
+4 个 code cell，其当时源码和 ID 的规范化 SHA-256 均为
 `68dfad0c9af76db3e6f904781c536833829594b72f5068f2da076515cacecf4b`；提交文件保持
-`execution_count: null` 且没有 output。
+`execution_count: null` 且没有 output。13 讲结构迁移只把后续课程提示从 L06/L11
+更新为 L07/L12，因此当前 code source 与这个历史 hash 不同；本节不把旧 hash
+声称为重编号后的复验证据。
 
 这些结果支持 L01 的 `cpu-verified` 最低能力状态，并额外证明同一简明 notebook 能在
 参考 R9700 环境自动选择 AMD backend。L01 没有运行相机渲染、资产加载、ACT/SmolVLA
@@ -735,3 +737,19 @@ shape、residual、tracking 或 camera 检查失败。沙箱内第一次启动 J
 
 本轮没有验证其他 AMD/ROCm 组合、NVIDIA、Apple Silicon、Windows、viewer 模式、真实
 相机、抓取成功、碰撞安全或无限时域稳定性；当前结果不得外推到这些平台或能力。
+
+## 15. M3.R13.2 课程重编号的证据边界
+
+> 迁移日期：2026-09-06（Asia/Shanghai）
+>
+> 范围：在 L05 之后插入新 L06，并将原 L06–L12 顺延为 L07–L13。
+
+第 10 节的 GPU 证据是在训练课尚编号为 L11 时生成的历史记录。M3.R13.2 已将该课的
+manifest lookup、讲义/notebook 路径、cell ID、训练运行名、输出目录和闭环交接从
+L11/L12 语义迁移到 L12/L13。因为 code source 已变，旧执行副本不能直接证明新
+L12 可执行；`course.json` 因此暂将 L12 标为 `reviewed`。
+
+M3.R13.2 只执行静态课程合同、单元测试、Python 编译和文档构建门禁；不重复 Genesis
+notebook、GPU 训练或 checkpoint 重载。M3.R13.3 将针对当前 L12 重跑 dry-run、
+ACT/SmolVLA 1-step GPU smoke 和 checkpoint audit/reload；只有该步通过后才能恢复
+`gpu-verified`。本次编号迁移不改变第 10 节的历史数值，也不扩大平台支持范围。

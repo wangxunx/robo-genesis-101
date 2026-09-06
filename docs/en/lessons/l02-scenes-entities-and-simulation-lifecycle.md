@@ -37,7 +37,7 @@ gs.init
 
 This pattern will reappear when the course adds rigid-body experiments in L03,
 an articulated robot in L04, inverse kinematics and cameras in L05, and the
-complete grasping scene in L06. Here we deliberately use only built-in Plane and
+complete grasping scene in L07. Here we deliberately use only built-in Plane and
 Box primitives. A small scene makes the lifecycle visible without hiding it
 behind a task-specific helper.
 
@@ -478,7 +478,7 @@ test, not an example of normal scene construction.
 ### Unexpected state shape
 
 First print the getter name, type, shape, and device. This lesson uses the
-default unbatched scene, so a leading environment dimension is unexpected. L08
+default unbatched scene, so a leading environment dimension is unexpected. L06
 will deliberately introduce batched environments and explain their shapes.
 
 ### Non-finite or implausible state
@@ -539,7 +539,7 @@ which arguments belong to the Morph and which belong to the Surface.
 As a code-reading extension, open `src/robo_genesis/build_scene.py` and locate
 the Scene construction, entity declarations, camera declarations, build call,
 and post-build configuration. Do not run the full grasping scene yet; the goal
-is only to recognize the lifecycle pattern that L06 will use.
+is only to recognize the lifecycle pattern that L07 will use.
 
 ## Summary and connection to L03
 

@@ -1,13 +1,13 @@
 ---
-lesson: L07
-slug: demonstration-acquisition-and-scripted-experts
+lesson: L09
+slug: synthetic-data-recording-and-throughput
 locale: zh
-title: "演示数据获取与脚本化专家"
+title: "合成数据录制与采数吞吐"
 duration_minutes: 120
 hardware: gpu-recommended
 status: planned
 ---
 
-# L07 · 演示数据获取与脚本化专家
+# L09 · 合成数据录制与采数吞吐
 
 > 本讲尚未发布，完整讲义和配套 notebook 仍在准备中。

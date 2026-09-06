@@ -4,10 +4,10 @@
 
 > **Project status: Alpha / course development.** L01–L05 are `cpu-verified`
 > after their clean-kernel CPU verification; their additional AMD paths also passed
-> their respective contracts on the reference R9700. L11 is `gpu-verified` after
-> ACT and SmolVLA GPU smoke and checkpoint-reload verification. The other
-> 6 lessons remain `planned`; an existing page or notebook is not evidence that
-> its lesson has been verified.
+> their respective contracts on the reference R9700. The renumbered L12 training
+> content previously passed ACT and SmolVLA GPU smoke and checkpoint-reload checks
+> as L11; because its lesson-specific code changed, it is temporarily `reviewed`
+> pending targeted GPU revalidation. The other 7 lessons remain `planned`.
 
 RoboGenesis 101 is a Datawhale open-source course for learners with basic Python experience who want a structured, hands-on introduction to robot learning. Using Genesis as its simulation platform, the course connects environment diagnostics, scenes, and rigid-body physics with robot control, inverse kinematics, grasping, demonstration data, imitation learning, policy training, and closed-loop evaluation.
 
@@ -35,7 +35,7 @@ Prior experience with Genesis, robot kinematics, or policy training is not requi
 The course follows these dependencies:
 
 1. Genesis environments, scenes, entities, physics, and the simulation lifecycle;
-2. robot degrees of freedom, joint control, inverse kinematics, end-effector poses, and cameras;
+2. robot degrees of freedom, joint control, inverse kinematics, end-effector poses, cameras, and parallel simulation;
 3. grasping tasks, scripted experts, demonstration acquisition, and data recording;
 4. datasets, imitation learning, domain randomization, ACT/SmolVLA training, and closed-loop evaluation.
 
@@ -52,13 +52,14 @@ Training loss or open-loop action prediction is not treated as task success. The
 | L03 | [Rigid-Body Physics and Stable Simulation](docs/en/lessons/l03-rigid-body-physics-and-stable-simulation.md) | 90 min | `cpu-ok` | `cpu-verified` |
 | L04 | [Robot Models, Degrees of Freedom, and Joint Control](docs/en/lessons/l04-robot-models-dofs-and-joint-control.md) | 90 min | `cpu-ok` | `cpu-verified` |
 | L05 | [Inverse Kinematics, End-Effector Poses, and Cameras](docs/en/lessons/l05-inverse-kinematics-end-effector-poses-and-cameras.md) | 120 min | `cpu-ok` | `cpu-verified` |
-| L06 | [Building a Grasping Task Scene](docs/en/lessons/l06-building-a-grasping-task-scene.md) | 120 min | `cpu-ok` | `planned` |
-| L07 | [Demonstration Acquisition and Scripted Experts](docs/en/lessons/l07-demonstration-acquisition-and-scripted-experts.md) | 120 min | `gpu-recommended` | `planned` |
-| L08 | [Synthetic Data Recording and Collection Throughput](docs/en/lessons/l08-synthetic-data-recording-and-throughput.md) | 120 min | `gpu-recommended` | `planned` |
-| L09 | [Dataset Anatomy and Imitation Learning 101](docs/en/lessons/l09-dataset-anatomy-and-imitation-learning.md) | 90 min | `gpu-recommended` | `planned` |
-| L10 | [Domain Randomization](docs/en/lessons/l10-domain-randomization.md) | 90 min | `gpu-recommended` | `planned` |
-| L11 | [Training ACT and SmolVLA Policies](docs/en/lessons/l11-act-and-smolvla-policy-training.md) | 150 min | `gpu-required` | `gpu-verified` |
-| L12 | [Closed-Loop Evaluation and Capstone](docs/en/lessons/l12-closed-loop-evaluation-and-capstone.md) | 120 min | `gpu-required` | `planned` |
+| L06 | [Parallel Simulation and Batched Franka Control](docs/en/lessons/l06-parallel-simulation-and-batched-franka-control.md) | 90 min | `cpu-ok` | `planned` |
+| L07 | [Building a Grasping Task Scene](docs/en/lessons/l07-building-a-grasping-task-scene.md) | 120 min | `cpu-ok` | `planned` |
+| L08 | [Demonstration Acquisition and Scripted Experts](docs/en/lessons/l08-demonstration-acquisition-and-scripted-experts.md) | 120 min | `gpu-recommended` | `planned` |
+| L09 | [Synthetic Data Recording and Collection Throughput](docs/en/lessons/l09-synthetic-data-recording-and-throughput.md) | 120 min | `gpu-recommended` | `planned` |
+| L10 | [Dataset Anatomy and Imitation Learning 101](docs/en/lessons/l10-dataset-anatomy-and-imitation-learning.md) | 90 min | `gpu-recommended` | `planned` |
+| L11 | [Domain Randomization](docs/en/lessons/l11-domain-randomization.md) | 90 min | `gpu-recommended` | `planned` |
+| L12 | [Training ACT and SmolVLA Policies](docs/en/lessons/l12-act-and-smolvla-policy-training.md) | 150 min | `gpu-required` | `reviewed` |
+| L13 | [Closed-Loop Evaluation and Capstone](docs/en/lessons/l13-closed-loop-evaluation-and-capstone.md) | 120 min | `gpu-required` | `planned` |
 
 Statuses progress from `planned` to `draft`, `reviewed`, `cpu-verified` or
 `gpu-verified`, and finally `published`. See the [course content guide](CONTENT_GUIDE.md) for the evidence required at each stage.
@@ -129,7 +130,7 @@ uv run jupyter lab
 
 The notebook prints the core versions, prefers an available AMD ROCm backend
 and otherwise uses CPU, then runs one minimal Genesis scene. CPU fallback does
-not block L01–L06. See the [L01 lecture](docs/en/lessons/l01-introduction-and-environment-diagnostics.md)
+not block L01–L07. See the [L01 lecture](docs/en/lessons/l01-introduction-and-environment-diagnostics.md)
 and [compatibility matrix](COMPATIBILITY.md) for training requirements and the
 reference platform.
 

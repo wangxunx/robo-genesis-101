@@ -1,14 +1,14 @@
 ---
-lesson: L11
+lesson: L12
 slug: act-and-smolvla-policy-training
 locale: zh
 title: "ACT 与 SmolVLA 策略训练"
 duration_minutes: 150
 hardware: gpu-required
-status: gpu-verified
+status: reviewed
 ---
 
-# L11 · ACT 与 SmolVLA 策略训练
+# L12 · ACT 与 SmolVLA 策略训练
 
 > **硬件约定：**完整实验需要 GPU。已经验证的参考平台为 Linux x86_64、
 > AMD Radeon AI PRO R9700 和 ROCm 7.2，但本讲的概念与命令不依赖特定平台。
@@ -17,10 +17,10 @@ status: gpu-verified
 
 ## 本讲在课程中的位置
 
-[L09](/zh/lessons/l09-dataset-anatomy-and-imitation-learning) 已经介绍了数据集
+[L10](/zh/lessons/l10-dataset-anatomy-and-imitation-learning) 已经介绍了数据集
 schema、相机键、行为克隆（behavior cloning）和动作分块（action chunking）的基本思想。
-[L10](/zh/lessons/l10-domain-randomization) 随后讨论了训练分布应该如何变化。
-L11 将把一份带版本记录的演示数据集转化为两类策略 checkpoint：
+[L11](/zh/lessons/l11-domain-randomization) 随后讨论了训练分布应该如何变化。
+L12 将把一份带版本记录的演示数据集转化为两类策略 checkpoint：
 
 ```text
 LeRobot dataset
@@ -29,12 +29,12 @@ LeRobot dataset
   → ACT or SmolVLA optimization
   → checkpoint + saved preprocessing
   → reload on one real sample
-  → closed-loop evaluation in L12
+  → closed-loop evaluation in L13
 ```
 
 最后一个箭头尤其重要。本讲能够证明训练和加载链路可以运行，却不能证明学到的
 策略能够完成抓取任务。要支持后一项结论，还需要在
-[L12](/zh/lessons/l12-closed-loop-evaluation-and-capstone) 中按照规定的 seed、
+[L13](/zh/lessons/l13-closed-loop-evaluation-and-capstone) 中按照规定的 seed、
 成功判据和报告协议进行模拟器 rollout（回合执行）。
 
 开始之前，你应当能够：
@@ -47,7 +47,7 @@ LeRobot dataset
 
 ## 学习目标
 
-完成 L11 后，你应当能够：
+完成 L12 后，你应当能够：
 
 1. 在分配模型之前，用一个真实训练样本检查 state、action、image、task 和时间
    信息是否符合约定；
@@ -67,7 +67,7 @@ LeRobot dataset
 
 ## 先明确证据边界
 
-“训练成功了”过于含糊，无法用于严谨的实验报告。L11 使用下面的证据阶梯：
+“训练成功了”过于含糊，无法用于严谨的实验报告。L12 使用下面的证据阶梯：
 
 | 证据 | 能够证明什么 | 不能证明什么 |
 |---|---|---|
@@ -296,7 +296,7 @@ replan interval in seconds = n_action_steps / dataset_fps
 
 它必须满足 `1 <= n_action_steps <= chunk_size`。值越小，策略越频繁地吸收新 observation，
 但推理频率也越高；值越大，查询频率越低，却要在重新观察前连续执行更多动作。延迟与
-反馈之间的取舍最终要在 L12 中测量。
+反馈之间的取舍最终要在 L13 中测量。
 
 ### batch size 与显存
 
@@ -421,8 +421,8 @@ RG101_DATASET_ROOT=datasets/fruit_pick
 uv run python -m robo_genesis.train_policy act \
   --repo-id "$RG101_REPO_ID" \
   --dataset-root "$RG101_DATASET_ROOT" \
-  --name l11-act-dry-run \
-  --output-dir outputs/train/l11-act-dry-run \
+  --name l12-act-dry-run \
+  --output-dir outputs/train/l12-act-dry-run \
   --steps 1 --save-freq 1 --log-freq 1 --num-workers 0 \
   --seed 1000 --device cuda --video-backend pyav \
   --dry-run
@@ -434,8 +434,8 @@ uv run python -m robo_genesis.train_policy act \
 uv run python -m robo_genesis.train_policy smolvla \
   --repo-id "$RG101_REPO_ID" \
   --dataset-root "$RG101_DATASET_ROOT" \
-  --name l11-smolvla-dry-run \
-  --output-dir outputs/train/l11-smolvla-dry-run \
+  --name l12-smolvla-dry-run \
+  --output-dir outputs/train/l12-smolvla-dry-run \
   --steps 1 --save-freq 1 --log-freq 1 --num-workers 0 \
   --seed 1000 --device cuda --video-backend pyav \
   --dry-run
@@ -466,8 +466,8 @@ dry-run 不会打开数据集、加载策略、分配 GPU tensor 或写入 check
 uv run python -m robo_genesis.train_policy act \
   --repo-id "$RG101_REPO_ID" \
   --dataset-root "$RG101_DATASET_ROOT" \
-  --name l11-act-smoke \
-  --output-dir outputs/train/l11-act-smoke \
+  --name l12-act-smoke \
+  --output-dir outputs/train/l12-act-smoke \
   --steps 1 --batch-size 1 --save-freq 1 --log-freq 1 \
   --num-workers 0 --seed 1000 --device cuda --video-backend pyav -- \
   --policy.pretrained_backbone_weights=null \
@@ -499,8 +499,8 @@ uv run python -m robo_genesis.train_policy smolvla \
   --dataset-root "$RG101_DATASET_ROOT" \
   --policy-path "$RG101_SMOLVLA_BASE_SNAPSHOT" \
   --smolvla-vlm-path "$RG101_SMOLVLA_VLM_SNAPSHOT" \
-  --name l11-smolvla-smoke \
-  --output-dir outputs/train/l11-smolvla-smoke \
+  --name l12-smolvla-smoke \
+  --output-dir outputs/train/l12-smolvla-smoke \
   --steps 1 --batch-size 1 --save-freq 1 --log-freq 1 \
   --num-workers 0 --seed 1000 --device cuda --video-backend pyav
 ```
@@ -531,7 +531,7 @@ uv run python -m robo_genesis.train_policy smolvla \
 LeRobot 会写入以数字步骤命名的目录，并更新 `last`，使其指向最新 checkpoint：
 
 ```text
-outputs/train/l11-act-smoke/
+outputs/train/l12-act-smoke/
 └── checkpoints/
     ├── 000001/
     │   └── pretrained_model/
@@ -595,7 +595,7 @@ Genesis 场景、应用动作、观察下一时刻状态或检查任务是否成
 | 时域 | 明确的 `chunk_size` 与 `n_action_steps`，以及按数据集 FPS 换算的时长 |
 | 优化 | steps、batch、学习率覆盖、seed、workers、log/save frequency |
 | 资源 | 实际 GPU/软件、空闲显存、模型 cache、输出存储空间 |
-| 评估交接 | 数字 checkpoint 路径，以及接收它的 L12 协议 |
+| 评估交接 | 数字 checkpoint 路径，以及接收它的 L13 协议 |
 
 选定数值后，一条完整 ACT 命令具有以下形式：
 
@@ -674,9 +674,9 @@ uv run python -m robo_genesis.train_policy smolvla \
 **未运行**；不要编造曲线、耗时、显存用量或 checkpoint 质量。
 
 没有训练硬件的学员仍可完成概念检查、数据门禁和 dry-run。如果课程将来发布带版本的
-checkpoint，它可以作为 L12 的输入，但在对应元数据和下载说明可用之前，不能假设该
+checkpoint，它可以作为 L13 的输入，但在对应元数据和下载说明可用之前，不能假设该
 产物存在。使用课程提供的产物时，必须报告为“使用提供的产物”，不能声称自己完成了
-L11 GPU 训练实验。
+L12 GPU 训练实验。
 
 ## 分层诊断故障
 
@@ -727,7 +727,7 @@ processor。原始数据集键应保持为 `world/wrist`；不要重命名文件
 
 ### 动作数值有限，但抓取仍然失败
 
-这说明重新加载探针已经通过，同时也走到了它的证据边界。接下来应进入 L12 的闭环诊断：
+这说明重新加载探针已经通过，同时也走到了它的证据边界。接下来应进入 L13 的闭环诊断：
 检查 observation 时序、执行时域、控制应用、任务判据、seed 和分布划分。
 
 ## 检查题与练习
@@ -763,7 +763,7 @@ processor。原始数据集键应保持为 `world/wrist`；不要重命名文件
 ### 实验设计练习
 
 编写两份只在 `n_action_steps` 上不同的运行记录，保持数据集、checkpoint、`chunk_size`、
-seed 集合和 L12 协议不变。预测重新规划频率与推理成本之间的取舍，但不要预测成功率
+seed 集合和 L13 协议不变。预测重新规划频率与推理成本之间的取舍，但不要预测成功率
 数值；该数值必须来自后续 rollout。
 
 ### 产物审计练习
@@ -778,7 +778,7 @@ seed 集合和 L12 协议不变。预测重新规划频率与推理成本之间�
 - 单样本 action 的 shape/dtype/有限性；
 - 对该产物所能做出的最强合理结论。
 
-## 总结并衔接 L12
+## 总结并衔接 L13
 
 - 两种策略都消费相同的双视角、9 维 state/action 课程数据集，但内部预处理与训练目标
   不同；
@@ -791,7 +791,7 @@ seed 集合和 L12 协议不变。预测重新规划频率与推理成本之间�
   checkpoint 必须一起传递；
 - 完整训练是一项明确记录、主动执行的课后实验，固定 steps 数并不能普遍保证质量。
 
-L12 会把其中一个 checkpoint 加载到 Genesis 控制循环中，随时间执行它的动作，在多次
+L13 会把其中一个 checkpoint 加载到 Genesis 控制循环中，随时间执行它的动作，在多次
 带 seed 的 episode 上评估任务判据，并报告带不确定性的成功次数。只有到那时，策略质量
 才会成为一项闭环结论。
 

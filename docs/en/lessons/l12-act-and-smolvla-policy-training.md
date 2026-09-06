@@ -1,14 +1,14 @@
 ---
-lesson: L11
+lesson: L12
 slug: act-and-smolvla-policy-training
 locale: en
 title: "Training ACT and SmolVLA Policies"
 duration_minutes: 150
 hardware: gpu-required
-status: gpu-verified
+status: reviewed
 ---
 
-# L11 · Training ACT and SmolVLA Policies
+# L12 · Training ACT and SmolVLA Policies
 
 > **Hardware contract:** the complete lab is GPU-required. The verified reference
 > platform is Linux x86_64 with an AMD Radeon AI PRO R9700 and ROCm 7.2, but the
@@ -18,10 +18,10 @@ status: gpu-verified
 
 ## Where this lesson fits
 
-[L09](/en/lessons/l09-dataset-anatomy-and-imitation-learning) established the
+[L10](/en/lessons/l10-dataset-anatomy-and-imitation-learning) established the
 dataset schema, camera keys, behavior cloning, and the basic idea of action
-chunking. [L10](/en/lessons/l10-domain-randomization) then asked how the training
-distribution should vary. L11 now turns a versioned demonstration dataset into
+chunking. [L11](/en/lessons/l11-domain-randomization) then asked how the training
+distribution should vary. L12 now turns a versioned demonstration dataset into
 two kinds of policy checkpoint:
 
 ```text
@@ -31,13 +31,13 @@ LeRobot dataset
   → ACT or SmolVLA optimization
   → checkpoint + saved preprocessing
   → reload on one real sample
-  → closed-loop evaluation in L12
+  → closed-loop evaluation in L13
 ```
 
 The last arrow matters. This lesson can prove that a training and loading path
 works. It cannot prove that the learned policy completes a grasping task. That
 claim requires the seeded simulator rollouts, success predicate, and reporting
-protocol in [L12](/en/lessons/l12-closed-loop-evaluation-and-capstone).
+protocol in [L13](/en/lessons/l13-closed-loop-evaluation-and-capstone).
 
 Before starting, you should be able to:
 
@@ -51,7 +51,7 @@ Before starting, you should be able to:
 
 ## Learning objectives
 
-By the end of L11, you should be able to:
+By the end of L12, you should be able to:
 
 1. validate the state, action, image, task, and timing contract of one real
    training sample before allocating a model;
@@ -74,7 +74,7 @@ By the end of L11, you should be able to:
 
 ## Start with the evidence boundary
 
-The phrase "training worked" is too vague for a useful experiment report. L11
+The phrase "training worked" is too vague for a useful experiment report. L12
 uses an evidence ladder instead:
 
 | Evidence | What it establishes | What it does not establish |
@@ -343,7 +343,7 @@ replan interval in seconds = n_action_steps / dataset_fps
 It must satisfy `1 <= n_action_steps <= chunk_size`. Smaller values incorporate
 new observations more often but increase inference frequency. Larger values
 reduce query frequency but commit to more actions before observing again. The
-latency-versus-feedback trade-off must eventually be measured in L12.
+latency-versus-feedback trade-off must eventually be measured in L13.
 
 ### Batch size and memory
 
@@ -481,8 +481,8 @@ First ask the wrapper to print the ACT command:
 uv run python -m robo_genesis.train_policy act \
   --repo-id "$RG101_REPO_ID" \
   --dataset-root "$RG101_DATASET_ROOT" \
-  --name l11-act-dry-run \
-  --output-dir outputs/train/l11-act-dry-run \
+  --name l12-act-dry-run \
+  --output-dir outputs/train/l12-act-dry-run \
   --steps 1 --save-freq 1 --log-freq 1 --num-workers 0 \
   --seed 1000 --device cuda --video-backend pyav \
   --dry-run
@@ -494,8 +494,8 @@ Then print the SmolVLA command:
 uv run python -m robo_genesis.train_policy smolvla \
   --repo-id "$RG101_REPO_ID" \
   --dataset-root "$RG101_DATASET_ROOT" \
-  --name l11-smolvla-dry-run \
-  --output-dir outputs/train/l11-smolvla-dry-run \
+  --name l12-smolvla-dry-run \
+  --output-dir outputs/train/l12-smolvla-dry-run \
   --steps 1 --save-freq 1 --log-freq 1 --num-workers 0 \
   --seed 1000 --device cuda --video-backend pyav \
   --dry-run
@@ -526,8 +526,8 @@ different output directories so one policy cannot overwrite the other.
 uv run python -m robo_genesis.train_policy act \
   --repo-id "$RG101_REPO_ID" \
   --dataset-root "$RG101_DATASET_ROOT" \
-  --name l11-act-smoke \
-  --output-dir outputs/train/l11-act-smoke \
+  --name l12-act-smoke \
+  --output-dir outputs/train/l12-act-smoke \
   --steps 1 --batch-size 1 --save-freq 1 --log-freq 1 \
   --num-workers 0 --seed 1000 --device cuda --video-backend pyav -- \
   --policy.pretrained_backbone_weights=null \
@@ -561,8 +561,8 @@ uv run python -m robo_genesis.train_policy smolvla \
   --dataset-root "$RG101_DATASET_ROOT" \
   --policy-path "$RG101_SMOLVLA_BASE_SNAPSHOT" \
   --smolvla-vlm-path "$RG101_SMOLVLA_VLM_SNAPSHOT" \
-  --name l11-smolvla-smoke \
-  --output-dir outputs/train/l11-smolvla-smoke \
+  --name l12-smolvla-smoke \
+  --output-dir outputs/train/l12-smolvla-smoke \
   --steps 1 --batch-size 1 --save-freq 1 --log-freq 1 \
   --num-workers 0 --seed 1000 --device cuda --video-backend pyav
 ```
@@ -597,7 +597,7 @@ LeRobot writes a numeric step directory and updates `last` to point to the
 newest one:
 
 ```text
-outputs/train/l11-act-smoke/
+outputs/train/l12-act-smoke/
 └── checkpoints/
     ├── 000001/
     │   └── pretrained_model/
@@ -669,7 +669,7 @@ because a notebook was run top to bottom. First fill in a run record:
 | Horizon | explicit `chunk_size` and `n_action_steps`, plus their duration at dataset FPS |
 | Optimization | steps, batch, learning rate overrides, seed, workers, log/save frequency |
 | Resources | actual GPU/software, free memory, model cache, output storage |
-| Evaluation handoff | numeric checkpoint path and the L12 protocol that will consume it |
+| Evaluation handoff | numeric checkpoint path and the L13 protocol that will consume it |
 
 After choosing values, a complete ACT command has this form:
 
@@ -752,9 +752,9 @@ run**; do not invent its curve, duration, memory use, or checkpoint quality.
 
 Learners without training hardware can still complete the conceptual checks,
 dataset gate, and dry-run. If a versioned course checkpoint is published, it can
-provide the handoff to L12, but do not assume that artifact exists until its
+provide the handoff to L13, but do not assume that artifact exists until its
 metadata and download instructions are available. Using one must be reported as
-using a provided artifact, not as completing the L11 GPU training lab.
+using a provided artifact, not as completing the L12 GPU training lab.
 
 ## Diagnose failures in layers
 
@@ -814,7 +814,7 @@ check the 9-D action contract before blaming the GPU.
 ### The action is finite but the grasp fails
 
 The reload probe has passed and the evidence boundary has been reached. Move to
-L12's closed-loop diagnostics: observation timing, execution horizon, control
+L13's closed-loop diagnostics: observation timing, execution horizon, control
 application, task predicate, seed, and distribution split.
 
 ## Checkpoints and exercises
@@ -852,7 +852,7 @@ and explain which raw and canonical feature names no longer agree.
 ### Experiment-design exercise
 
 Write two run records that differ only in `n_action_steps`. Keep dataset,
-checkpoint, `chunk_size`, seed set, and L12 protocol fixed. Predict the trade-off
+checkpoint, `chunk_size`, seed set, and L13 protocol fixed. Predict the trade-off
 in replanning frequency and inference cost. Do not predict a success-rate number;
 that value must come from the later rollouts.
 
@@ -868,7 +868,7 @@ Given a numeric checkpoint directory, produce a short report containing:
 - one-sample action shape/dtype/finiteness; and
 - the strongest justified claim about the artifact.
 
-## Summary and connection to L12
+## Summary and connection to L13
 
 - Both policies consume the same two-view, 9-D state/action course dataset, but
   their internal preprocessing and objectives differ.
@@ -885,7 +885,7 @@ Given a numeric checkpoint directory, produce a short report containing:
 - Full training is an explicit, recorded take-home experiment. A fixed step
   count is not a universal quality guarantee.
 
-L12 will load one of these checkpoints into the Genesis control loop, apply its
+L13 will load one of these checkpoints into the Genesis control loop, apply its
 actions over time, evaluate the task predicate across seeded episodes, and
 report success counts with uncertainty. That is where policy quality becomes a
 closed-loop claim.

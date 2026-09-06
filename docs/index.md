@@ -15,10 +15,10 @@ hero:
       link: /en/
 
 features:
-  - title: 12 讲渐进式路径
+  - title: 13 讲渐进式路径
     details: 从场景、物理和控制逐步推进到数据、策略训练与闭环评估。
   - title: Bilingual by design
     details: Lectures and notebooks use paired English and Chinese structures.
   - title: 当前状态 · Current status
-    details: All lesson pages are planned scaffolds and are not yet published course content.
+    details: Five lessons are CPU-verified, the renumbered training lesson awaits GPU revalidation, and no lesson is published yet.
 ---

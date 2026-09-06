@@ -54,8 +54,8 @@ Before starting, you should be able to:
 - check array shapes, units, and finite values.
 
 No table, grasp object, state machine, dataset, or learned policy is needed.
-L06 will add the grasping scene after this joint-space/task-space connection is
-clear.
+L06 will extend this joint-space/task-space connection to batched environments;
+L07 will then add the grasping scene.
 
 ### A 120-minute route
 
@@ -283,9 +283,9 @@ reveals that the target tolerance was not met.
 
 IK produces an endpoint configuration. It does not produce a collision-free
 trajectory to that endpoint. The L05 scene intentionally contains only a
-plane, Franka, and a non-colliding target marker. L06 and L07 will add task
-geometry and safe waypoint logic; a low L05 residual must not be described as
-a successful grasp or a safe path.
+plane, Franka, and a non-colliding target marker. L06 will batch the control
+problem, while L07 and L08 will add task geometry and safe waypoint logic; a low
+L05 residual must not be described as a successful grasp or a safe path.
 
 ## Solve, predict, execute, and measure
 
@@ -563,9 +563,11 @@ batch dimension, or new camera; those changes would create a different lesson.
 - One fixed camera provides RGB and depth. `res=(W, H)` corresponds to RGB
   `(H, W, 3)` and depth `(H, W)`.
 
-L06 will place this controlled robot into a tabletop grasping scene. L07 will
-sequence multiple pose targets into a scripted expert. Neither lesson should
-treat IK as a collision-free path planner or a low residual as grasp success.
+L06 will apply the same IK and control contract across parallel environments.
+L07 will place the controlled robot into a tabletop grasping scene, and L08 will
+sequence multiple pose targets into a scripted expert. None of these lessons
+should treat IK as a collision-free path planner or a low residual as grasp
+success.
 
 ## Sources
 

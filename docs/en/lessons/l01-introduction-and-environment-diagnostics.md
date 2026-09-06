@@ -11,7 +11,7 @@ status: cpu-verified
 # L01 · Introduction, Runtime Platforms, and Environment Diagnostics
 
 > **Hardware contract:** CPU is enough for this lesson and the minimum exercises
-> in L01–L06. An AMD ROCm GPU is the reference path for later data generation,
+> in L01–L07. An AMD ROCm GPU is the reference path for later data generation,
 > policy training, and closed-loop evaluation, but it is not an L01 requirement.
 
 ## The course in one view
@@ -27,9 +27,9 @@ Genesis simulation → robot control and IK → scripted demonstrations
 By the end of the course, you will understand how a Franka arm can learn a
 fruit-picking task in simulation. The lessons build that result in order:
 
-- L01–L06 introduce the environment, simulation, control, cameras, and grasping scene;
-- L07–L10 generate demonstrations and turn them into training data; and
-- L11–L12 train policies and test them in closed-loop rollouts.
+- L01–L07 introduce the environment, simulation, control, cameras, parallel environments, and grasping scene;
+- L08–L11 generate demonstrations, turn them into training data, and vary the training distribution; and
+- L12–L13 train policies and test them in closed-loop rollouts.
 
 Training loss and a plausible open-loop action are not task success. The final
 evidence comes from applying the policy in the simulator and measuring the task
@@ -81,7 +81,7 @@ torch.version.cuda      # None on the verified ROCm build
 ```
 
 No visible GPU is not an L01 failure. CPU learners can continue through the
-minimum L01–L06 path; the full training lessons later state their stronger
+minimum L01–L07 path; the full training lessons later state their stronger
 hardware requirements.
 
 ## Run the self-check
@@ -112,7 +112,7 @@ not need to open or edit the report itself.
 | A tensor operation succeeds on the selected device | Required before continuing |
 | The minimal scene builds, steps, and produces finite changed state | Required before continuing |
 | AMD GPU and HIP are visible | Useful confirmation for the reference platform; CPU fallback is allowed |
-| LeRobot 0.6.0 is installed | Useful preview for later training; not required for L01–L06 |
+| LeRobot 0.6.0 is installed | Useful preview for later training; not required for L01–L07 |
 | Camera rendering, YCB assets, and policy training work | Not checked here; later lessons verify them when first needed |
 
 ## Quick troubleshooting
