@@ -9,14 +9,13 @@
 
 ## 1. 当前 Git 快照
 
-- 当前分支：`main`；本地 `M3.L05`、`origin/main` 与 `origin/HEAD` 当前也指向同一提交。
-- 当前 HEAD：`0646277`，提交说明为 `verified refactored l05 notebooks`。该提交已包含
-  M3.L05R.6 的双语 L05 状态说明、`COMPATIBILITY.md` 新版第 14 节和本 handoff 的
-  重构后快照。
-- 当前 worktree 的 tracked 修改只有本 handoff 的验收日期与门禁同步；本地开发计划和
-  L05 档案仍按约定保持 untracked。
+- 本轮开始时的当前分支为 `insert_parallel_lecture`，HEAD 为 `55ef681`，提交说明为
+  `update handoff current doc`；本地 `main` 也指向 `55ef681`，比
+  `origin/main` / `origin/HEAD` 的 `0646277` 超前 1 个提交。
+- 当前 tracked 修改只涉及本 handoff 的 `M3.R13.1` 状态同步；本地开发计划和 L05 档案
+  仍按约定保持 untracked，并由本步更新。
 - M3.L05R.1–M3.L05R.6 已由项目负责人逐步验收；L05 精简重做轮次正式完成并保持
-  `cpu-verified`。当前只等待项目负责人另行明确开始 `M3.L06.1`。
+  `cpu-verified`。项目负责人随后明确启动 `M3.R13.1`，当前步骤已交付并等待验收。
 - 本地开发计划和 `course_development/` 是有意保持 untracked 的开发记录，不应加入发布
   结构。既有未跟踪内容 `.vscode/`、`0001-4-cards-failure.patch`、`MIGRATION.md` 和
   `genesis_公开课体系规划_2ba5d82e.plan.md` 也必须保留。
@@ -29,12 +28,16 @@
 
 - 已验收：M0、M1、M2、M3.1、M3.L03.1–M3.L03.6、M3.L04.1–M3.L04.6，以及
   L05 精简重做的 M3.L05R.1–M3.L05R.6。
-- 当前门禁：等待项目负责人另行明确开始 M3.L06.1；不得因 L05 已完成而自动开始 L06。
+- 当前门禁：`M3.R13.1` 已交付，等待项目负责人验收；不得开始 `M3.R13.2`、
+  `M3.R13.3` 或 `M3.L06.1`。
 
 当前公开 manifest 状态为：L01–L05 共 5 讲 `cpu-verified`，L11 为 `gpu-verified`，
 L06–L10 和 L12 共 6 讲 `planned`。L05 继续使用 `cpu-verified`，因为已验收的新版
 EN/ZH CPU clean-kernel 满足最低 `cpu-ok` 合同；参考 R9700 + EGL 是附加兼容性证据，
 不把 GPU 变成学习门槛，也不表示 L05 已经 `published`。
+
+以上仍是 tracked 12 讲结构的真实状态。`M3.R13.1` 只冻结目标计划，没有修改
+`course.json`、公开讲义/notebook、README、验证器或公开状态。
 
 ## 3. 当前 L05 精简实现
 
@@ -123,13 +126,47 @@ M3.L05R.6 交付前完成的门禁结果：
 - `npm ci`：成功；仍有既有 13 项 advisory（6 low、1 moderate、6 high）；
 - `npm run docs:build` 和 `EDGEONE=1 npm run docs:build`：通过。
 
-## 6. 下一步恢复顺序
+## 6. M3.R13 目标结构与当前决策
 
-1. 读取根目录 `AGENTS.md`、本文件、主开发计划和 `course_development/lessons/l05.md`
-   的 M3.L05R.6 记录。
+项目负责人决定在 L05 后新增独立课程“并行仿真与批量 Franka 控制”，目标结构扩展为
+13 讲。当前公开 L06–L12 将顺延为目标 L07–L13；其中当前 L11 训练课已经验收，迁移后
+成为新 L12，并非未完成骨架。
+
+新 L06 暂定 90 分钟、`cpu-ok`、`planned`，核心范围是：
+
+- `build(n_envs=B, env_spacing=...)` 与 leading environment dimension；
+- B=4 batched IK/control、6D residual 和逐环境 measured error；
+- `envs_idx=[1,3]` selective update，以及 selected/untouched 环境证据；
+- 批量 API、仿真吞吐与完整并行数据录制的边界。
+
+桌面/YCB 抓取场景顺延到新 L07，脚本专家到新 L08，数据录制到新 L09。完整并行 recorder
+仍是 V1 扩展项。原 Module 05 的 `Capstone` 不进入新 L06 正式标题，避免与新 L13 的最终
+Capstone 混淆。
+
+结构调整分三步：
+
+1. `M3.R13.1` 冻结本地设计、映射和门禁；当前已交付待验收；
+2. `M3.R13.2` 原子迁移 13 讲 manifest、双语路径/metadata、活跃引用、验证器与状态；
+3. `M3.R13.3` 对重编号后的 L12 重新执行 GPU smoke 与 checkpoint 回归，再恢复
+   `gpu-verified`。
+
+由于训练 notebook 的 code cell 含 `lesson("L11")`、`l11-*` 输出目录和 L12 闭环交接，
+编号迁移会改变 code source。`M3.R13.2` 应先把新 L12 标为 `reviewed`，不得直接继承旧
+执行副本；`M3.R13.3` 通过后再恢复 `gpu-verified`。历史 `M2.6`–`M2.10` 和 L05 已验收
+记录保留原编号，只追加迁移说明，不做误导性的全局替换。
+
+`M3.R13.1` 已通过当前 12 讲结构下的 course validation、35 项 pytest、compileall、
+`npm ci`、标准/EDGEONE 文档构建和 `git diff --check`。这只证明计划记录更新没有使现有
+仓库回归，不证明 13 讲公开迁移或新 L06 已经实现。
+
+## 7. 下一步恢复顺序
+
+1. 读取根目录 `AGENTS.md`、本文件、主开发计划的 `M3.R13` 部分，以及
+   `course_development/lessons/l05.md` 的 M3.L05R.6 与 M3.R13.1 记录。
 2. 重新检查 Git 状态，保护未跟踪内容和用户后续修改。
 3. 将 M3.L05R.1–M3.L05R.6 视为已验收历史，不重复开发或回退精简教学边界。
-4. 只有收到项目负责人另行开始 L06 的明确指令后，才进入 `M3.L06.1`。
+4. 等待项目负责人验收 `M3.R13.1`；只有收到明确指令后才进入 `M3.R13.2`，不得跳到
+   `M3.R13.3` 或 `M3.L06.1`。
 
 持续适用的边界：不创建 commit、不 push、不发布外部 artifact，除非项目负责人明确要求；
 不把静态状态 literal 当作运行证据；不把 R9700 结果外推到其他 AMD/ROCm、NVIDIA、
