@@ -30,13 +30,8 @@ def test_repository_manifest_defines_the_canonical_learning_path() -> None:
         f"L{number:02d}" for number in range(1, 14)
     ]
     assert [lesson.status for lesson in manifest.lessons] == [
-        CourseStatus.CPU_VERIFIED,
-        CourseStatus.CPU_VERIFIED,
-        CourseStatus.CPU_VERIFIED,
-        CourseStatus.CPU_VERIFIED,
-        CourseStatus.CPU_VERIFIED,
-        CourseStatus.CPU_VERIFIED,
-        *([CourseStatus.PLANNED] * 5),
+        *([CourseStatus.CPU_VERIFIED] * 7),
+        *([CourseStatus.PLANNED] * 4),
         CourseStatus.GPU_VERIFIED,
         CourseStatus.PLANNED,
     ]

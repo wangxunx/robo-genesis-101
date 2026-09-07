@@ -5,14 +5,14 @@ locale: zh
 title: "抓取任务场景搭建"
 duration_minutes: 90
 hardware: cpu-ok
-status: planned
+status: cpu-verified
 ---
 
 # L07 · 抓取任务场景搭建
 
-> **课程状态：** 英文讲义已经完成，中文讲义当前进入评审。双语可执行 notebook 仍在
-> 规划中，因此 L07 继续保持 `planned`。场景搭建具有完整的无渲染数值路径；RGB/depth
-> 渲染是单独的能力分支。
+> **课程状态：** 双语讲义和 notebook 均已完成。EN/ZH CPU 无渲染路径已经通过；英文
+> CPU+EGL 双相机路径和参考 AMD+EGL 路径也已作为附加检查通过。L07 当前为
+> `cpu-verified`。场景搭建具有完整的无渲染数值路径；RGB/depth 渲染仍是单独的能力分支。
 
 ## 本讲定位
 

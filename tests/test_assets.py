@@ -62,7 +62,7 @@ def test_l07_notebooks_expose_the_scene_building_contract() -> None:
         assert len(cells) == 17
         assert tuple(cell["id"] for cell in code_cells) == expected_code_ids
         assert notebook["metadata"]["robo_genesis"]["duration_minutes"] == 90
-        assert notebook["metadata"]["robo_genesis"]["status"] == "planned"
+        assert notebook["metadata"]["robo_genesis"]["status"] == "cpu-verified"
         assert all(cell["execution_count"] is None for cell in code_cells)
         assert all(cell["outputs"] == [] for cell in code_cells)
         assert all(fragment in code_source for fragment in required_code)

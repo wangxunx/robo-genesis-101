@@ -144,7 +144,7 @@
         "zh": "docs/zh/lessons/l07-building-a-grasping-task-scene.md",
         "en": "docs/en/lessons/l07-building-a-grasping-task-scene.md"
       },
-      "status": "planned"
+      "status": "cpu-verified"
     },
     {
       "id": "L08",

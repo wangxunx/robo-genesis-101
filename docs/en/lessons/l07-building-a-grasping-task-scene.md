@@ -5,15 +5,16 @@ locale: en
 title: "Building a Grasping Task Scene"
 duration_minutes: 90
 hardware: cpu-ok
-status: planned
+status: cpu-verified
 ---
 
 # L07 · Building a Grasping Task Scene
 
-> **Course status:** the English lecture is complete and under review. The
-> Chinese lecture and executable notebooks are still planned, so L07 remains
-> `planned`. Scene construction has a complete non-rendering numerical path;
-> RGB/depth rendering is a separate capability branch.
+> **Course status:** the bilingual lectures and notebooks are complete. Both
+> CPU non-rendering paths passed; the English CPU+EGL dual-camera path and a
+> reference AMD+EGL path also passed as additional checks. L07 is
+> `cpu-verified`. Scene construction has a complete non-rendering numerical
+> path; RGB/depth rendering remains a separate capability branch.
 
 ## Where this lesson fits
 

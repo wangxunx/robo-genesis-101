@@ -126,7 +126,7 @@ ACT 和 SmolVLA 的 checkpoint 都由 M0.7 干净环境生成，随后通过源�
 | Linux x86_64 / R9700 / 系统 ROCm 7.2.0 / 本文 wheel | **已验证** | 完整训练参考平台。 |
 | 其他 AMD GPU 或 ROCm 组合 | **未验证** | 不能从 R9700 结果外推；欢迎后续补充实测矩阵。 |
 | NVIDIA CUDA | **未验证** | 解析器出现 CUDA 包不构成验证；V1 不承诺完整链路支持。 |
-| CPU-only 完整链路 | **部分验证** | L01–L06 的 CPU 最小实验已实际通过并完成对应运行验收，状态均为 `cpu-verified`；L07 尚未完成，训练全链路也未在 CPU-only 环境验证。 |
+| CPU-only 完整链路 | **部分验证** | L01–L07 的 CPU 最小实验已实际通过并完成对应运行验收，状态均为 `cpu-verified`；训练全链路未在 CPU-only 环境验证。 |
 | Apple Silicon / macOS | **未验证** | 本轮没有执行 MPS、Genesis 或 LeRobot 兼容性测试。 |
 | Windows | **未验证** | 本轮没有执行原生 Windows 或 WSL 测试。 |
 | Python 3.11、3.13 或其他版本 | **不支持** | V1 的可复现环境限定为 Python 3.12.x。 |
@@ -947,3 +947,137 @@ AMD+EGL 结果继续适用，不因单一状态 literal 变化而被描述为重
 
 `M3.L06.6` 已于 2026-09-07 通过项目负责人验收；L06 的最终公开状态为
 `cpu-verified`。
+
+## 18. L07 / M3.L07.5–M3.L07.6 抓取任务场景验证与状态同步
+
+> 验证日期：2026-09-07（Asia/Shanghai）
+>
+> 范围：L07 双语 CPU 无渲染数值路径、English CPU+EGL 双相机路径，以及参考 R9700
+> 的 English AMD+EGL 附加回归。`M3.L07.5` 已于 2026-09-07 通过项目负责人验收；
+> `M3.L07.6` 据此把 L07 从 `planned` 同步为 `cpu-verified`，并执行更新后复验；本步
+> 已于 2026-09-07 通过项目负责人验收。
+
+### 18.1 环境与执行矩阵
+
+本轮复用仓库 `.venv`：Python 3.12.3、Genesis 1.3.3、PyTorch
+`2.9.1+rocm7.2.1.gitff65f5bc` 和 HIP `7.2.53211-e1a6bc5663`。系统可见 4 张
+AMD Radeon AI PRO R9700；AMD 路径只设置 `ROCR_VISIBLE_DEVICES=0`，把一张物理卡
+映射为进程内设备，并由 notebook 确认实际 backend 为 `amdgpu`。四条路径均由
+`jupyter nbconvert --execute --to notebook` 启动独立 kernel。
+
+命令结构如下，其中 `<tmp>` 表示本轮隔离目录；Jupyter runtime、IPython、Matplotlib
+和 Numba cache 也分别指向该目录，以下省略这些不影响实验语义的 cache 环境变量：
+
+```sh
+ROBO_GENESIS_BACKEND=cpu ROBO_GENESIS_RENDER=0 \
+  .venv/bin/jupyter nbconvert --execute --to notebook \
+  --ExecutePreprocessor.timeout=600 --output en-cpu.ipynb --output-dir <tmp> \
+  notebooks/en/l07-building-a-grasping-task-scene.ipynb
+
+ROBO_GENESIS_BACKEND=cpu ROBO_GENESIS_RENDER=0 \
+  .venv/bin/jupyter nbconvert --execute --to notebook \
+  --ExecutePreprocessor.timeout=600 --output zh-cpu.ipynb --output-dir <tmp> \
+  notebooks/zh/l07-building-a-grasping-task-scene.ipynb
+
+PYOPENGL_PLATFORM=egl ROBO_GENESIS_BACKEND=cpu ROBO_GENESIS_RENDER=1 \
+  .venv/bin/jupyter nbconvert --execute --to notebook \
+  --ExecutePreprocessor.timeout=600 --output en-cpu-egl.ipynb --output-dir <tmp> \
+  notebooks/en/l07-building-a-grasping-task-scene.ipynb
+
+PYOPENGL_PLATFORM=egl ROCR_VISIBLE_DEVICES=0 \
+ROBO_GENESIS_BACKEND=auto ROBO_GENESIS_RENDER=1 \
+  .venv/bin/jupyter nbconvert --execute --to notebook \
+  --ExecutePreprocessor.timeout=600 --output en-amd-egl.ipynb --output-dir <tmp> \
+  notebooks/en/l07-building-a-grasping-task-scene.ipynb
+```
+
+| Notebook / 能力路径 | 请求后端 → 实际后端 | 相机证据 | 执行时间 | 最终结果 |
+| --- | --- | --- | ---: | --- |
+| EN / CPU | `cpu` → `cpu` | 明确 `SKIP`；没有创建 camera | 29.23 秒 | `L07 CHECK: PASSED` |
+| ZH / CPU | `cpu` → `cpu` | 明确 `SKIP`；没有创建 camera | 28.01 秒 | `L07 CHECK: PASSED` |
+| EN / CPU + EGL | `cpu` → `cpu` | world/wrist RGB + depth | 43.19 秒 | `L07 CHECK: PASSED` |
+| EN / AMD + EGL | `auto` → `amdgpu` | world/wrist RGB + depth | 78.22 秒 | `L07 CHECK: PASSED` |
+
+四份执行后 notebook 的 8 个 code cell 都取得 execution count，没有 error output。执行副本
+与提交版 EN/ZH notebook 的 code-cell ID/source 规范化 SHA-256 均为
+`b059f41ac40c5eeb545c8c795e01cf57ca04eadd89345bc99b3c1083550ca3be`，因此证据来自当前
+提交源码而不是临时改写。提交版 notebook 仍保持空 output 和 `execution_count: null`。
+
+执行后 notebook、Markdown 转换、PNG 与 cache 只写入隔离的 `/tmp` 目录；notebook 报告的
+仓库 `outputs/l07-grasping-task-scene` 是既有 ignored 输出目录，本轮没有向其中保存文件、
+rollout 或视频。
+
+### 18.2 Asset、布局与静置状态证据
+
+四条路径都通过相同的 asset、layout、bundle 与 state 检查：
+
+- `setup_assets()` 和 `get_ycb_assets()` 解析出 banana、lemon、plum、bowl 四个支持对象，
+  mesh path 存在，`rest_z_offset` / `radius_xy` 为正且 finite；
+- table xy bounds 为 `[-0.25,0.95] × [-0.40,0.40] m`，course working region 为
+  `[0.30,0.50] × [-0.22,0.28] m`；四个中心和保守 footprint 均通过边界检查；
+- 六个 pairwise conservative margin 全为正，最小值为 lemon–bowl 的 `0.004790 m`；
+- `SceneBundle` 含 5 个 table entity、4 个具名 YCB entity、finite `(9,)` Franka qpos，
+  且没有 video camera；
+- 60 steps home hold 后，CPU 的 max `|q-home|` 为 `0.006442 rad`，低于 `0.02 rad`；
+- banana/lemon/plum/bowl 的 AABB bottom 支撑误差分别约为
+  `0.000060/0.000043/0.000054/0.000114 m`，均低于 `0.005 m`；
+- 四个对象的 xy drift 分别约为 `0.000608/0.001864/0.000956/0.000044 m`，均低于
+  `0.01 m`；position `(3,)`、AABB `(2,3)` 与全部状态值均 finite；
+- 默认 banana candidate `(0.30,0.18)` 位于 working region，保守 footprint 留在桌面内，
+  对 lemon/plum/bowl 的 margin 分别为 `0.116010/0.028966/0.125367 m`。
+
+EN/ZH CPU 结果逐项一致。AMD+EGL 的数值只在 bowl 末位浮点上有差异：支撑误差约为
+`0.000117 m`、xy drift 约为 `0.000045 m`；其余记录值和所有判据保持通过。这些数据证明
+当前 base scene 在有限静置窗口中的结构、布局和数值状态，不构成抓取或放置结果。
+
+### 18.3 World/wrist 相机与人工检查
+
+English CPU+EGL 与 AMD+EGL 都实际进入 `render=1` 分支，并得到：
+
+- world RGB `(720,1280,3)` `uint8`，depth `(720,1280)` floating；
+- wrist RGB `(720,1280,3)` `uint8`，depth `(720,1280)` floating；
+- 两路数组 shape、dtype、全部像素 finite、RGB variation 和 positive depth pixel 检查通过；
+- CPU 与 AMD 的 world positive-depth range 均约为 `[0.7151,2.9806] m`，wrist 均约为
+  `[0.0100,0.6113] m`。
+
+人工检查两条路径生成的并排 RGB 图后确认：world view 能同时识别桌面、Franka、banana、
+lemon、plum 与 bowl 的全局关系；wrist view 是 hand 附着视角，能看到局部桌面、三件水果
+和 bowl。两条路径均不存在空白、全黑、明显错位或损坏画面。depth 没有显示为图像，因而
+这里只把它记录为数组、finite 与正距离证据，不把数值检查写成人工视觉结论。
+
+### 18.4 已知 warning、状态边界与限制
+
+四条路径均观察到 Genesis 1.3.3 已知的 Franka tendon approximation、neutral qpos 超出
+joint limit、solver time constant 从 `0.005` 调整为 `0.01`，以及 neutral configuration
+self-collision pair filtering warning。它们没有导致非有限状态、结构、布局、AABB、drift、
+camera 或最终检查失败；本轮没有新增 fallback、EGL 或 OpenGL 错误。
+
+本节证据支持 L07 的 CPU 无渲染数值路径、当前 Linux CPU+EGL 双相机路径和一张参考
+R9700 的 AMD+EGL 附加路径。它不外推到其他 AMD/ROCm、NVIDIA、Apple Silicon、Windows、
+viewer 模式或长时间稳定性，也不证明 IK 可达、无碰撞路径、抓取成功、放入 bowl、数据
+时间对齐、真实相机等价、训练收益或闭环任务表现。
+
+`M3.L07.5` 已于 2026-09-07 通过项目负责人验收。`M3.L07.6` 已将 manifest、双语讲义
+与 notebook、README、首页和测试合同原子同步为 `cpu-verified`；更新后复验结果见
+下一小节。
+
+### 18.5 状态同步后复验与结论
+
+状态 literal 变化后，双语 notebook 的 8 个 code-cell ID/source 仍完全一致，规范化
+SHA-256 从 `.5` 执行时的
+`b059f41ac40c5eeb545c8c795e01cf57ca04eadd89345bc99b3c1083550ca3be` 变为
+`f12315f4d18f8ccdcea96853404bd67bc0e72cb75f862ecd90e3bbe688b1f3ff`；唯一行为语义变化是
+setup 中的 manifest status 断言从 `planned` 改为 `cpu-verified`。
+
+为确认当前源码，English notebook 又在独立 CPU、`render=0` kernel 中从头执行。8 个
+code cell 全部完成、没有 error output，实际 backend 为 `cpu`，world/wrist camera 明确
+`SKIP`，asset、layout、bundle、settled state 与最终汇总检查全部通过，最终输出
+`L07 CHECK: PASSED`。执行副本与当前双语提交版的 code source 哈希一致，产物只位于
+`/tmp`；两份提交版 notebook 继续保持空 outputs 和 `execution_count: null`。
+
+`.5` 已验收的中文 CPU、English CPU+EGL 和 English AMD+EGL 证据继续适用，因为本步没有
+改变仿真、布局或渲染逻辑。仓库课程验证、36 项测试、Python compileall、双模式文档构建
+也均通过。以上证据支持 L07 的最终公开状态为 `cpu-verified`；其中 CPU 是最低兼容路径，
+CPU+EGL 与参考 R9700 AMD+EGL 仍只是独立的附加能力证据。
+
+`M3.L07.6` 已于 2026-09-07 通过项目负责人验收；L07 六个子步骤至此全部完成并验收。
