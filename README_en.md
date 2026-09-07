@@ -52,7 +52,7 @@ Training loss or open-loop action prediction is not treated as task success. The
 | L04 | [Robot Models, Degrees of Freedom, and Joint Control](docs/en/lessons/l04-robot-models-dofs-and-joint-control.md) | 90 min | `cpu-ok` | `cpu-verified` |
 | L05 | [Inverse Kinematics, End-Effector Poses, and Cameras](docs/en/lessons/l05-inverse-kinematics-end-effector-poses-and-cameras.md) | 120 min | `cpu-ok` | `cpu-verified` |
 | L06 | [Parallel Simulation and Batched Franka Control](docs/en/lessons/l06-parallel-simulation-and-batched-franka-control.md) | 90 min | `cpu-ok` | `cpu-verified` |
-| L07 | [Building a Grasping Task Scene](docs/en/lessons/l07-building-a-grasping-task-scene.md) | 120 min | `cpu-ok` | `planned` |
+| L07 | [Building a Grasping Task Scene](docs/en/lessons/l07-building-a-grasping-task-scene.md) | 90 min | `cpu-ok` | `planned` |
 | L08 | [Demonstration Acquisition and Scripted Experts](docs/en/lessons/l08-demonstration-acquisition-and-scripted-experts.md) | 120 min | `gpu-recommended` | `planned` |
 | L09 | [Synthetic Data Recording and Collection Throughput](docs/en/lessons/l09-synthetic-data-recording-and-throughput.md) | 120 min | `gpu-recommended` | `planned` |
 | L10 | [Dataset Anatomy and Imitation Learning 101](docs/en/lessons/l10-dataset-anatomy-and-imitation-learning.md) | 90 min | `gpu-recommended` | `planned` |

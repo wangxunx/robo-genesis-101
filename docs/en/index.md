@@ -39,7 +39,7 @@ features:
 | L04 | [Robot Models, Degrees of Freedom, and Joint Control](/en/lessons/l04-robot-models-dofs-and-joint-control) | 90 min | `cpu-ok` | `cpu-verified` |
 | L05 | [Inverse Kinematics, End-Effector Poses, and Cameras](/en/lessons/l05-inverse-kinematics-end-effector-poses-and-cameras) | 120 min | `cpu-ok` | `cpu-verified` |
 | L06 | [Parallel Simulation and Batched Franka Control](/en/lessons/l06-parallel-simulation-and-batched-franka-control) | 90 min | `cpu-ok` | `cpu-verified` |
-| L07 | [Building a Grasping Task Scene](/en/lessons/l07-building-a-grasping-task-scene) | 120 min | `cpu-ok` | `planned` |
+| L07 | [Building a Grasping Task Scene](/en/lessons/l07-building-a-grasping-task-scene) | 90 min | `cpu-ok` | `planned` |
 | L08 | [Demonstration Acquisition and Scripted Experts](/en/lessons/l08-demonstration-acquisition-and-scripted-experts) | 120 min | `gpu-recommended` | `planned` |
 | L09 | [Synthetic Data Recording and Collection Throughput](/en/lessons/l09-synthetic-data-recording-and-throughput) | 120 min | `gpu-recommended` | `planned` |
 | L10 | [Dataset Anatomy and Imitation Learning 101](/en/lessons/l10-dataset-anatomy-and-imitation-learning) | 90 min | `gpu-recommended` | `planned` |

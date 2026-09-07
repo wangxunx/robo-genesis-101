@@ -38,7 +38,7 @@ features:
 | L04 | [机器人模型、DOF 与关节控制](/zh/lessons/l04-robot-models-dofs-and-joint-control) | 90 分钟 | `cpu-ok` | `cpu-verified` |
 | L05 | [逆运动学、末端位姿与相机](/zh/lessons/l05-inverse-kinematics-end-effector-poses-and-cameras) | 120 分钟 | `cpu-ok` | `cpu-verified` |
 | L06 | [并行仿真与批量 Franka 控制](/zh/lessons/l06-parallel-simulation-and-batched-franka-control) | 90 分钟 | `cpu-ok` | `cpu-verified` |
-| L07 | [抓取任务场景搭建](/zh/lessons/l07-building-a-grasping-task-scene) | 120 分钟 | `cpu-ok` | `planned` |
+| L07 | [抓取任务场景搭建](/zh/lessons/l07-building-a-grasping-task-scene) | 90 分钟 | `cpu-ok` | `planned` |
 | L08 | [演示数据获取与脚本化专家](/zh/lessons/l08-demonstration-acquisition-and-scripted-experts) | 120 分钟 | `gpu-recommended` | `planned` |
 | L09 | [合成数据录制与采数吞吐](/zh/lessons/l09-synthetic-data-recording-and-throughput) | 120 分钟 | `gpu-recommended` | `planned` |
 | L10 | [数据集解剖与模仿学习 101](/zh/lessons/l10-dataset-anatomy-and-imitation-learning) | 90 分钟 | `gpu-recommended` | `planned` |

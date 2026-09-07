@@ -3,7 +3,7 @@ lesson: L07
 slug: building-a-grasping-task-scene
 locale: en
 title: "Building a Grasping Task Scene"
-duration_minutes: 120
+duration_minutes: 90
 hardware: cpu-ok
 status: planned
 ---
@@ -58,15 +58,15 @@ Before starting, you should be able to:
   shapes, even though this lesson deliberately returns to one unbatched task
   scene.
 
-### A focused 120-minute route
+### A focused 90-minute route
 
 | Time | Topic | Learner output |
 |---:|---|---|
-| 0–15 min | Task scene and prepared community assets | Connect the four YCB meshes to their task roles |
-| 15–40 min | Configuration and placement geometry | Derive table bounds, rest z, footprints, and separation |
-| 40–70 min | Base-scene construction | Build once and inspect the named `SceneBundle` components |
-| 70–100 min | Settle and inspect | Check Franka qpos, object positions, AABBs, and drift |
-| 100–120 min | World/wrist observations, placement exercise, and L08 handoff | Compare the two views and evaluate one new xy candidate |
+| 0–10 min | Task scene and prepared community assets | Connect the four YCB meshes to their task roles |
+| 10–30 min | Configuration and placement geometry | Derive table bounds, rest z, footprints, and separation |
+| 30–50 min | Base-scene construction | Build once and inspect the named `SceneBundle` components |
+| 50–70 min | Settle and inspect | Check Franka qpos, object positions, AABBs, and drift |
+| 70–90 min | World/wrist observations, placement exercise, and L08 handoff | Compare the two views and evaluate one new xy candidate |
 
 Scene lifecycle, entity categories, PD control, and basic camera concepts were
 established in L02–L06. This lesson recalls them only where they are needed to

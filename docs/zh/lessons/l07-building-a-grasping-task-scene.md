@@ -3,7 +3,7 @@ lesson: L07
 slug: building-a-grasping-task-scene
 locale: zh
 title: "抓取任务场景搭建"
-duration_minutes: 120
+duration_minutes: 90
 hardware: cpu-ok
 status: planned
 ---
@@ -51,15 +51,15 @@ L03 建立了接触与稳定步进的基础，L04 让 Franka 关节运动起来�
 - 记得 L06 中 leading environment dimension 会改变数组 shape；本讲则有意回到一个
   无 batch 维度的任务场景。
 
-### 精简的 120 分钟学习路径
+### 精简的 90 分钟学习路径
 
 | 时间 | 主题 | 学员产出 |
 |---:|---|---|
-| 0–15 分钟 | 任务场景与已准备的社区资产 | 把四个 YCB 网格对应到各自的任务角色 |
-| 15–40 分钟 | 配置与布局几何 | 推导桌面边界、rest z、footprint 与 separation |
-| 40–70 分钟 | 基础场景构建 | 完成一次 build 并检查具名 `SceneBundle` 组件 |
-| 70–100 分钟 | 静置与检查 | 检查 Franka qpos、物体 position、AABB 与 drift |
-| 100–120 分钟 | World/wrist observation、布局练习与 L08 衔接 | 对比两个视角并判断一个新的 xy candidate |
+| 0–10 分钟 | 任务场景与已准备的社区资产 | 把四个 YCB 网格对应到各自的任务角色 |
+| 10–30 分钟 | 配置与布局几何 | 推导桌面边界、rest z、footprint 与 separation |
+| 30–50 分钟 | 基础场景构建 | 完成一次 build 并检查具名 `SceneBundle` 组件 |
+| 50–70 分钟 | 静置与检查 | 检查 Franka qpos、物体 position、AABB 与 drift |
+| 70–90 分钟 | World/wrist observation、布局练习与 L08 衔接 | 对比两个视角并判断一个新的 xy candidate |
 
 Scene 生命周期、entity 分类、PD 控制和相机基础已在 L02–L06 建立。本讲只在搭建和检查
 任务场景需要时简短调用这些先修知识，不再单独安排复习环节。
