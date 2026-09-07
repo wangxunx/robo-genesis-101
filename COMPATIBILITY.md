@@ -126,7 +126,7 @@ ACT 和 SmolVLA 的 checkpoint 都由 M0.7 干净环境生成，随后通过源�
 | Linux x86_64 / R9700 / 系统 ROCm 7.2.0 / 本文 wheel | **已验证** | 完整训练参考平台。 |
 | 其他 AMD GPU 或 ROCm 组合 | **未验证** | 不能从 R9700 结果外推；欢迎后续补充实测矩阵。 |
 | NVIDIA CUDA | **未验证** | 解析器出现 CUDA 包不构成验证；V1 不承诺完整链路支持。 |
-| CPU-only 完整链路 | **部分验证** | L01–L05 的 CPU 最小实验已验证；L06–L07 尚未完成，训练全链路也未在 CPU-only 环境验证。 |
+| CPU-only 完整链路 | **部分验证** | L01–L06 的 CPU 最小实验已实际通过并完成对应运行验收，状态均为 `cpu-verified`；L07 尚未完成，训练全链路也未在 CPU-only 环境验证。 |
 | Apple Silicon / macOS | **未验证** | 本轮没有执行 MPS、Genesis 或 LeRobot 兼容性测试。 |
 | Windows | **未验证** | 本轮没有执行原生 Windows 或 WSL 测试。 |
 | Python 3.11、3.13 或其他版本 | **不支持** | V1 的可复现环境限定为 Python 3.12.x。 |
@@ -819,3 +819,131 @@ checkpoint、日志和训练输出都位于 `/tmp/rg101-r133.sPlI2O`，未进入
 
 以上证据支持当前 L12 恢复 `gpu-verified`。它不证明长训练收敛、策略质量、空缓存
 联网下载、Genesis 闭环运行或任务成功率；后两项仍属于 L13。
+
+## 17. L06 / M3.L06.5 并行仿真与批量 Franka 控制 clean-kernel 验证
+
+> 验证日期：2026-09-07（Asia/Shanghai）
+>
+> 范围：L06 双语 CPU 最低路径、English CPU+EGL 四环境相机路径，以及参考 R9700
+> 的 English AMD+EGL 附加回归。`M3.L06.5` 已于 2026-09-07 通过项目负责人验收；
+> `M3.L06.6` 据此把 L06 从 `planned` 同步为 `cpu-verified`，并于 2026-09-07 通过
+> 项目负责人验收。
+
+### 17.1 环境与执行矩阵
+
+本轮复用仓库 `.venv`：Python 3.12.3、Genesis 1.3.3、PyTorch
+`2.9.1+rocm7.2.1.gitff65f5bc` 和 HIP `7.2.53211-e1a6bc5663`。系统可见 4 张
+AMD Radeon AI PRO R9700；AMD 路径将物理 GPU 0 单独映射为进程内设备，并实际选择
+`amdgpu`。四条路径均由 `jupyter nbconvert --execute --to notebook` 启动独立 kernel，
+执行副本、图片与缓存只写入隔离的 `/tmp` 目录。
+
+命令结构如下，其中 `<tmp>` 表示本轮隔离目录：
+
+```sh
+ROBO_GENESIS_BACKEND=cpu ROBO_GENESIS_RENDER=0 \
+ROBO_GENESIS_OUTPUTS_DIR=<tmp>/en-cpu-outputs \
+  .venv/bin/jupyter nbconvert --execute --to notebook \
+  --ExecutePreprocessor.timeout=900 --output l06-en-cpu-render0.ipynb \
+  --output-dir <tmp> \
+  notebooks/en/l06-parallel-simulation-and-batched-franka-control.ipynb
+
+ROBO_GENESIS_BACKEND=cpu ROBO_GENESIS_RENDER=0 \
+ROBO_GENESIS_OUTPUTS_DIR=<tmp>/zh-cpu-outputs \
+  .venv/bin/jupyter nbconvert --execute --to notebook \
+  --ExecutePreprocessor.timeout=900 --output l06-zh-cpu-render0.ipynb \
+  --output-dir <tmp> \
+  notebooks/zh/l06-parallel-simulation-and-batched-franka-control.ipynb
+
+PYOPENGL_PLATFORM=egl ROBO_GENESIS_BACKEND=cpu ROBO_GENESIS_RENDER=1 \
+ROBO_GENESIS_OUTPUTS_DIR=<tmp>/en-cpu-egl-outputs \
+  .venv/bin/jupyter nbconvert --execute --to notebook \
+  --ExecutePreprocessor.timeout=1200 --output l06-en-cpu-egl-render1.ipynb \
+  --output-dir <tmp> \
+  notebooks/en/l06-parallel-simulation-and-batched-franka-control.ipynb
+
+PYOPENGL_PLATFORM=egl ROCR_VISIBLE_DEVICES=0 HIP_VISIBLE_DEVICES=0 \
+CUDA_VISIBLE_DEVICES=0 ROBO_GENESIS_BACKEND=auto ROBO_GENESIS_RENDER=1 \
+ROBO_GENESIS_OUTPUTS_DIR=<tmp>/en-amd-egl-outputs \
+  .venv/bin/jupyter nbconvert --execute --to notebook \
+  --ExecutePreprocessor.timeout=1200 --output l06-en-amd-egl-render1.ipynb \
+  --output-dir <tmp> \
+  notebooks/en/l06-parallel-simulation-and-batched-franka-control.ipynb
+```
+
+| Notebook / 能力路径 | 请求后端 → 实际后端 | 相机证据 | 最终结果 |
+| --- | --- | --- | --- |
+| EN / CPU | `cpu` → `cpu` | 明确 `SKIP`；没有创建 camera | `L06 CHECK: PASSED` |
+| ZH / CPU | `cpu` → `cpu` | 明确 `SKIP`；没有创建 camera | `L06 CHECK: PASSED` |
+| EN / CPU + EGL | `cpu` → `cpu` | 四环境 RGB/depth batch | `L06 CHECK: PASSED` |
+| EN / AMD + EGL | `auto` → `amdgpu` | 四环境 RGB/depth batch | `L06 CHECK: PASSED` |
+
+四份执行后 notebook 的 7 个 code cell 都取得 execution count，没有 error output。
+`M3.L06.5` 执行时，四份执行副本与当时提交版 EN/ZH notebook 的 code-cell ID/source
+规范化 SHA-256 均为
+`d1bab5f21645f42148ee0c6c29d7e294b0ac50fda1d5a90b06a8dd28d88160ee`；运行证据不是来自
+临时改写。`M3.L06.6` 只把 setup 中的 manifest status 断言改为 `cpu-verified`，当前双语
+code source 哈希因此变为
+`7be4b1574090ed727f084f03b6f74d1c65ff2c562a1e74311eb81e592bbfb97d`，提交版仍保持空
+output 和 `execution_count: null`。
+
+### 17.2 Batch、IK、动态控制与 selective update 证据
+
+四条路径均得到 qpos `(4,9)`、full target `(4,3)/(4,4)`、full IK
+`(4,9)/(4,6)`，以及 selective IK `(2,9)/(2,6)`。CPU 的四行 baseline IK
+position residual 约为 `0.000001`、`0.000015`、`0.000159`、`0.000492 m`；rotation
+residual 约为 `0.000000`、`0.000007`、`0.000252`、`0.000297 rad`，逐行满足
+`5e-4 m` / `5e-3 rad` 阈值。
+
+180-step baseline 控制后，env 0–3 的 position error 约为 `0.004860`、`0.005578`、
+`0.005593`、`0.005106 m`，orientation error 约为 `0.011410`、`0.012569`、
+`0.012505`、`0.010948 rad`，均低于 `0.02 m` / `0.05 rad`。selective update 的 row 0
+和 row 1 分别映射到 env 1 和 env 3；二者末态 position error 约为 `0.005276`、
+`0.006059 m`，orientation error 约为 `0.012084`、`0.013394 rad`。未选择的 env 0/2
+继续保留 baseline target，本轮报告的额外 motion 与 position-error change 均为
+`0.000000 m`，满足 `<0.005 m` 和 `<=0.002 m` 的联合检查。
+
+EN/ZH CPU 结果逐项一致。AMD+EGL 与 CPU 的 IK residual 一致，动态误差只在末位出现
+浮点差异，例如 env 0 orientation error 为 `0.011409 rad`、selected env 1 position
+error 为 `0.005275 m`；所有逐环境断言继续通过。这里的结果证明 batch row 语义、
+有限控制窗内的 measured pose 和 selective indexing，不证明固定吞吐加速、碰撞安全、
+抓取成功或完整并行数据录制。
+
+### 17.3 四环境相机与人工检查
+
+English CPU+EGL 与 AMD+EGL 都实际进入 `render=1` 分支。Rasterizer 返回 RGB
+`(4,360,640,3)` `uint8` 与 depth `(4,360,640)` `float32`；shape、dtype、全部像素
+finite、每幅 RGB 非零变化和每幅 depth 存在正值的检查均通过。
+
+人工检查两条路径生成的 2×2 RGB mosaic 后确认，env 0–3 四幅图都能看到对应 Franka
+与棋盘地面，不存在空白、全黑、明显错位或损坏画面；四幅机器人姿态与 selective
+阶段结束状态相符。depth 本轮只作为数组、有限性和正值像素证据，没有把未显示的 depth
+数组描述为人工视觉检查结果。相机 batch 证明 batched rendering 可用，不替代逐环境
+IK 或动态控制证据。
+
+### 17.4 已知 warning、状态边界与限制
+
+运行观察到 Genesis 1.3.3 已知的 tendon approximation、neutral qpos、solver time
+constant adjustment 和 neutral self-collision filtering warning；它们没有导致非有限
+状态、shape、residual、tracking、index mapping 或 camera 检查失败。沙箱内首次启动
+English CPU kernel 因 Jupyter 本地 socket 权限返回 `Operation not permitted`，随后在
+获准环境以同一命令复跑并通过；这不是 notebook 行为失败。
+
+本节证据支持 L06 的 CPU 最低路径、当前 Linux CPU+EGL 四环境相机路径和一张参考 R9700
+的 AMD+EGL 附加路径。它不外推到其他 AMD/ROCm、NVIDIA、Apple Silicon、Windows、
+viewer 模式、更大 batch、固定 speedup 或长时间稳定性。
+
+### 17.5 M3.L06.6 状态结论
+
+已验收的双语 CPU clean-kernel 证明 L06 满足 `cpu-ok` 最低硬件合同，因此 L06 在
+`M3.L06.6` 同步为 `cpu-verified`。English CPU+EGL 与参考 R9700 AMD+EGL 的通过结果
+继续作为附加兼容性证据，不把 GPU 变成最低要求，也不表示本讲已经 `published`。
+
+状态同步后，当前 English notebook 又在独立 CPU、`render=0` kernel 中从头执行，7 个
+code cell 全部完成、没有 error output，并再次得到 `L06 CHECK: PASSED`。执行副本与当前
+双语提交版的 code-cell ID/source 哈希均为
+`7be4b1574090ed727f084f03b6f74d1c65ff2c562a1e74311eb81e592bbfb97d`。这次复验确认新的
+manifest 状态断言和未改变的数值主线能共同通过；`.5` 已验收的中文 CPU、CPU+EGL 与
+AMD+EGL 结果继续适用，不因单一状态 literal 变化而被描述为重新执行。
+
+`M3.L06.6` 已于 2026-09-07 通过项目负责人验收；L06 的最终公开状态为
+`cpu-verified`。

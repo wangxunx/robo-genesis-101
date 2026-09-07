@@ -5,15 +5,15 @@ locale: en
 title: "Parallel Simulation and Batched Franka Control"
 duration_minutes: 90
 hardware: cpu-ok
-status: planned
+status: cpu-verified
 ---
 
 # L06 · Parallel Simulation and Batched Franka Control
 
-> **Course status:** L06 remains `planned`. This page defines the complete
-> English mechanism and experiment path, but the executable companion notebook
-> and its clean-kernel evidence are not available yet. The code below is for
-> focused reading; no numerical output is presented as a verified course run.
+> **Course status:** L06 is `cpu-verified`. Both localized notebooks passed
+> independent CPU clean-kernel execution; the English notebook also passed its
+> CPU+EGL and reference AMD R9700+EGL batched-camera paths. This status verifies
+> the CPU minimum path; it does not mean the lesson is `published` or requires a GPU.
 
 ## Where this lesson fits
 

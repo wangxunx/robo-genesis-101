@@ -5,14 +5,15 @@ locale: zh
 title: "并行仿真与批量 Franka 控制"
 duration_minutes: 90
 hardware: cpu-ok
-status: planned
+status: cpu-verified
 ---
 
 # L06 · 并行仿真与批量 Franka 控制
 
-> **课程状态：** L06 仍为 `planned`。本页给出了完整的机制解释与实验路径，但可执行的
-> 配套 notebook 及其 clean-kernel 证据尚未提供。下文代码用于聚焦关键逻辑；其中没有把
-> 任何数值输出表述为已经验证的课程运行结果。
+> **课程状态：** L06 已达到 `cpu-verified`。双语 notebook 均已通过独立 CPU
+> clean-kernel 执行；英文 notebook 还通过了 CPU+EGL 和参考 AMD R9700+EGL 的批量相机
+> 路径。该状态表示 CPU 最低路径已经验证，不表示课程已经 `published`，也不把 GPU
+> 变成学习本讲的必要条件。
 
 ## 本讲定位
 

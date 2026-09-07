@@ -25,10 +25,10 @@ features:
 
 ## 课程状态
 
-> L01–L05 已通过各自的 CPU clean-kernel 验证，状态均为 `cpu-verified`；这些讲次的
+> L01–L06 已通过各自的 CPU clean-kernel 验证，状态均为 `cpu-verified`；这些讲次的
 > 附加 AMD 路径也已在参考 R9700 环境按各自合同通过。重编号后的 L12 训练内容已针对
 > 当前代码通过 ACT、SmolVLA GPU smoke、checkpoint 审计和重载验证，状态为
-> `gpu-verified`。其余 7 讲仍为 `planned`。
+> `gpu-verified`。其余 6 讲仍为 `planned`。
 
 | 讲次 | 主题 | 预计时长 | 硬件 | 状态 |
 |---|---|---:|---|---|
@@ -37,7 +37,7 @@ features:
 | L03 | [刚体物理与稳定仿真](/zh/lessons/l03-rigid-body-physics-and-stable-simulation) | 90 分钟 | `cpu-ok` | `cpu-verified` |
 | L04 | [机器人模型、DOF 与关节控制](/zh/lessons/l04-robot-models-dofs-and-joint-control) | 90 分钟 | `cpu-ok` | `cpu-verified` |
 | L05 | [逆运动学、末端位姿与相机](/zh/lessons/l05-inverse-kinematics-end-effector-poses-and-cameras) | 120 分钟 | `cpu-ok` | `cpu-verified` |
-| L06 | [并行仿真与批量 Franka 控制](/zh/lessons/l06-parallel-simulation-and-batched-franka-control) | 90 分钟 | `cpu-ok` | `planned` |
+| L06 | [并行仿真与批量 Franka 控制](/zh/lessons/l06-parallel-simulation-and-batched-franka-control) | 90 分钟 | `cpu-ok` | `cpu-verified` |
 | L07 | [抓取任务场景搭建](/zh/lessons/l07-building-a-grasping-task-scene) | 120 分钟 | `cpu-ok` | `planned` |
 | L08 | [演示数据获取与脚本化专家](/zh/lessons/l08-demonstration-acquisition-and-scripted-experts) | 120 分钟 | `gpu-recommended` | `planned` |
 | L09 | [合成数据录制与采数吞吐](/zh/lessons/l09-synthetic-data-recording-and-throughput) | 120 分钟 | `gpu-recommended` | `planned` |

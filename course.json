@@ -125,7 +125,7 @@
         "zh": "docs/zh/lessons/l06-parallel-simulation-and-batched-franka-control.md",
         "en": "docs/en/lessons/l06-parallel-simulation-and-batched-franka-control.md"
       },
-      "status": "planned"
+      "status": "cpu-verified"
     },
     {
       "id": "L07",

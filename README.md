@@ -2,11 +2,11 @@
 
 [English](README_en.md)
 
-> **项目状态：Alpha / 课程开发阶段。** L01–L05 已通过各自的 CPU clean-kernel 验证，
+> **项目状态：Alpha / 课程开发阶段。** L01–L06 已通过各自的 CPU clean-kernel 验证，
 > 状态为 `cpu-verified`；这些讲次的附加 AMD 路径也已在参考 R9700 环境按各自合同通过。
 > 重编号后的 L12 训练内容已针对当前代码通过 ACT、SmolVLA GPU smoke、checkpoint
 > 审计和重载验证，状态为 `gpu-verified`。
-> 其余 7 讲仍为 `planned`。页面和 notebook 已建立不代表对应课程已经完成验证。
+> 其余 6 讲仍为 `planned`。页面和 notebook 已建立不代表对应课程已经完成验证。
 
 RoboGenesis 101 是一门 Datawhale 开源课程，面向具备 Python 基础、希望系统进入机器人学习实践的学习者。课程以 Genesis 为仿真平台，从环境诊断、场景和刚体物理出发，逐步连接机器人控制、逆运动学、抓取、演示数据、模仿学习、策略训练与闭环评估。
 
@@ -51,7 +51,7 @@ RoboGenesis 101 是一门 Datawhale 开源课程，面向具备 Python 基础、
 | L03 | [刚体物理与稳定仿真](docs/zh/lessons/l03-rigid-body-physics-and-stable-simulation.md) | 90 分钟 | `cpu-ok` | `cpu-verified` |
 | L04 | [机器人模型、DOF 与关节控制](docs/zh/lessons/l04-robot-models-dofs-and-joint-control.md) | 90 分钟 | `cpu-ok` | `cpu-verified` |
 | L05 | [逆运动学、末端位姿与相机](docs/zh/lessons/l05-inverse-kinematics-end-effector-poses-and-cameras.md) | 120 分钟 | `cpu-ok` | `cpu-verified` |
-| L06 | [并行仿真与批量 Franka 控制](docs/zh/lessons/l06-parallel-simulation-and-batched-franka-control.md) | 90 分钟 | `cpu-ok` | `planned` |
+| L06 | [并行仿真与批量 Franka 控制](docs/zh/lessons/l06-parallel-simulation-and-batched-franka-control.md) | 90 分钟 | `cpu-ok` | `cpu-verified` |
 | L07 | [抓取任务场景搭建](docs/zh/lessons/l07-building-a-grasping-task-scene.md) | 120 分钟 | `cpu-ok` | `planned` |
 | L08 | [演示数据获取与脚本化专家](docs/zh/lessons/l08-demonstration-acquisition-and-scripted-experts.md) | 120 分钟 | `gpu-recommended` | `planned` |
 | L09 | [合成数据录制与采数吞吐](docs/zh/lessons/l09-synthetic-data-recording-and-throughput.md) | 120 分钟 | `gpu-recommended` | `planned` |

@@ -2,11 +2,11 @@
 
 [简体中文](README.md)
 
-> **Project status: Alpha / course development.** L01–L05 are `cpu-verified`
+> **Project status: Alpha / course development.** L01–L06 are `cpu-verified`
 > after their clean-kernel CPU verification; their additional AMD paths also passed
 > their respective contracts on the reference R9700. The renumbered L12 training
 > content has passed ACT and SmolVLA GPU smoke, checkpoint audit, and reload checks
-> against the current code and is `gpu-verified`. The other 7 lessons remain `planned`.
+> against the current code and is `gpu-verified`. The other 6 lessons remain `planned`.
 
 RoboGenesis 101 is a Datawhale open-source course for learners with basic Python experience who want a structured, hands-on introduction to robot learning. Using Genesis as its simulation platform, the course connects environment diagnostics, scenes, and rigid-body physics with robot control, inverse kinematics, grasping, demonstration data, imitation learning, policy training, and closed-loop evaluation.
 
@@ -51,7 +51,7 @@ Training loss or open-loop action prediction is not treated as task success. The
 | L03 | [Rigid-Body Physics and Stable Simulation](docs/en/lessons/l03-rigid-body-physics-and-stable-simulation.md) | 90 min | `cpu-ok` | `cpu-verified` |
 | L04 | [Robot Models, Degrees of Freedom, and Joint Control](docs/en/lessons/l04-robot-models-dofs-and-joint-control.md) | 90 min | `cpu-ok` | `cpu-verified` |
 | L05 | [Inverse Kinematics, End-Effector Poses, and Cameras](docs/en/lessons/l05-inverse-kinematics-end-effector-poses-and-cameras.md) | 120 min | `cpu-ok` | `cpu-verified` |
-| L06 | [Parallel Simulation and Batched Franka Control](docs/en/lessons/l06-parallel-simulation-and-batched-franka-control.md) | 90 min | `cpu-ok` | `planned` |
+| L06 | [Parallel Simulation and Batched Franka Control](docs/en/lessons/l06-parallel-simulation-and-batched-franka-control.md) | 90 min | `cpu-ok` | `cpu-verified` |
 | L07 | [Building a Grasping Task Scene](docs/en/lessons/l07-building-a-grasping-task-scene.md) | 120 min | `cpu-ok` | `planned` |
 | L08 | [Demonstration Acquisition and Scripted Experts](docs/en/lessons/l08-demonstration-acquisition-and-scripted-experts.md) | 120 min | `gpu-recommended` | `planned` |
 | L09 | [Synthetic Data Recording and Collection Throughput](docs/en/lessons/l09-synthetic-data-recording-and-throughput.md) | 120 min | `gpu-recommended` | `planned` |
