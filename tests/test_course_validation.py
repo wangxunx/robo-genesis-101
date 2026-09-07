@@ -40,7 +40,7 @@ def test_repository_passes_all_course_gates() -> None:
     summary = validate_repository(PROJECT_ROOT)
 
     assert summary.lessons == 13
-    assert summary.markdown_files == 28
+    assert summary.markdown_files == 32
     assert summary.notebooks == 26
     assert summary.python_files == 31
 

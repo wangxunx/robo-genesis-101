@@ -36,10 +36,42 @@ function lessonSidebar(locale: Locale) {
   return [
     {
       text: locale === 'zh' ? '课程目录' : 'Course Outline',
-      items: course.lessons.map((lesson) => ({
-        text: `${lesson.id} · ${lesson.title[locale]}`,
-        link: pageLink(lesson.lecture[locale])
-      }))
+      items: course.lessons.map((lesson) => {
+        const text = `${lesson.id} · ${lesson.title[locale]}`
+
+        if (lesson.id !== 'L08') {
+          return {
+            text,
+            link: pageLink(lesson.lecture[locale])
+          }
+        }
+
+        const lessonRoot = `/${locale}/lessons`
+        return {
+          text,
+          collapsed: false,
+          items: [
+            {
+              text: locale === 'zh' ? '本讲导览' : 'Lesson Overview',
+              link: pageLink(lesson.lecture[locale])
+            },
+            {
+              text:
+                locale === 'zh'
+                  ? '演示数据获取方法'
+                  : 'Demonstration Acquisition Methods',
+              link: `${lessonRoot}/l08-demonstration-acquisition-methods`
+            },
+            {
+              text:
+                locale === 'zh'
+                  ? '脚本化抓取放置专家'
+                  : 'The Scripted Pick-and-Place Expert',
+              link: `${lessonRoot}/l08-scripted-pick-and-place-expert`
+            }
+          ]
+        }
+      })
     }
   ]
 }

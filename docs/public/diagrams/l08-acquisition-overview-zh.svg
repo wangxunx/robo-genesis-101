@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">演示数据获取路线及其适配器</title>
+  <desc id="desc">六类原始演示数据来源分别经过来源特定的适配器，再汇入共同的任务、观察、动作和结果接口。</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#64748b"/>
+    </marker>
+    <style>
+      .title { font: 700 30px Inter, "Noto Sans CJK SC", "Microsoft YaHei", system-ui, sans-serif; fill: #0f172a; }
+      .subtitle { font: 400 17px Inter, "Noto Sans CJK SC", "Microsoft YaHei", system-ui, sans-serif; fill: #475569; }
+      .heading { font: 700 17px Inter, "Noto Sans CJK SC", "Microsoft YaHei", system-ui, sans-serif; fill: #0f172a; }
+      .label { font: 650 16px Inter, "Noto Sans CJK SC", "Microsoft YaHei", system-ui, sans-serif; fill: #0f172a; }
+      .small { font: 400 14px Inter, "Noto Sans CJK SC", "Microsoft YaHei", system-ui, sans-serif; fill: #334155; }
+      .arrow { stroke: #64748b; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+    </style>
+  </defs>
+
+  <rect width="1200" height="760" rx="24" fill="#f8fafc"/>
+  <text x="600" y="48" text-anchor="middle" class="title">不同来源需要不同适配器</text>
+  <text x="600" y="78" text-anchor="middle" class="subtitle">共同学习接口是转换的结果，而不是来源的原生属性。</text>
+
+  <text x="40" y="116" class="heading">原始来源</text>
+  <text x="390" y="116" class="heading">来源特定适配器</text>
+  <text x="825" y="116" class="heading">演示数据接口</text>
+
+  <g>
+    <rect x="40" y="138" width="275" height="72" rx="12" fill="#dbeafe" stroke="#60a5fa"/>
+    <text x="58" y="166" class="label">遥操作</text>
+    <text x="58" y="190" class="small">设备命令 + 机器人传感器</text>
+    <rect x="390" y="138" width="305" height="72" rx="12" fill="#e0f2fe" stroke="#38bdf8"/>
+    <text x="408" y="166" class="label">控制映射与时钟</text>
+    <text x="408" y="190" class="small">标定、同步、质量检查</text>
+    <path d="M315 174 H382" class="arrow"/>
+  </g>
+
+  <g>
+    <rect x="40" y="226" width="275" height="72" rx="12" fill="#dbeafe" stroke="#60a5fa"/>
+    <text x="58" y="254" class="label">拖动示教</text>
+    <text x="58" y="278" class="small">人工引导的机器人轨迹</text>
+    <rect x="390" y="226" width="305" height="72" rx="12" fill="#e0f2fe" stroke="#38bdf8"/>
+    <text x="408" y="254" class="label">可回放动作与安全</text>
+    <text x="408" y="278" class="small">转换柔顺示教运动</text>
+    <path d="M315 262 H382" class="arrow"/>
+  </g>
+
+  <g>
+    <rect x="40" y="314" width="275" height="72" rx="12" fill="#dcfce7" stroke="#4ade80"/>
+    <text x="58" y="342" class="label">脚本化专家</text>
+    <text x="58" y="366" class="small">任务状态 + 运动基元</text>
+    <rect x="390" y="314" width="305" height="72" rx="12" fill="#ecfccb" stroke="#84cc16"/>
+    <text x="408" y="342" class="label">阶段与失败合同</text>
+    <text x="408" y="366" class="small">recorder hook 与结果检查</text>
+    <path d="M315 350 H382" class="arrow"/>
+  </g>
+
+  <g>
+    <rect x="40" y="402" width="275" height="72" rx="12" fill="#dcfce7" stroke="#4ade80"/>
+    <text x="58" y="430" class="label">特权学习专家</text>
+    <text x="58" y="454" class="small">teacher action + 仿真状态</text>
+    <rect x="390" y="402" width="305" height="72" rx="12" fill="#ecfccb" stroke="#84cc16"/>
+    <text x="408" y="430" class="label">限制 observation</text>
+    <text x="408" y="454" class="small">蒸馏或重新采集可执行动作</text>
+    <path d="M315 438 H382" class="arrow"/>
+  </g>
+
+  <g>
+    <rect x="40" y="490" width="275" height="72" rx="12" fill="#fef3c7" stroke="#fbbf24"/>
+    <text x="58" y="518" class="label">自动扩增</text>
+    <text x="58" y="542" class="small">变换后的 seed trajectory</text>
+    <rect x="390" y="490" width="305" height="72" rx="12" fill="#fffbeb" stroke="#f59e0b"/>
+    <text x="408" y="518" class="label">重放与成功过滤</text>
+    <text x="408" y="542" class="small">剔除物理无效候选项</text>
+    <path d="M315 526 H382" class="arrow"/>
+  </g>
+
+  <g>
+    <rect x="40" y="578" width="275" height="72" rx="12" fill="#f3e8ff" stroke="#c084fc"/>
+    <text x="58" y="606" class="label">人类视频迁移</text>
+    <text x="58" y="630" class="small">图像 + 估计物体运动</text>
+    <rect x="390" y="578" width="305" height="72" rx="12" fill="#faf5ff" stroke="#a855f7"/>
+    <text x="408" y="606" class="label">本体映射</text>
+    <text x="408" y="630" class="small">几何、动作、可执行性</text>
+    <path d="M315 614 H382" class="arrow"/>
+  </g>
+
+  <path d="M695 174 H760 V394 H812" class="arrow"/>
+  <path d="M695 262 H760 V394 H812" class="arrow"/>
+  <path d="M695 350 H760 V394 H812" class="arrow"/>
+  <path d="M695 438 H760 V394 H812" class="arrow"/>
+  <path d="M695 526 H760 V394 H812" class="arrow"/>
+  <path d="M695 614 H760 V394 H812" class="arrow"/>
+
+  <rect x="820" y="258" width="340" height="272" rx="18" fill="#ffffff" stroke="#2563eb" stroke-width="2"/>
+  <text x="990" y="298" text-anchor="middle" class="heading">共同演示数据合同</text>
+  <rect x="858" y="326" width="264" height="38" rx="8" fill="#eff6ff"/>
+  <text x="990" y="351" text-anchor="middle" class="label">任务上下文</text>
+  <rect x="858" y="376" width="264" height="38" rx="8" fill="#eff6ff"/>
+  <text x="990" y="401" text-anchor="middle" class="label">观察</text>
+  <rect x="858" y="426" width="264" height="38" rx="8" fill="#eff6ff"/>
+  <text x="990" y="451" text-anchor="middle" class="label">机器人动作</text>
+  <rect x="858" y="476" width="264" height="38" rx="8" fill="#eff6ff"/>
+  <text x="990" y="501" text-anchor="middle" class="label">结果</text>
+
+  <text x="600" y="708" text-anchor="middle" class="subtitle">L08 选择脚本化路线；L09 再定义具体的时间与存储 schema。</text>
+</svg>
