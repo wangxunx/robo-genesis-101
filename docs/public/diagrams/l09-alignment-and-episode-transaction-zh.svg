@@ -1,0 +1,115 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="760" viewBox="0 0 1400 760" role="img" aria-labelledby="title desc">
+  <title id="title">Control-step 对齐采样与 success-gated episode commit</title>
+  <desc id="desc">上半部分在仿真推进前，把当前状态和两路相机画面与当前命令动作配对。下半部分先缓存完整尝试，只在成功时提交为 episode，失败时丢弃，并在采集完成后关闭数据集。</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
+    </marker>
+    <style>
+      .title { font: 700 29px Inter, ui-sans-serif, system-ui, sans-serif; fill: #0f172a; }
+      .subtitle { font: 400 16px Inter, ui-sans-serif, system-ui, sans-serif; fill: #475569; }
+      .section { font: 700 20px Inter, ui-sans-serif, system-ui, sans-serif; fill: #0f172a; }
+      .label { font: 700 16px Inter, ui-sans-serif, system-ui, sans-serif; fill: #0f172a; }
+      .body { font: 400 14px Inter, ui-sans-serif, system-ui, sans-serif; fill: #334155; }
+      .small { font: 500 12px Inter, ui-sans-serif, system-ui, sans-serif; fill: #475569; }
+      .code { font: 600 13px ui-monospace, SFMono-Regular, Menlo, monospace; fill: #1e293b; }
+      .flow { stroke: #64748b; stroke-width: 2.2; fill: none; marker-end: url(#arrow); }
+      .dashed { stroke: #64748b; stroke-width: 1.7; stroke-dasharray: 7 5; fill: none; marker-end: url(#arrow); }
+      .return { stroke: #64748b; stroke-width: 1.7; stroke-dasharray: 7 5; fill: none; }
+    </style>
+  </defs>
+
+  <rect width="1400" height="760" rx="24" fill="#f8fafc"/>
+  <text x="700" y="43" text-anchor="middle" class="title">一帧正确对齐，一次 episode 事务</text>
+  <text x="700" y="72" text-anchor="middle" class="subtitle">在 control step 内同步语义；等 attempt 结果确定后再持久化。</text>
+
+  <rect x="30" y="98" width="1340" height="278" rx="19" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="55" y="130" class="section">A · 一个 control step 内</text>
+
+  <rect x="55" y="153" width="230" height="154" rx="14" fill="#eff6ff" stroke="#60a5fa" stroke-width="1.8"/>
+  <text x="170" y="181" text-anchor="middle" class="label">当前 observation</text>
+  <text x="170" y="211" text-anchor="middle" class="code">measured q_t</text>
+  <text x="170" y="237" text-anchor="middle" class="code">world RGB_t</text>
+  <text x="170" y="263" text-anchor="middle" class="code">wrist RGB_t</text>
+  <text x="170" y="290" text-anchor="middle" class="small">transition 之前</text>
+
+  <rect x="335" y="180" width="190" height="100" rx="14" fill="#faf5ff" stroke="#c084fc" stroke-width="1.8"/>
+  <text x="430" y="210" text-anchor="middle" class="label">专家命令</text>
+  <text x="430" y="239" text-anchor="middle" class="code">action_t</text>
+  <text x="430" y="262" text-anchor="middle" class="small">9 维目标</text>
+
+  <path d="M285 190 C380 148 490 148 575 190" class="flow"/>
+  <path d="M525 247 H575" class="flow"/>
+
+  <rect x="590" y="145" width="240" height="170" rx="15" fill="#ecfdf5" stroke="#34d399" stroke-width="2"/>
+  <text x="710" y="177" text-anchor="middle" class="label">一次采样决定</text>
+  <text x="710" y="204" text-anchor="middle" class="body">保留或跳过当前 callback</text>
+  <rect x="616" y="224" width="188" height="58" rx="10" fill="#ffffff" stroke="#86efac"/>
+  <text x="710" y="247" text-anchor="middle" class="code">(observation_t,</text>
+  <text x="710" y="268" text-anchor="middle" class="code"> action_t)</text>
+  <text x="710" y="301" text-anchor="middle" class="small">state 与两路 image 同步保留</text>
+
+  <path d="M830 230 H870" class="flow"/>
+  <rect x="885" y="180" width="180" height="100" rx="14" fill="#fffbeb" stroke="#fbbf24" stroke-width="1.8"/>
+  <text x="975" y="210" text-anchor="middle" class="label">发送命令</text>
+  <text x="975" y="239" text-anchor="middle" class="code">control(action_t)</text>
+  <text x="975" y="262" text-anchor="middle" class="small">arm + fingers</text>
+
+  <path d="M1065 230 H1105" class="flow"/>
+  <rect x="1120" y="153" width="220" height="154" rx="14" fill="#fff7ed" stroke="#fb923c" stroke-width="1.8"/>
+  <text x="1230" y="181" text-anchor="middle" class="label">推进 transition</text>
+  <text x="1230" y="211" text-anchor="middle" class="code">scene.step()</text>
+  <text x="1230" y="237" text-anchor="middle" class="code">update_wrist_cam()</text>
+  <text x="1230" y="269" text-anchor="middle" class="body">准备 observation_(t+1)</text>
+  <text x="1230" y="291" text-anchor="middle" class="small">不属于当前 row</text>
+
+  <rect x="414" y="326" width="572" height="32" rx="16" fill="#e0f2fe"/>
+  <text x="700" y="347" text-anchor="middle" class="body">Sampler 对整个 tuple 做一次决定，不会分别对各 modality 降频。</text>
+
+  <rect x="30" y="400" width="1340" height="330" rx="19" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="55" y="434" class="section">B · 一次 attempt 的完整流程</text>
+
+  <rect x="55" y="483" width="205" height="112" rx="14" fill="#eff6ff" stroke="#60a5fa" stroke-width="1.8"/>
+  <text x="157" y="514" text-anchor="middle" class="label">重置 attempt</text>
+  <text x="157" y="541" text-anchor="middle" class="body">scene + sampler</text>
+  <text x="157" y="565" text-anchor="middle" class="body">清空 local buffer</text>
+  <text x="157" y="586" text-anchor="middle" class="small">frame index 将从 0 开始</text>
+
+  <path d="M260 539 H298" class="flow"/>
+  <rect x="313" y="471" width="245" height="136" rx="14" fill="#faf5ff" stroke="#c084fc" stroke-width="1.8"/>
+  <text x="435" y="503" text-anchor="middle" class="label">运行完整专家</text>
+  <text x="435" y="532" text-anchor="middle" class="body">采样对齐 tuple</text>
+  <text x="435" y="556" text-anchor="middle" class="body">写入 episode-local arrays</text>
+  <text x="435" y="583" text-anchor="middle" class="small">尚未提交 LeRobot row</text>
+
+  <path d="M558 539 H619" class="flow"/>
+  <path d="M705 469 L791 539 L705 609 L619 539 Z" fill="#fffbeb" stroke="#f59e0b" stroke-width="2"/>
+  <text x="705" y="530" text-anchor="middle" class="label">任务成功？</text>
+  <text x="705" y="555" text-anchor="middle" class="small">release + settle 之后</text>
+
+  <path d="M765 490 C805 452 820 451 855 451" class="flow"/>
+  <text x="805" y="462" class="small">是</text>
+  <rect x="870" y="445" width="250" height="125" rx="14" fill="#ecfdf5" stroke="#22c55e" stroke-width="2"/>
+  <text x="995" y="476" text-anchor="middle" class="label">提交一条 episode</text>
+  <text x="995" y="505" text-anchor="middle" class="code">add_frame(...) × T</text>
+  <text x="995" y="531" text-anchor="middle" class="code">save_episode()</text>
+  <text x="995" y="556" text-anchor="middle" class="small">global index 继续累计</text>
+
+  <path d="M764 589 C806 630 820 631 855 631" class="flow"/>
+  <text x="805" y="623" class="small">否</text>
+  <rect x="870" y="592" width="250" height="78" rx="14" fill="#fff1f2" stroke="#fb7185" stroke-width="2"/>
+  <text x="995" y="622" text-anchor="middle" class="label">丢弃 local buffer</text>
+  <text x="995" y="648" text-anchor="middle" class="small">不写 dataset row 或 failure prefix</text>
+
+  <path d="M1120 507 H1160" class="flow"/>
+  <rect x="1175" y="453" width="165" height="108" rx="14" fill="#eef2ff" stroke="#818cf8" stroke-width="1.8"/>
+  <text x="1257" y="483" text-anchor="middle" class="label">已验收两条？</text>
+  <text x="1257" y="510" text-anchor="middle" class="body">是</text>
+  <text x="1257" y="534" text-anchor="middle" class="code">finalize()</text>
+  <text x="1257" y="552" text-anchor="middle" class="small">关闭可读数据集</text>
+
+  <path d="M1257 561 V694 H157 V610" class="dashed"/>
+  <path d="M995 670 V694" class="return"/>
+  <text x="1268" y="587" class="small">尚未</text>
+  <text x="650" y="713" text-anchor="middle" class="small">目标未达到时，开始一次新的独立 attempt；reset 后绝不能沿用 sampler 或 buffer 状态。</text>
+</svg>
