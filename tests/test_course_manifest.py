@@ -31,7 +31,8 @@ def test_repository_manifest_defines_the_canonical_learning_path() -> None:
     ]
     assert [lesson.status for lesson in manifest.lessons] == [
         *([CourseStatus.CPU_VERIFIED] * 7),
-        *([CourseStatus.PLANNED] * 4),
+        CourseStatus.GPU_VERIFIED,
+        *([CourseStatus.PLANNED] * 3),
         CourseStatus.GPU_VERIFIED,
         CourseStatus.PLANNED,
     ]

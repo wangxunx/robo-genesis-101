@@ -5,13 +5,15 @@ locale: zh
 title: "演示数据获取与脚本化专家"
 duration_minutes: 120
 hardware: gpu-recommended
-status: planned
+status: gpu-verified
 ---
 
 # L08 · 演示数据获取与脚本化专家
 
-> **课程状态：** 双语讲义已经完成，配套 notebook 和 clean-kernel 运行证据仍待完成，
-> 因此 L08 继续保持 `planned`。
+> **课程状态：** 双语讲义和 notebook 均已完成。EN/ZH CPU 无渲染路径、English
+> CPU+EGL 路径和参考 R9700 AMD+EGL 路径均已通过，L08 当前为 `gpu-verified`。
+> GPU 仍是获得正常视觉体验的推荐路径；CPU fallback 也验证了同一 scripted rollout
+> 和不依赖相机的数值证据。
 
 ## 本讲定位
 

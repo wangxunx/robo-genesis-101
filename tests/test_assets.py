@@ -156,7 +156,7 @@ def test_l08_notebooks_expose_the_scripted_expert_contract() -> None:
             "locale": locale,
             "duration_minutes": 120,
             "hardware": "gpu-recommended",
-            "status": "planned",
+            "status": "gpu-verified",
         }
         assert all(cell["execution_count"] is None for cell in code_cells)
         assert all(cell["outputs"] == [] for cell in code_cells)

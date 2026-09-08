@@ -4,9 +4,11 @@
 
 > **Project status: Alpha / course development.** L01–L07 are `cpu-verified`
 > after their clean-kernel CPU verification; their additional AMD paths also passed
-> their respective contracts on the reference R9700. The renumbered L12 training
-> content has passed ACT and SmolVLA GPU smoke, checkpoint audit, and reload checks
-> against the current code and is `gpu-verified`. The other 5 lessons remain `planned`.
+> their respective contracts on the reference R9700. L08 is `gpu-verified` after its
+> bilingual CPU numerical paths, CPU+EGL path, and scripted-expert path on a reference
+> R9700 all passed. The renumbered L12 training content is also `gpu-verified` after
+> ACT and SmolVLA GPU smoke, checkpoint audit, and reload checks. The other 4 lessons
+> remain `planned`.
 
 RoboGenesis 101 is a Datawhale open-source course for learners with basic Python experience who want a structured, hands-on introduction to robot learning. Using Genesis as its simulation platform, the course connects environment diagnostics, scenes, and rigid-body physics with robot control, inverse kinematics, grasping, demonstration data, imitation learning, policy training, and closed-loop evaluation.
 
@@ -53,7 +55,7 @@ Training loss or open-loop action prediction is not treated as task success. The
 | L05 | [Inverse Kinematics, End-Effector Poses, and Cameras](docs/en/lessons/l05-inverse-kinematics-end-effector-poses-and-cameras.md) | 120 min | `cpu-ok` | `cpu-verified` |
 | L06 | [Parallel Simulation and Batched Franka Control](docs/en/lessons/l06-parallel-simulation-and-batched-franka-control.md) | 90 min | `cpu-ok` | `cpu-verified` |
 | L07 | [Building a Grasping Task Scene](docs/en/lessons/l07-building-a-grasping-task-scene.md) | 90 min | `cpu-ok` | `cpu-verified` |
-| L08 | [Demonstration Acquisition and Scripted Experts](docs/en/lessons/l08-demonstration-acquisition-and-scripted-experts.md) | 120 min | `gpu-recommended` | `planned` |
+| L08 | [Demonstration Acquisition and Scripted Experts](docs/en/lessons/l08-demonstration-acquisition-and-scripted-experts.md) | 120 min | `gpu-recommended` | `gpu-verified` |
 | L09 | [Synthetic Data Recording and Collection Throughput](docs/en/lessons/l09-synthetic-data-recording-and-throughput.md) | 120 min | `gpu-recommended` | `planned` |
 | L10 | [Dataset Anatomy and Imitation Learning 101](docs/en/lessons/l10-dataset-anatomy-and-imitation-learning.md) | 90 min | `gpu-recommended` | `planned` |
 | L11 | [Domain Randomization](docs/en/lessons/l11-domain-randomization.md) | 90 min | `gpu-recommended` | `planned` |

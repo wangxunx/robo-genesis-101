@@ -163,7 +163,7 @@
         "zh": "docs/zh/lessons/l08-demonstration-acquisition-and-scripted-experts.md",
         "en": "docs/en/lessons/l08-demonstration-acquisition-and-scripted-experts.md"
       },
-      "status": "planned"
+      "status": "gpu-verified"
     },
     {
       "id": "L09",

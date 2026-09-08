@@ -5,14 +5,16 @@ locale: en
 title: "Demonstration Acquisition and Scripted Experts"
 duration_minutes: 120
 hardware: gpu-recommended
-status: planned
+status: gpu-verified
 ---
 
 # L08 · Demonstration Acquisition and Scripted Experts
 
-> **Course status:** the English lecture is complete. The Chinese adaptation,
-> companion notebook, and clean-kernel evidence are still pending, so L08
-> remains `planned`.
+> **Course status:** the bilingual lectures and notebooks are complete. The
+> EN/ZH CPU non-rendering paths, English CPU+EGL path, and a reference
+> R9700 AMD+EGL path all passed. L08 is `gpu-verified`; GPU remains recommended
+> for the normal visual experience, while the CPU fallback covers the same
+> scripted rollout and numerical evidence without a camera.
 
 ## Where this lesson fits
 

@@ -1081,3 +1081,167 @@ code cell 全部完成、没有 error output，实际 backend 为 `cpu`，world/
 CPU+EGL 与参考 R9700 AMD+EGL 仍只是独立的附加能力证据。
 
 `M3.L07.6` 已于 2026-09-07 通过项目负责人验收；L07 六个子步骤至此全部完成并验收。
+
+## 19. L08 / M3.L08.5 脚本化专家 clean-kernel 验证
+
+> 验证日期：2026-09-08（Asia/Shanghai）
+>
+> 范围：L08 双语 CPU 无渲染数值路径、English CPU+EGL world-camera 路径，以及参考
+> R9700 的 English AMD+EGL 附加路径。四条要求路径和仓库门禁均已完成；
+> `M3.L08.5` 已于 2026-09-08 通过项目负责人验收。随后启动的 `M3.L08.6` 已把 L08
+> 同步为 `gpu-verified` 并完成更新后复验，当前等待项目负责人验收。
+
+### 19.1 环境与执行矩阵
+
+本轮复用仓库 `.venv`：Python 3.12.3、Genesis 1.3.3、PyTorch
+`2.9.1+rocm7.2.1.gitff65f5bc` 和 HIP `7.2.53211-e1a6bc5663`。系统可见 4 张
+AMD Radeon AI PRO R9700；AMD 路径把物理 GPU 0 单独映射为进程内设备，notebook 实际
+选择 `amdgpu`。四条路径均由 `jupyter nbconvert --execute --to notebook` 启动独立
+kernel。
+
+命令结构如下，其中 `<tmp>` 表示本轮隔离目录；Jupyter runtime、IPython、Matplotlib、
+Numba、XDG cache 和 `ROBO_GENESIS_OUTPUTS_DIR` 也分别指向对应的隔离子目录：
+
+```sh
+ROBO_GENESIS_BACKEND=cpu ROBO_GENESIS_RENDER=0 \
+  .venv/bin/jupyter nbconvert --execute --to notebook \
+  --ExecutePreprocessor.timeout=1200 --output l08-en-cpu-render0.ipynb \
+  --output-dir <tmp> \
+  notebooks/en/l08-demonstration-acquisition-and-scripted-experts.ipynb
+
+ROBO_GENESIS_BACKEND=cpu ROBO_GENESIS_RENDER=0 \
+  .venv/bin/jupyter nbconvert --execute --to notebook \
+  --ExecutePreprocessor.timeout=1200 --output l08-zh-cpu-render0.ipynb \
+  --output-dir <tmp> \
+  notebooks/zh/l08-demonstration-acquisition-and-scripted-experts.ipynb
+
+PYOPENGL_PLATFORM=egl ROBO_GENESIS_BACKEND=cpu ROBO_GENESIS_RENDER=1 \
+  .venv/bin/jupyter nbconvert --execute --to notebook \
+  --ExecutePreprocessor.timeout=1200 --output l08-en-cpu-egl-render1.ipynb \
+  --output-dir <tmp> \
+  notebooks/en/l08-demonstration-acquisition-and-scripted-experts.ipynb
+
+PYOPENGL_PLATFORM=egl ROCR_VISIBLE_DEVICES=0 HIP_VISIBLE_DEVICES=0 \
+CUDA_VISIBLE_DEVICES=0 ROBO_GENESIS_BACKEND=auto ROBO_GENESIS_RENDER=1 \
+  .venv/bin/jupyter nbconvert --execute --to notebook \
+  --ExecutePreprocessor.timeout=1200 --output l08-en-amd-egl-render1.ipynb \
+  --output-dir <tmp> \
+  notebooks/en/l08-demonstration-acquisition-and-scripted-experts.ipynb
+```
+
+| Notebook / 能力路径 | 请求后端 → 实际后端 | 相机证据 | 执行时间 | 最终结果 |
+| --- | --- | --- | ---: | --- |
+| EN / CPU | `cpu` → `cpu` | 没有创建 camera；阶段图像为 0，明确 `SKIP` | 70.23 秒 | `L08 CHECK: PASSED` |
+| ZH / CPU | `cpu` → `cpu` | 没有创建 camera；阶段图像为 0，明确 `SKIP` | 72.31 秒 | `L08 CHECK: PASSED` |
+| EN / CPU + EGL | `cpu` → `cpu` | world RGB，start + 七阶段共 8 帧 | 85.21 秒 | `L08 CHECK: PASSED` |
+| EN / AMD + EGL | `auto` → `amdgpu` | world RGB，start + 七阶段共 8 帧 | 127.24 秒 | `L08 CHECK: PASSED` |
+
+四份执行后 notebook 的 7 个 code cell 均取得 execution count，没有 error output。执行副本
+与对应提交版 notebook 的 code-cell ID/source 规范化 SHA-256 均为
+`627e260f1d34ef1b3cc18af8c1baccc0d58791857eeb7fc132c0834696ceca5a`；双语提交版代码也
+逐字一致，并继续保持空 output 和 `execution_count: null`。执行后 notebook、提取的人工
+检查 PNG、runtime、cache 和日志只位于 `/tmp/rg101-l085.QCL68t`；四个隔离
+`ROBO_GENESIS_OUTPUTS_DIR` 没有产生文件，仓库内没有写入 rollout、图片或缓存。
+
+### 19.2 Task、command schedule、trace 与 containment 证据
+
+四条路径都读取固定 `011_banana → 024_bowl` 任务：容差 `0.060 m`，banana profile 的
+yaw offset 为 `90°`、固定 hand height 为 `0.855 m`、closing force 为 `-10 N`。七阶段
+名称与顺序断言通过。纯 NumPy rate-schedule 实验也逐条一致：`Δq∞=0.380 rad`；
+`max_dq=0.006` 产生 64 个 waypoint、最大相邻 command 增量约 `0.0059 rad`；
+`max_dq=0.003` 产生 127 个 waypoint、最大增量约 `0.0030 rad`，两条路径都准确到达同一
+goal。
+
+| 路径 | trace shape | 最大观测 arm command/state 差异 | horizontal containment | below-rim containment |
+| --- | --- | --- | --- | --- |
+| EN/ZH CPU、EN CPU+EGL | state/action 均为 `(850,9)` | joint 6，约 `2.4681 rad` | `0.0078 < 0.0600 m` | `0.7915 < 0.7973 m` |
+| EN AMD+EGL | state/action 均为 `(849,9)` | joint 6，约 `2.4673 rad` | `0.0079 < 0.0600 m` | `0.7917 < 0.7973 m` |
+
+所有 trace 都是等长、非空的 floating arrays，数值全部 finite；完整 rollout 均返回
+`success=True`。CPU 的 EN/ZH 结果逐项一致，AMD 只出现上表所示的步数和末位浮点差异。
+这些当次 trace 长度和数值用于记录当前运行，不作为跨 backend 固定答案。
+
+### 19.3 World-camera 关键帧与人工检查
+
+两条 `render=1` 路径都实际创建 world camera，并生成以下有序 tag：
+
+```text
+00_start → 01_pregrasp → 02_reach → 03_grasp
+→ 04_lift → 05_above_target → 06_release → 07_done
+```
+
+8 张 RGB 均为 `(720,1280,3)` `uint8`，全部像素 finite；每帧有非零像素变化，序列中也
+存在帧间变化。人工检查 CPU+EGL 与 AMD+EGL 的 2×4 montage 后确认：起点能同时辨认
+Franka、banana、lemon、plum 与 bowl；后续帧依次显示 hand 到达 banana 上方、下降与闭合、
+抬起 banana、移动到 bowl 上方、释放并退回；`07_done` 中 banana 位于 bowl 内。两条路径
+均无空白、全黑、明显错位或损坏画面，阶段顺序与动作语义一致。
+
+两条 containment 图也经过人工检查：俯视图的 banana center 位于允许的 bowl footprint
+内，侧视图的 banana AABB bottom 低于 rim-minus-margin 阈值；图形结论与数值断言一致。
+`render=0` 两条路径仍正常显示 command schedule、command/state trace 和 containment
+三组 Matplotlib 数值图，但没有创建 camera 或伪装阶段画面。
+
+### 19.4 Warning、证据范围与未运行项
+
+四条路径均观察到 Genesis 1.3.3 已知的 Franka tendon approximation、neutral qpos 超出
+joint limit、solver time constant 从 `0.005` 调整为 `0.01`，以及 neutral configuration
+self-collision pair filtering warning；Quadrants 还提示 tuple 不能建立 weak reference，
+因而关闭 template mapper cache。AMD kernel 另有一条第三方 `ast.Str` Python 3.14
+deprecation warning。它们没有导致非有限 state/action、scene、rollout、containment、
+camera 或最终检查失败；本轮没有 EGL、OpenGL 或 backend fallback 错误。
+
+本节证据支持 L08 的双语 CPU 无相机数值路径、当前 Linux CPU+EGL world-camera 路径和
+一张参考 R9700 的 AMD+EGL 附加路径，也记录了固定 banana episode 在四条路径中完成的
+实例。成功率和对不同初态的可重复性需要另行运行多 seed 实验；notebook 末尾的
+`motion_probe.py --compare`、lemon/plum 对照属于可选扩展，本步没有执行。其他 AMD/ROCm
+组合、NVIDIA、Apple Silicon、Windows、viewer 模式和长时间运行也不在本轮矩阵中。
+
+### 19.5 仓库门禁与当前状态
+
+本轮在相同工作树完成：
+
+- `.venv/bin/python -m robo_genesis.course_validation`：通过，13 lessons、32 localized
+  Markdown files、26 notebooks、31 Python files；
+- `.venv/bin/python -m pytest`：38 passed；
+- `.venv/bin/python -m compileall -q src scripts tests`：通过；
+- `npm ci`：安装并审计 190 个包；仍报告既有 Node `20.18.2` `EBADENGINE` warning 和
+  13 项 advisory（6 low、1 moderate、6 high），未运行 `npm audit fix`；
+- `npm run docs:build` 与 `EDGEONE=1 npm run docs:build`：通过；
+- `git diff --check`：通过。
+
+`M3.L08.5` 的要求路径和门禁均已完成，并于 2026-09-08 通过项目负责人验收。L08 公开
+状态仍为 `planned`；是否同步为目标 `gpu-verified` 留给单独启动的 `M3.L08.6`。
+
+### 19.6 M3.L08.6 状态同步后复验
+
+项目负责人验收 `.1`–`.5` 并明确启动 `.6` 后，L08 已原子同步为 `gpu-verified`：
+
+- `course.json`、双语导览 frontmatter 与课程状态说明；
+- EN/ZH notebook metadata，以及 setup/final-check 中的 manifest status 断言；
+- `README.md`、`README_en.md`、双语首页的课程表和整体进度摘要；
+- notebook 与 manifest 合同测试。
+
+硬件字段继续为 `gpu-recommended`。`gpu-verified` 表示本讲的正常视觉路径已经在参考 R9700
+AMD+EGL 环境通过；第 19.1–19.4 节同时保留了 EN/ZH CPU 无相机数值路径和 CPU+EGL
+路径的独立证据，不把 GPU 改写成阅读讲义或运行数值 fallback 的硬门槛。
+
+状态 literal 更新后，双语 notebook 的 7 个 code-cell ID/source 仍完全一致，规范化
+SHA-256 从 `.5` 执行时的
+`627e260f1d34ef1b3cc18af8c1baccc0d58791857eeb7fc132c0834696ceca5a` 变为
+`da664ce963a3e8cb1eebca5c48bef9aa16dec2a4e3455bfdf9f3d691dbef2c52`。行为逻辑没有改变；
+两处 manifest status 断言由 `planned` 改为 `gpu-verified`。
+
+为验证当前源码，English notebook 又在独立 CPU、`render=0` kernel 中从头执行，耗时
+66.96 秒。7 个 code cell 全部完成、没有 error output，实际 backend 为 `cpu`，没有创建
+camera，并得到 `(850,9)` state/action、`success=True`、通过的 horizontal/below-rim
+containment 和最终 `L08 CHECK: PASSED`。执行副本与当前提交版 code source 哈希一致；
+产物只位于 `/tmp/rg101-l086.wT3Yrk`，提交版双语 notebook 继续保持 clean output。
+
+状态同步后的仓库门禁结果为：course validation 通过（13 lessons、32 localized Markdown、
+26 notebooks、31 Python files），pytest 38 passed，compileall 通过，常规与 `EDGEONE=1`
+文档构建通过，`git diff --check` 通过。`npm ci` 保留既有 Node `20.18.2` engine warning
+和 13 项 advisory，没有修改依赖。
+
+`.5` 已验收的中文 CPU、English CPU+EGL 与 English AMD+EGL 证据继续适用，因为 `.6`
+没有改变任务、控制、仿真或渲染逻辑。以上证据支持 L08 当前公开状态为 `gpu-verified`，
+同时明确 CPU 无相机数值路径也已验证。

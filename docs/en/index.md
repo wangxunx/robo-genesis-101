@@ -27,9 +27,10 @@ features:
 
 > L01–L07 are `cpu-verified` after their clean-kernel CPU verification; their
 > additional AMD paths also passed their respective contracts on the reference R9700.
-> The renumbered L12 training content has passed ACT and SmolVLA GPU smoke,
-> checkpoint audit, and reload checks against the current code and is
-> `gpu-verified`. The other 5 lessons remain `planned`.
+> L08 is `gpu-verified` after its bilingual CPU numerical paths, CPU+EGL path, and
+> scripted-expert path on a reference R9700 all passed. The renumbered L12 training
+> content is also `gpu-verified` after ACT and SmolVLA GPU smoke, checkpoint audit,
+> and reload checks. The other 4 lessons remain `planned`.
 
 | Lesson | Topic | Planned duration | Hardware | Status |
 |---|---|---:|---|---|
@@ -40,7 +41,7 @@ features:
 | L05 | [Inverse Kinematics, End-Effector Poses, and Cameras](/en/lessons/l05-inverse-kinematics-end-effector-poses-and-cameras) | 120 min | `cpu-ok` | `cpu-verified` |
 | L06 | [Parallel Simulation and Batched Franka Control](/en/lessons/l06-parallel-simulation-and-batched-franka-control) | 90 min | `cpu-ok` | `cpu-verified` |
 | L07 | [Building a Grasping Task Scene](/en/lessons/l07-building-a-grasping-task-scene) | 90 min | `cpu-ok` | `cpu-verified` |
-| L08 | [Demonstration Acquisition and Scripted Experts](/en/lessons/l08-demonstration-acquisition-and-scripted-experts) | 120 min | `gpu-recommended` | `planned` |
+| L08 | [Demonstration Acquisition and Scripted Experts](/en/lessons/l08-demonstration-acquisition-and-scripted-experts) | 120 min | `gpu-recommended` | `gpu-verified` |
 | L09 | [Synthetic Data Recording and Collection Throughput](/en/lessons/l09-synthetic-data-recording-and-throughput) | 120 min | `gpu-recommended` | `planned` |
 | L10 | [Dataset Anatomy and Imitation Learning 101](/en/lessons/l10-dataset-anatomy-and-imitation-learning) | 90 min | `gpu-recommended` | `planned` |
 | L11 | [Domain Randomization](/en/lessons/l11-domain-randomization) | 90 min | `gpu-recommended` | `planned` |
