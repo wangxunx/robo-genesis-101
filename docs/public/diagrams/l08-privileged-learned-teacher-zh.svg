@@ -1,0 +1,118 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="650" viewBox="0 0 1200 650" role="img" aria-labelledby="title desc">
+  <title id="title">特权学习专家使用仿真专有信息生成演示</title>
+  <desc id="desc">仿真特权状态和奖励用于训练或驱动学习型教师策略，教师在仿真中执行动作并检查结果，面向学生策略的演示只保留部署时可用的观察、教师动作与结果，不把特权状态当作学生输入。</desc>
+  <defs>
+    <marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="3" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L0,6 L8,3 z" fill="#64748b"/>
+    </marker>
+    <marker id="arrow-green" markerWidth="9" markerHeight="9" refX="8" refY="3" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L0,6 L8,3 z" fill="#059669"/>
+    </marker>
+    <style>
+      .title { font: 700 30px Inter, ui-sans-serif, system-ui, sans-serif; fill: #0f172a; }
+      .subtitle { font: 400 17px Inter, ui-sans-serif, system-ui, sans-serif; fill: #475569; }
+      .stage { font: 700 18px Inter, ui-sans-serif, system-ui, sans-serif; fill: #0f172a; }
+      .label { font: 650 15px Inter, ui-sans-serif, system-ui, sans-serif; fill: #0f172a; }
+      .small { font: 400 14px Inter, ui-sans-serif, system-ui, sans-serif; fill: #475569; }
+      .tiny { font: 550 12px Inter, ui-sans-serif, system-ui, sans-serif; fill: #334155; }
+      .flow { stroke: #64748b; stroke-width: 2.2; fill: none; marker-end: url(#arrow); }
+      .export { stroke: #059669; stroke-width: 2.2; fill: none; marker-end: url(#arrow-green); }
+      .robot { stroke: #334155; stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+      .joint { fill: #ffffff; stroke: #334155; stroke-width: 3; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="650" rx="24" fill="#f8fafc"/>
+  <text x="600" y="48" text-anchor="middle" class="title">特权学习专家：利用更多信息学会行为</text>
+  <text x="600" y="78" text-anchor="middle" class="subtitle">教师可以使用仿真专有状态和奖励，学生只能依赖部署时可获得的观察。</text>
+
+  <text x="40" y="114" class="label">教师训练与 rollout 生成</text>
+
+  <rect x="40" y="132" width="240" height="316" rx="18" fill="#f3e8ff" stroke="#c084fc" stroke-width="1.5"/>
+  <text x="64" y="166" class="stage">1 · 特权输入</text>
+  <rect x="68" y="190" width="184" height="54" rx="12" fill="#ffffff" stroke="#d8b4fe"/>
+  <text x="160" y="212" text-anchor="middle" class="label">完整仿真状态</text>
+  <text x="160" y="232" text-anchor="middle" class="small">精确 · 同步 · 部署时不可见</text>
+  <g class="small">
+    <circle cx="80" cy="280" r="4" fill="#7c3aed"/><text x="94" y="285">物体与机器人位姿</text>
+    <circle cx="80" cy="312" r="4" fill="#7c3aed"/><text x="94" y="317">接触与作用力</text>
+    <circle cx="80" cy="344" r="4" fill="#7c3aed"/><text x="94" y="349">目标距离</text>
+    <circle cx="80" cy="376" r="4" fill="#7c3aed"/><text x="94" y="381">奖励信号</text>
+  </g>
+  <rect x="84" y="402" width="152" height="28" rx="14" fill="#ede9fe"/>
+  <text x="160" y="421" text-anchor="middle" class="tiny">训练阶段可用</text>
+
+  <path d="M280 290 H312" class="flow"/>
+
+  <rect x="320" y="132" width="240" height="316" rx="18" fill="#eff6ff" stroke="#60a5fa" stroke-width="1.5"/>
+  <text x="344" y="166" class="stage">2 · 学习教师策略 π<tspan baseline-shift="sub" font-size="12">T</tspan></text>
+  <g stroke="#2563eb" stroke-width="2" fill="none">
+    <path d="M372 235 L430 215 L493 232 M372 235 L430 268 L493 232 M372 294 L430 268 L493 286 M372 294 L430 215 L493 286"/>
+  </g>
+  <g fill="#dbeafe" stroke="#2563eb" stroke-width="2">
+    <circle cx="372" cy="235" r="11"/><circle cx="372" cy="294" r="11"/>
+    <circle cx="430" cy="215" r="11"/><circle cx="430" cy="268" r="11"/>
+    <circle cx="493" cy="232" r="11"/><circle cx="493" cy="286" r="11"/>
+  </g>
+  <text x="440" y="326" text-anchor="middle" class="label">学习得到的策略</text>
+  <text x="440" y="351" text-anchor="middle" class="small">强化学习或 model-based 优化</text>
+  <rect x="366" y="371" width="148" height="40" rx="20" fill="#ffffff" stroke="#2563eb" stroke-width="2" stroke-dasharray="6 5"/>
+  <text x="440" y="394" text-anchor="middle" class="tiny">大量可重复试验</text>
+  <text x="440" y="427" text-anchor="middle" class="small">行为来自优化，而不是手写规则</text>
+
+  <path d="M560 290 H592" class="flow"/>
+
+  <rect x="600" y="132" width="240" height="316" rx="18" fill="#fffbeb" stroke="#fbbf24" stroke-width="1.5"/>
+  <text x="624" y="166" class="stage">3 · 生成 rollout</text>
+  <rect x="632" y="190" width="176" height="42" rx="10" fill="#ffffff" stroke="#fcd34d"/>
+  <text x="720" y="216" text-anchor="middle" class="label">a<tspan baseline-shift="sub" font-size="11">t</tspan> = π<tspan baseline-shift="sub" font-size="11">T</tspan>(s<tspan baseline-shift="sub" font-size="11">priv</tspan>)</text>
+  <rect x="651" y="378" width="138" height="16" rx="5" fill="#fde68a" stroke="#92400e" stroke-width="3"/>
+  <path d="M682 378 L683 338 L715 306 L691 269 L746 247" class="robot"/>
+  <circle cx="683" cy="338" r="8" class="joint"/>
+  <circle cx="715" cy="306" r="8" class="joint"/>
+  <circle cx="691" cy="269" r="8" class="joint"/>
+  <path d="M746 247 L758 235 M746 247 L761 254" class="robot"/>
+  <path d="M642 256 H792" stroke="#f59e0b" stroke-width="2.5" stroke-dasharray="7 6" marker-end="url(#arrow)"/>
+  <text x="720" y="420" text-anchor="middle" class="label">实际执行的教师动作</text>
+
+  <path d="M840 290 H872" class="flow"/>
+
+  <rect x="880" y="132" width="280" height="316" rx="18" fill="#ecfdf5" stroke="#34d399" stroke-width="1.5"/>
+  <text x="904" y="166" class="stage">4 · 验证 rollout</text>
+  <circle cx="952" cy="233" r="34" fill="#dcfce7" stroke="#22c55e" stroke-width="2"/>
+  <path d="M936 233 L947 244 L970 218" stroke="#15803d" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="1088" cy="233" r="34" fill="#fee2e2" stroke="#f87171" stroke-width="2"/>
+  <path d="M1074 219 L1102 247 M1102 219 L1074 247" stroke="#dc2626" stroke-width="5" stroke-linecap="round"/>
+  <text x="952" y="289" text-anchor="middle" class="label">接受</text>
+  <text x="1088" y="289" text-anchor="middle" class="label">拒绝</text>
+  <rect x="912" y="322" width="216" height="88" rx="12" fill="#ffffff" stroke="#6ee7b7"/>
+  <text x="1020" y="348" text-anchor="middle" class="label">质量门禁</text>
+  <text x="1020" y="374" text-anchor="middle" class="small">任务结果 · 失败类型</text>
+  <text x="1020" y="397" text-anchor="middle" class="small">覆盖范围 · 动作可执行性</text>
+  <text x="1020" y="430" text-anchor="middle" class="tiny">只有检查后的 rollout 才会继续</text>
+
+  <path d="M160 448 V478" stroke="#e11d48" stroke-width="2" stroke-dasharray="5 4"/>
+  <path d="M720 448 V478" class="export"/>
+  <path d="M1020 448 V478" class="export"/>
+
+  <rect x="40" y="486" width="240" height="120" rx="16" fill="#fff1f2" stroke="#fb7185" stroke-width="1.5"/>
+  <text x="64" y="518" class="label">教师专用边界</text>
+  <text x="64" y="544" class="small">特权状态与奖励</text>
+  <path d="M75 566 H245" stroke="#e11d48" stroke-width="2"/>
+  <text x="160" y="588" text-anchor="middle" class="tiny">不假设学生在部署时能够获得</text>
+
+  <rect x="320" y="486" width="840" height="120" rx="16" fill="#ffffff" stroke="#60a5fa" stroke-width="1.5"/>
+  <text x="344" y="518" class="label">面向学生的演示数据</text>
+  <rect x="344" y="540" width="212" height="42" rx="10" fill="#eff6ff"/>
+  <text x="450" y="566" text-anchor="middle" class="small">部署可用观察 o<tspan baseline-shift="sub" font-size="10">t</tspan></text>
+  <text x="574" y="566" class="label">+</text>
+  <rect x="600" y="540" width="184" height="42" rx="10" fill="#fffbeb"/>
+  <text x="692" y="566" text-anchor="middle" class="small">教师动作 a<tspan baseline-shift="sub" font-size="10">t</tspan></text>
+  <text x="802" y="566" class="label">+</text>
+  <rect x="828" y="540" width="138" height="42" rx="10" fill="#ecfdf5"/>
+  <text x="897" y="566" text-anchor="middle" class="small">结果标签</text>
+  <path d="M976 561 H1008" class="export"/>
+  <rect x="1016" y="532" width="120" height="58" rx="12" fill="#dbeafe" stroke="#60a5fa"/>
+  <text x="1076" y="555" text-anchor="middle" class="label">模仿学习</text>
+  <text x="1076" y="576" text-anchor="middle" class="small">数据</text>
+</svg>

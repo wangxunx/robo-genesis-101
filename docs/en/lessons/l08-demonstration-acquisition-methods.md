@@ -47,11 +47,19 @@ representation and alignment step.
 ### Teleoperation: direct human task knowledge
 
 In teleoperation, a person closes the control loop through an interface. A
-leader arm can make joint-space correspondence intuitive; VR, motion capture,
-or handheld interfaces can reduce mechanical coupling; whole-body interfaces
-can include base and bimanual motion. ALOHA and GELLO are well-known examples
-of the lower-cost hardware direction, while Mobile ALOHA extends the idea to
-mobile bimanual tasks.
+leader arm can make joint-space or Cartesian correspondence intuitive. A
+keyboard or gamepad can issue discrete or incremental commands with little
+specialized hardware, while VR, motion capture, and handheld interfaces track
+the operator more directly without requiring a mechanically similar leader.
+Whole-body interfaces can also include base and bimanual motion. ALOHA and
+GELLO are well-known examples of the lower-cost hardware direction, while
+Mobile ALOHA extends the idea to mobile bimanual tasks.
+
+![Four representative teleoperation interfaces connect different operator devices to a robot arm through calibration, mapping, safety checks, and feedback.](/diagrams/l08-teleoperation-interfaces.svg)
+
+*Course-created schematic. The panels compare the native command and required
+mapping of four representative interfaces; they are not a ranking of control
+quality, and real systems can combine several of them.*
 
 The main advantage is behavioral relevance: the operator can react to contact,
 recover from small mistakes, and demonstrate a strategy in the real task
@@ -71,6 +79,18 @@ through the desired trajectory. It can be the shortest path from an idea to a
 few robot-native trajectories because the teacher and learner share the same
 embodiment.
 
+In practice, the robot first enters a manufacturer-supported hand-guiding,
+gravity-compensation, or compliant-control mode. The teacher then holds the
+arm or end effector and guides it through the motion; this does **not** mean
+pulling against active brakes or a stiff position controller.
+
+![Kinesthetic teaching enables a safe hand-guiding mode, lets a person directly move the target robot, and records robot-native motion.](/diagrams/l08-kinesthetic-teaching.svg)
+
+*Course-created schematic. Unlike teleoperation, the person physically guides
+the target robot itself. Joint states and end-effector poses come directly from
+that robot; gripper events or mode changes may still need a button, pedal, or
+separate annotation.*
+
 That convenience brings constraints. The robot must support safe physical
 guidance; the teacher may not reproduce the forces or velocities needed during
 autonomous execution; and collecting many diverse episodes remains labor
@@ -83,6 +103,14 @@ A scripted expert converts known task state into a sequence of goals and
 motion primitives. In simulation it is reproducible, easy to instrument, and
 cheap to rerun after the script exists. Every phase can emit a label and every
 episode can be checked by a programmatic success predicate.
+
+![A scripted expert reads known task state, applies an explicit phase program, executes robot commands, and keeps a checked demonstration.](/diagrams/l08-scripted-expert-overview.svg)
+
+*Course-created schematic. The script—not a person issuing each command or a
+policy learned beforehand—selects the phase, subgoal, primitive, and transition
+rule. The phase names in the figure are deliberately generic; the
+[scripted-expert article](./l08-scripted-pick-and-place-expert.md) shows one
+task-specific pick-and-place implementation of this pattern.*
 
 Its weakness is the knowledge it assumes. A script may depend on object poses,
 task-specific grasp profiles, or simulator state unavailable to a deployed
@@ -100,6 +128,14 @@ rewards, and many parallel trials to acquire behavior that would be awkward to
 write as a fixed state machine. Once trained, the teacher can generate many
 rollouts across controlled variations.
 
+![A privileged learned teacher uses simulator-only state and rewards to learn behavior, generates and validates rollouts, and exports teacher actions with deployable observations.](/diagrams/l08-privileged-learned-teacher.svg)
+
+*Course-created schematic. “Privileged” means that the teacher may use exact
+simulator signals unavailable at deployment; “learned” means that optimization,
+rather than a handwritten phase program, produces its behavior. The exported
+demonstration pairs executed teacher actions with observations the student can
+actually receive.*
+
 The automation is not free: reward and environment design, training compute,
 teacher validation, and distribution coverage all become part of acquisition.
 If the teacher sees privileged state, its action can supervise a student, but
@@ -116,6 +152,12 @@ to obtain additional episodes. The important word is *execute*: a transformed
 trajectory is only a candidate until contact and task outcome have been
 checked.
 
+![Automatic augmentation starts from a trusted seed, generates transformed candidates, replays each candidate with physics, and retains only those that pass outcome checks.](/diagrams/l08-automatic-augmentation.svg)
+
+*Course-created schematic. Transformation provides scale, while physical
+replay and outcome filtering preserve validity. Simply copying or warping a
+trajectory does not make the result a successful demonstration.*
+
 Augmentation can expand object-pose and scene coverage without asking a human
 to demonstrate every combination. Its coverage is still shaped by the seed
 demonstrations, the transformation assumptions, and the task segments that can
@@ -131,6 +173,13 @@ Ordinary human video offers enormous diversity in objects, environments, and
 task semantics. Instrumented first-person capture, as explored by work such as
 UMI and EgoMimic, narrows the gap by estimating trajectories or using an
 interface whose motion can be related to a robot end effector.
+
+![Human-video transfer extracts task-relevant hand, object, contact, or optional skeleton information, maps it to a robot embodiment, and validates the resulting candidate action through execution.](/diagrams/l08-human-video-transfer.svg)
+
+*Course-created schematic. A full-body skeleton is one possible intermediate
+representation, especially for humanoid or whole-body tasks. Tabletop
+manipulation often relies more directly on hand or wrist motion, object tracks,
+contact events, and object-relative geometry.*
 
 The remaining embodiment gap is fundamental. Pixels do not directly specify a
 robot's joint command, gripper force, timing, or collision-free path. Viewpoint,

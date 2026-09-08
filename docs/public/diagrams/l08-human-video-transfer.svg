@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="640" viewBox="0 0 1200 640" role="img" aria-labelledby="title desc">
+  <title id="title">Human-video transfer converts visual behavior into robot-executable candidates</title>
+  <desc id="desc">Human video is analyzed for hand and object motion, contact events, or optional body skeletons. Semantic, geometric, and embodiment mappings produce candidate robot actions, which must be executed and validated.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="3" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L0,6 L8,3 z" fill="#64748b"/>
+    </marker>
+    <style>
+      .title { font: 700 30px Inter, ui-sans-serif, system-ui, sans-serif; fill: #0f172a; }
+      .subtitle { font: 400 17px Inter, ui-sans-serif, system-ui, sans-serif; fill: #475569; }
+      .stage { font: 700 18px Inter, ui-sans-serif, system-ui, sans-serif; fill: #0f172a; }
+      .label { font: 650 15px Inter, ui-sans-serif, system-ui, sans-serif; fill: #0f172a; }
+      .small { font: 400 14px Inter, ui-sans-serif, system-ui, sans-serif; fill: #475569; }
+      .tiny { font: 550 12px Inter, ui-sans-serif, system-ui, sans-serif; fill: #334155; }
+      .flow { stroke: #64748b; stroke-width: 2.2; fill: none; marker-end: url(#arrow); }
+      .human { stroke: #7c3aed; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+      .robot { stroke: #334155; stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+      .joint { fill: #ffffff; stroke: #334155; stroke-width: 3; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="640" rx="24" fill="#f8fafc"/>
+  <text x="600" y="48" text-anchor="middle" class="title">Human-video transfer: from visible behavior to robot action</text>
+  <text x="600" y="78" text-anchor="middle" class="subtitle">Video supplies rich task evidence, but it does not directly contain robot joint commands.</text>
+
+  <rect x="40" y="112" width="220" height="366" rx="18" fill="#faf5ff" stroke="#c084fc" stroke-width="1.5"/>
+  <text x="64" y="148" class="stage">1 · Human video</text>
+  <rect x="68" y="180" width="164" height="170" rx="10" fill="#ffffff" stroke="#a78bfa" stroke-width="2"/>
+  <g fill="#c4b5fd">
+    <circle cx="82" cy="193" r="4"/><circle cx="104" cy="193" r="4"/><circle cx="126" cy="193" r="4"/><circle cx="148" cy="193" r="4"/><circle cx="170" cy="193" r="4"/><circle cx="192" cy="193" r="4"/><circle cx="214" cy="193" r="4"/>
+    <circle cx="82" cy="337" r="4"/><circle cx="104" cy="337" r="4"/><circle cx="126" cy="337" r="4"/><circle cx="148" cy="337" r="4"/><circle cx="170" cy="337" r="4"/><circle cx="192" cy="337" r="4"/><circle cx="214" cy="337" r="4"/>
+  </g>
+  <circle cx="111" cy="235" r="12" fill="#ede9fe" stroke="#7c3aed" stroke-width="3"/>
+  <path d="M111 250 V292 M111 266 L139 277 L163 259 M111 292 L94 320 M111 292 L130 320" class="human"/>
+  <circle cx="166" cy="258" r="6" fill="#ddd6fe" stroke="#7c3aed" stroke-width="2"/>
+  <path d="M78 320 H220" stroke="#94a3b8" stroke-width="3"/>
+  <rect x="180" y="290" width="24" height="26" rx="3" fill="#facc15" stroke="#a16207" stroke-width="2"/>
+  <path d="M164 255 C183 252 199 267 194 284" stroke="#2563eb" stroke-width="2" stroke-dasharray="5 4" fill="none"/>
+  <text x="150" y="382" text-anchor="middle" class="label">pixels over time</text>
+  <text x="150" y="410" text-anchor="middle" class="small">third-person or egocentric</text>
+  <text x="150" y="438" text-anchor="middle" class="small">ordinary or instrumented</text>
+
+  <path d="M260 295 H292" class="flow"/>
+
+  <rect x="300" y="112" width="270" height="366" rx="18" fill="#eff6ff" stroke="#60a5fa" stroke-width="1.5"/>
+  <text x="324" y="148" class="stage">2 · Recover task evidence</text>
+  <rect x="328" y="178" width="214" height="132" rx="12" fill="#ffffff" stroke="#93c5fd"/>
+  <text x="435" y="202" text-anchor="middle" class="label">manipulation cues</text>
+  <path d="M355 256 C377 220 414 237 442 216 S498 229 517 208" stroke="#2563eb" stroke-width="2.5" fill="none" stroke-dasharray="6 4"/>
+  <g fill="#dbeafe" stroke="#2563eb" stroke-width="2">
+    <circle cx="355" cy="256" r="6"/><circle cx="397" cy="232" r="6"/><circle cx="442" cy="216" r="6"/><circle cx="484" cy="220" r="6"/>
+  </g>
+  <rect x="482" y="257" width="24" height="24" rx="3" fill="#facc15" stroke="#a16207" stroke-width="2"/>
+  <text x="435" y="294" text-anchor="middle" class="tiny">hand/wrist · object track · contact event</text>
+
+  <rect x="328" y="326" width="214" height="116" rx="12" fill="#ffffff" stroke="#93c5fd"/>
+  <text x="435" y="350" text-anchor="middle" class="label">optional body skeleton</text>
+  <circle cx="380" cy="377" r="10" fill="#e0f2fe" stroke="#0284c7" stroke-width="2"/>
+  <path d="M380 388 V416 M380 397 L356 412 M380 397 L404 412 M380 416 L362 434 M380 416 L398 434" stroke="#0284c7" stroke-width="3" stroke-linecap="round" fill="none"/>
+  <text x="423" y="387" class="small">useful for humanoid</text>
+  <text x="423" y="410" class="small">or whole-body tasks;</text>
+  <text x="423" y="433" class="small">not always required</text>
+
+  <path d="M570 295 H602" class="flow"/>
+
+  <rect x="610" y="112" width="270" height="366" rx="18" fill="#fffbeb" stroke="#fbbf24" stroke-width="1.5"/>
+  <text x="634" y="148" class="stage">3 · Map embodiments</text>
+  <rect x="638" y="184" width="214" height="64" rx="12" fill="#ffffff" stroke="#fcd34d"/>
+  <text x="658" y="208" class="label">semantic mapping</text>
+  <text x="658" y="232" class="small">what task and subgoals?</text>
+  <path d="M745 248 V267" class="flow"/>
+  <rect x="638" y="276" width="214" height="64" rx="12" fill="#ffffff" stroke="#fcd34d"/>
+  <text x="658" y="300" class="label">geometric mapping</text>
+  <text x="658" y="324" class="small">where and how should it move?</text>
+  <path d="M745 340 V359" class="flow"/>
+  <rect x="638" y="368" width="214" height="70" rx="12" fill="#ffffff" stroke="#fcd34d"/>
+  <text x="658" y="392" class="label">robot-feasible mapping</text>
+  <text x="658" y="416" class="small">retargeting · IK · planning</text>
+  <text x="658" y="433" class="tiny">candidate action, not proof</text>
+
+  <path d="M880 295 H912" class="flow"/>
+
+  <rect x="920" y="112" width="240" height="366" rx="18" fill="#ecfdf5" stroke="#34d399" stroke-width="1.5"/>
+  <text x="944" y="148" class="stage">4 · Execute and verify</text>
+  <rect x="971" y="356" width="138" height="16" rx="5" fill="#a7f3d0" stroke="#047857" stroke-width="3"/>
+  <path d="M1002 356 L1003 316 L1035 284 L1011 247 L1066 225" class="robot"/>
+  <circle cx="1003" cy="316" r="8" class="joint"/>
+  <circle cx="1035" cy="284" r="8" class="joint"/>
+  <circle cx="1011" cy="247" r="8" class="joint"/>
+  <path d="M1066 225 L1078 213 M1066 225 L1081 232" class="robot"/>
+  <path d="M963 205 C1000 184 1079 188 1118 216" stroke="#10b981" stroke-width="2.5" stroke-dasharray="7 5" fill="none" marker-end="url(#arrow)"/>
+  <text x="1040" y="397" text-anchor="middle" class="label">robot execution</text>
+  <g class="small">
+    <circle cx="952" cy="423" r="4" fill="#10b981"/><text x="966" y="428">reachability</text>
+    <circle cx="1041" cy="423" r="4" fill="#10b981"/><text x="1055" y="428">collision</text>
+    <circle cx="952" cy="451" r="4" fill="#10b981"/><text x="966" y="456">contact</text>
+    <circle cx="1041" cy="451" r="4" fill="#10b981"/><text x="1055" y="456">outcome</text>
+  </g>
+
+  <rect x="40" y="506" width="546" height="92" rx="16" fill="#eff6ff" stroke="#60a5fa" stroke-width="1.5"/>
+  <text x="64" y="538" class="label">What video contributes</text>
+  <text x="64" y="563" class="small">Broad tasks · object interactions · human strategy · visual diversity</text>
+  <text x="64" y="584" class="tiny">A full skeleton is one possible representation—not the definition of this route.</text>
+  <rect x="614" y="506" width="546" height="92" rx="16" fill="#fff7ed" stroke="#fdba74" stroke-width="1.5"/>
+  <text x="638" y="538" class="label">Why control is indirect</text>
+  <text x="638" y="563" class="small">Pixels ≠ joint commands, force, timing, reachability, or collision-free motion</text>
+  <text x="638" y="584" class="tiny">Retargeted actions remain candidates until the robot executes them successfully.</text>
+</svg>

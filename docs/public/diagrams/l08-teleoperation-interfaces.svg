@@ -1,0 +1,136 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="780" viewBox="0 0 1200 780" role="img" aria-labelledby="title desc">
+  <title id="title">Four representative teleoperation interfaces</title>
+  <desc id="desc">Leader arms, keyboards or gamepads, VR motion controllers, and handheld end-effector tools produce different native commands that must be mapped to robot motion with safety checks and operator feedback.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#64748b"/>
+    </marker>
+    <marker id="arrow-blue" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#2563eb"/>
+    </marker>
+    <style>
+      .title { font: 700 30px Inter, ui-sans-serif, system-ui, sans-serif; fill: #0f172a; }
+      .subtitle { font: 400 17px Inter, ui-sans-serif, system-ui, sans-serif; fill: #475569; }
+      .card-title { font: 700 19px Inter, ui-sans-serif, system-ui, sans-serif; fill: #0f172a; }
+      .signal { font: 500 14px Inter, ui-sans-serif, system-ui, sans-serif; fill: #475569; }
+      .label { font: 650 14px Inter, ui-sans-serif, system-ui, sans-serif; fill: #0f172a; }
+      .small { font: 400 13px Inter, ui-sans-serif, system-ui, sans-serif; fill: #475569; }
+      .flow { stroke: #64748b; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+      .feedback { stroke: #2563eb; stroke-width: 2; fill: none; marker-end: url(#arrow-blue); }
+      .icon { stroke: #334155; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+      .joint { fill: #ffffff; stroke: #334155; stroke-width: 3; }
+    </style>
+    <g id="robot-arm">
+      <rect x="3" y="86" width="94" height="14" rx="5" fill="#cbd5e1" stroke="#334155" stroke-width="3"/>
+      <path d="M27 86 L28 65 L49 47 L66 25 L82 39" class="icon"/>
+      <circle cx="28" cy="65" r="6" class="joint"/>
+      <circle cx="49" cy="47" r="6" class="joint"/>
+      <circle cx="66" cy="25" r="6" class="joint"/>
+      <path d="M82 39 L91 48 M82 39 L94 34" class="icon"/>
+    </g>
+    <g id="leader-arm">
+      <rect x="2" y="86" width="96" height="14" rx="5" fill="#bfdbfe" stroke="#2563eb" stroke-width="3"/>
+      <path d="M24 86 L30 62 L53 51 L69 28 L83 43" stroke="#2563eb" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <circle cx="30" cy="62" r="6" fill="#ffffff" stroke="#2563eb" stroke-width="3"/>
+      <circle cx="53" cy="51" r="6" fill="#ffffff" stroke="#2563eb" stroke-width="3"/>
+      <circle cx="69" cy="28" r="6" fill="#ffffff" stroke="#2563eb" stroke-width="3"/>
+      <circle cx="88" cy="44" r="10" fill="#dbeafe" stroke="#2563eb" stroke-width="3"/>
+    </g>
+  </defs>
+
+  <rect width="1200" height="780" rx="24" fill="#f8fafc"/>
+  <text x="600" y="48" text-anchor="middle" class="title">Four representative teleoperation interfaces</text>
+  <text x="600" y="78" text-anchor="middle" class="subtitle">The device changes the native command; calibration, mapping, safety, and feedback close the loop.</text>
+
+  <g>
+    <rect x="40" y="108" width="550" height="244" rx="18" fill="#eff6ff" stroke="#60a5fa" stroke-width="1.5"/>
+    <text x="64" y="140" class="card-title">Leader–follower arms</text>
+    <text x="566" y="140" text-anchor="end" class="signal">joint or Cartesian targets</text>
+    <use href="#leader-arm" transform="translate(78 166)"/>
+    <text x="128" y="288" text-anchor="middle" class="label">leader device</text>
+    <rect x="220" y="190" width="152" height="54" rx="12" fill="#ffffff" stroke="#93c5fd"/>
+    <text x="296" y="212" text-anchor="middle" class="label">calibrated</text>
+    <text x="296" y="231" text-anchor="middle" class="small">correspondence</text>
+    <path d="M182 217 H211" class="flow"/>
+    <path d="M372 217 H408" class="flow"/>
+    <use href="#robot-arm" transform="translate(430 166)"/>
+    <text x="480" y="288" text-anchor="middle" class="label">robot arm</text>
+    <text x="64" y="326" class="small">Direct and intuitive when the leader geometry resembles the controlled robot.</text>
+  </g>
+
+  <g>
+    <rect x="610" y="108" width="550" height="244" rx="18" fill="#fffbeb" stroke="#fbbf24" stroke-width="1.5"/>
+    <text x="634" y="140" class="card-title">Keyboard or gamepad</text>
+    <text x="1136" y="140" text-anchor="end" class="signal">key or axis increments</text>
+    <rect x="650" y="184" width="112" height="70" rx="9" fill="#ffffff" stroke="#92400e" stroke-width="3"/>
+    <g fill="#fde68a" stroke="#92400e" stroke-width="1.5">
+      <rect x="663" y="197" width="19" height="16" rx="3"/><rect x="687" y="197" width="19" height="16" rx="3"/><rect x="711" y="197" width="19" height="16" rx="3"/>
+      <rect x="663" y="219" width="19" height="16" rx="3"/><rect x="687" y="219" width="19" height="16" rx="3"/><rect x="711" y="219" width="19" height="16" rx="3"/>
+      <rect x="735" y="219" width="14" height="16" rx="3"/>
+    </g>
+    <text x="706" y="288" text-anchor="middle" class="label">input device</text>
+    <rect x="790" y="190" width="152" height="54" rx="12" fill="#ffffff" stroke="#fcd34d"/>
+    <text x="866" y="212" text-anchor="middle" class="label">mode mapping</text>
+    <text x="866" y="231" text-anchor="middle" class="small">+ rate limits</text>
+    <path d="M762 217 H781" class="flow"/>
+    <path d="M942 217 H978" class="flow"/>
+    <use href="#robot-arm" transform="translate(1000 166)"/>
+    <text x="1050" y="288" text-anchor="middle" class="label">robot arm</text>
+    <text x="634" y="326" class="small">Easy to deploy for discrete, incremental, or supervisory motion commands.</text>
+  </g>
+
+  <g>
+    <rect x="40" y="374" width="550" height="244" rx="18" fill="#faf5ff" stroke="#c084fc" stroke-width="1.5"/>
+    <text x="64" y="406" class="card-title">VR or motion tracking</text>
+    <text x="566" y="406" text-anchor="end" class="signal">tracked 6-DoF pose + buttons</text>
+    <path d="M79 462 Q128 434 177 462 L168 496 Q128 510 88 496 Z" fill="#ffffff" stroke="#7e22ce" stroke-width="3"/>
+    <path d="M93 466 H119 M137 466 H163" stroke="#c084fc" stroke-width="8" stroke-linecap="round"/>
+    <path d="M91 515 Q78 530 87 548 M165 515 Q178 530 169 548" stroke="#7e22ce" stroke-width="7" stroke-linecap="round" fill="none"/>
+    <circle cx="87" cy="550" r="7" fill="#e9d5ff" stroke="#7e22ce" stroke-width="2"/>
+    <circle cx="169" cy="550" r="7" fill="#e9d5ff" stroke="#7e22ce" stroke-width="2"/>
+    <text x="128" y="576" text-anchor="middle" class="label">tracked controllers</text>
+    <rect x="220" y="456" width="152" height="54" rx="12" fill="#ffffff" stroke="#d8b4fe"/>
+    <text x="296" y="478" text-anchor="middle" class="label">frame transform</text>
+    <text x="296" y="497" text-anchor="middle" class="small">+ retargeting</text>
+    <path d="M182 483 H211" class="flow"/>
+    <path d="M372 483 H408" class="flow"/>
+    <use href="#robot-arm" transform="translate(430 432)"/>
+    <text x="480" y="554" text-anchor="middle" class="label">robot arm</text>
+    <text x="64" y="592" class="small">Tracks free-space hand motion without requiring a matching mechanical leader.</text>
+  </g>
+
+  <g>
+    <rect x="610" y="374" width="550" height="244" rx="18" fill="#ecfdf5" stroke="#34d399" stroke-width="1.5"/>
+    <text x="634" y="406" class="card-title">Handheld end-effector tool</text>
+    <text x="1136" y="406" text-anchor="end" class="signal">tool pose + gripper state</text>
+    <path d="M679 456 L734 456 L747 474 L734 493 L679 493 Z" fill="#ffffff" stroke="#047857" stroke-width="3"/>
+    <path d="M684 493 L677 535 M730 493 L737 535" stroke="#047857" stroke-width="9" stroke-linecap="round"/>
+    <path d="M677 535 L663 548 M737 535 L751 548" class="icon"/>
+    <circle cx="707" cy="474" r="8" fill="#a7f3d0" stroke="#047857" stroke-width="2"/>
+    <path d="M754 450 Q770 474 754 498" stroke="#10b981" stroke-width="3" stroke-linecap="round" fill="none"/>
+    <text x="706" y="576" text-anchor="middle" class="label">portable tool</text>
+    <rect x="790" y="456" width="152" height="54" rx="12" fill="#ffffff" stroke="#6ee7b7"/>
+    <text x="866" y="478" text-anchor="middle" class="label">embodiment map</text>
+    <text x="866" y="497" text-anchor="middle" class="small">+ safety checks</text>
+    <path d="M762 483 H781" class="flow"/>
+    <path d="M942 483 H978" class="flow"/>
+    <use href="#robot-arm" transform="translate(1000 432)"/>
+    <text x="1050" y="554" text-anchor="middle" class="label">robot arm</text>
+    <text x="634" y="592" class="small">Portable collection still needs a robot-specific executable-action mapping.</text>
+  </g>
+
+  <rect x="40" y="642" width="1120" height="98" rx="16" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="64" y="674" class="label">Shared closed loop</text>
+  <text x="218" y="674" class="small">operator intent</text>
+  <path d="M308 669 H358" class="flow"/>
+  <text x="376" y="674" class="small">interface signal</text>
+  <path d="M472 669 H522" class="flow"/>
+  <rect x="540" y="652" width="224" height="34" rx="10" fill="#eff6ff"/>
+  <text x="652" y="674" text-anchor="middle" class="label">mapping · safety · timing</text>
+  <path d="M764 669 H814" class="flow"/>
+  <text x="832" y="674" class="small">robot command</text>
+  <path d="M929 669 H979" class="flow"/>
+  <text x="997" y="674" class="small">robot motion</text>
+  <path d="M1060 707 H226" class="feedback"/>
+  <text x="643" y="724" text-anchor="middle" class="small">feedback: robot state · video · contact cues</text>
+</svg>

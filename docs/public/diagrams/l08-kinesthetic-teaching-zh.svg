@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="620" viewBox="0 0 1200 620" role="img" aria-labelledby="title desc">
+  <title id="title">直接引导目标机器人的拖动示教</title>
+  <desc id="desc">机器人进入支持的柔顺模式后，人直接引导同一台机器人沿期望路径运动，系统记录机器人原生的关节与末端轨迹。</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#64748b"/>
+    </marker>
+    <marker id="arrow-blue" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#2563eb"/>
+    </marker>
+    <style>
+      .title { font: 700 30px Inter, ui-sans-serif, system-ui, sans-serif; fill: #0f172a; }
+      .subtitle { font: 400 17px Inter, ui-sans-serif, system-ui, sans-serif; fill: #475569; }
+      .stage { font: 700 19px Inter, ui-sans-serif, system-ui, sans-serif; fill: #0f172a; }
+      .label { font: 650 15px Inter, ui-sans-serif, system-ui, sans-serif; fill: #0f172a; }
+      .small { font: 400 14px Inter, ui-sans-serif, system-ui, sans-serif; fill: #475569; }
+      .flow { stroke: #64748b; stroke-width: 2.5; fill: none; marker-end: url(#arrow); }
+      .motion { stroke: #2563eb; stroke-width: 3; stroke-dasharray: 9 7; fill: none; marker-end: url(#arrow-blue); }
+      .human { stroke: #7c3aed; stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+      .robot { stroke: #047857; stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+      .joint { fill: #ffffff; stroke: #047857; stroke-width: 4; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="620" rx="24" fill="#f8fafc"/>
+  <text x="600" y="48" text-anchor="middle" class="title">拖动示教：直接引导目标机器人</text>
+  <text x="600" y="78" text-anchor="middle" class="subtitle">机器人先进入受支持的低阻力模式，再由人手引导并记录机器人自身的运动。</text>
+
+  <rect x="40" y="112" width="260" height="362" rx="18" fill="#eff6ff" stroke="#60a5fa" stroke-width="1.5"/>
+  <text x="64" y="148" class="stage">1 · 开启安全引导</text>
+  <rect x="84" y="190" width="172" height="58" rx="14" fill="#ffffff" stroke="#93c5fd" stroke-width="2"/>
+  <text x="170" y="214" text-anchor="middle" class="label">手动引导模式</text>
+  <text x="170" y="235" text-anchor="middle" class="small">已开启</text>
+  <rect x="109" y="274" width="122" height="42" rx="21" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+  <circle cx="209" cy="295" r="16" fill="#2563eb"/>
+  <text x="170" y="348" text-anchor="middle" class="label">重力补偿</text>
+  <text x="170" y="371" text-anchor="middle" class="small">或柔顺控制</text>
+  <path d="M105 410 H235" stroke="#94a3b8" stroke-width="3" stroke-linecap="round"/>
+  <path d="M123 410 L131 389 L154 376 L174 352" stroke="#047857" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="131" cy="389" r="5" class="joint"/>
+  <circle cx="154" cy="376" r="5" class="joint"/>
+  <text x="170" y="446" text-anchor="middle" class="small">低阻力，并配置安全限制</text>
+
+  <path d="M300 293 H338" class="flow"/>
+
+  <rect x="348" y="112" width="514" height="362" rx="18" fill="#faf5ff" stroke="#c084fc" stroke-width="1.5"/>
+  <text x="372" y="148" class="stage">2 · 用手移动同一台机器人</text>
+  <text x="838" y="174" text-anchor="end" class="small">直接物理引导</text>
+  <path d="M519 241 C584 171 703 174 759 224" class="motion"/>
+  <text x="644" y="202" text-anchor="middle" class="small">期望路径</text>
+
+  <circle cx="429" cy="236" r="19" fill="#ede9fe" stroke="#7c3aed" stroke-width="5"/>
+  <path d="M429 260 V344 M429 279 L386 320 M429 279 L480 253 L515 259 M429 344 L395 402 M429 344 L463 402" class="human"/>
+  <circle cx="519" cy="260" r="9" fill="#ddd6fe" stroke="#7c3aed" stroke-width="4"/>
+  <text x="427" y="434" text-anchor="middle" class="label">示教者</text>
+
+  <rect x="687" y="392" width="126" height="18" rx="6" fill="#a7f3d0" stroke="#047857" stroke-width="3"/>
+  <path d="M716 392 L718 349 L745 309 L711 269 L544 260" class="robot"/>
+  <circle cx="718" cy="349" r="9" class="joint"/>
+  <circle cx="745" cy="309" r="9" class="joint"/>
+  <circle cx="711" cy="269" r="9" class="joint"/>
+  <path d="M544 260 L532 247 M544 260 L532 273" stroke="#047857" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="544" cy="260" r="8" fill="#ffffff" stroke="#047857" stroke-width="4"/>
+  <text x="750" y="434" text-anchor="middle" class="label">目标机器人</text>
+  <rect x="531" y="294" width="164" height="48" rx="12" fill="#ffffff" stroke="#d8b4fe"/>
+  <text x="613" y="315" text-anchor="middle" class="label">直接物理接触</text>
+  <text x="613" y="333" text-anchor="middle" class="small">人手 ↔ 机器人</text>
+
+  <path d="M862 293 H900" class="flow"/>
+
+  <rect x="910" y="112" width="250" height="362" rx="18" fill="#ecfdf5" stroke="#34d399" stroke-width="1.5"/>
+  <text x="934" y="148" class="stage">3 · 记录运动</text>
+  <rect x="943" y="180" width="184" height="132" rx="12" fill="#ffffff" stroke="#6ee7b7" stroke-width="1.5"/>
+  <path d="M966 283 V205 M966 283 H1106" stroke="#94a3b8" stroke-width="2"/>
+  <path d="M970 264 C993 255 1003 216 1027 231 S1065 280 1101 219" stroke="#2563eb" stroke-width="3" fill="none"/>
+  <path d="M970 247 C995 227 1016 277 1044 253 S1078 228 1101 242" stroke="#10b981" stroke-width="3" fill="none"/>
+  <circle cx="1027" cy="231" r="4" fill="#2563eb"/>
+  <circle cx="1044" cy="253" r="4" fill="#10b981"/>
+  <text x="1035" y="335" text-anchor="middle" class="label">机器人原生轨迹</text>
+  <g class="small">
+    <circle cx="954" cy="365" r="4" fill="#2563eb"/><text x="968" y="370">关节状态 q(t)</text>
+    <circle cx="954" cy="394" r="4" fill="#10b981"/><text x="968" y="399">末端位姿 x(t)</text>
+    <circle cx="954" cy="423" r="4" fill="#f59e0b"/><text x="968" y="428">夹爪事件</text>
+  </g>
+
+  <rect x="40" y="502" width="1120" height="78" rx="16" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="64" y="533" class="label">与遥操作的关键区别</text>
+  <text x="64" y="559" class="small">人直接引导目标机器人本体，而不是通过另一台主手、键盘或 VR 接口间接发出控制命令。</text>
+</svg>
