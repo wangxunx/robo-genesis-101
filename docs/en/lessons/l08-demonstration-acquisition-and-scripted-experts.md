@@ -126,10 +126,11 @@ fingers. The two arrays have the same width, but they answer different
 questions: the action is what the expert requested; the state is what the
 simulated robot had reached when that sample was observed.
 
-The core path does not need a camera. When rendering is explicitly enabled, a
-world camera adds a start image and one image after each expert phase. Those
-images make the sequence easier to inspect, while the trace and containment
-values remain the task evidence.
+The notebook defaults to `ROBO_GENESIS_RENDER=1`, so the normal learning path
+creates a world camera and shows a start image plus one image after each expert
+phase. Learners without a working rendering stack can explicitly set the value
+to `0`; the full rollout, numerical plots, trace, and containment checks still
+run without a camera.
 
 ## One task, one result
 

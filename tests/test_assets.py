@@ -94,15 +94,17 @@ def test_l08_notebooks_expose_the_scripted_expert_contract() -> None:
         "markdown",
         "code",
         "markdown",
-        "markdown",
         "code",
+        "markdown",
     )
     required_code = (
         "TaskSpec(",
         "isinstance(profile, GraspProfile)",
-        "('pregrasp', 'descend', 'grasp', 'lift', 'transport', 'release', 'retreat')",
+        "tuple(row[0] for row in PHASES)",
+        "os.environ.get('ROBO_GENESIS_RENDER', '1')",
         "np.ceil(delta_q_inf / MOVE_MAX_DQ)",
         "CANDIDATE_MAX_DQ",
+        "make_command_schedule(",
         "build_scene(",
         "add_world_cam=render_enabled",
         "add_wrist_cam=False",
@@ -118,6 +120,8 @@ def test_l08_notebooks_expose_the_scripted_expert_contract() -> None:
         "inside_bowl",
         "check_success(bundle, task)",
         "EXPECTED_FRAME_TAGS",
+        "tracking_joint",
+        "allowed_circle = plt.Circle(",
         "L08 CHECK: PASSED",
     )
     forbidden_code = (
@@ -158,5 +162,52 @@ def test_l08_notebooks_expose_the_scripted_expert_contract() -> None:
         assert all(cell["outputs"] == [] for cell in code_cells)
         assert all(fragment in code_source for fragment in required_code)
         assert all(fragment not in code_source for fragment in forbidden_code)
+        assert "os.environ.get('ROBO_GENESIS_RENDER', '0')" not in code_source
+        assert code_source.count("PASS") == 1
+        markdown_source = "\n".join(
+            "".join(cell["source"])
+            for cell in cells
+            if cell["cell_type"] == "markdown"
+        )
+        assert f"l08-seven-phase-pick-place{'-zh' if locale == 'zh' else ''}.svg" in markdown_source
 
     assert localized_code["en"] == localized_code["zh"]
+
+
+def test_l08_and_later_render_switches_default_to_enabled() -> None:
+    notebooks_with_render_switch: set[str] = set()
+    enabled_defaults = (
+        "get('ROBO_GENESIS_RENDER', '1')",
+        'get("ROBO_GENESIS_RENDER", "1")',
+    )
+    disabled_defaults = (
+        "get('ROBO_GENESIS_RENDER', '0')",
+        'get("ROBO_GENESIS_RENDER", "0")',
+    )
+
+    for locale in ("en", "zh"):
+        for path in sorted((PROJECT_ROOT / "notebooks" / locale).glob("l*.ipynb")):
+            lesson_number = int(path.name[1:3])
+            if lesson_number < 8:
+                continue
+            notebook = json.loads(path.read_text(encoding="utf-8"))
+            code_source = "\n".join(
+                "".join(cell["source"])
+                for cell in notebook["cells"]
+                if cell["cell_type"] == "code"
+            )
+            if "ROBO_GENESIS_RENDER" not in code_source:
+                continue
+            notebooks_with_render_switch.add(path.as_posix())
+            assert any(fragment in code_source for fragment in enabled_defaults)
+            assert all(fragment not in code_source for fragment in disabled_defaults)
+
+    assert {
+        str(
+            PROJECT_ROOT
+            / "notebooks"
+            / locale
+            / "l08-demonstration-acquisition-and-scripted-experts.ipynb"
+        )
+        for locale in ("en", "zh")
+    }.issubset(notebooks_with_render_switch)

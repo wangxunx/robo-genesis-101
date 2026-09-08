@@ -108,8 +108,9 @@ commanded action     : (T, 9)
 前 7 个值表示 arm joints，最后 2 个值表示 fingers。两组数组宽度相同，但回答的问题不同：
 action 是专家发出的请求，state 则是采样时仿真机器人已经到达的状态。
 
-核心路径不需要创建相机。显式开启渲染后，world camera 会额外给出一张起始画面和七个阶段
-后的画面。这些图片方便观察动作顺序；任务证据仍来自数值轨迹与 containment 几何量。
+Notebook 默认使用 `ROBO_GENESIS_RENDER=1`，正常学习路径会创建 world camera，并展示一张
+起始画面和七个阶段后的画面。如果当前环境无法使用渲染栈，可以显式设为 `0`；完整 rollout、
+数值图、trace 与 containment 检查仍会在无相机条件下运行。
 
 ## 一个任务，一次结果
 

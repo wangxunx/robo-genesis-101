@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="360" viewBox="0 0 1400 360" role="img" aria-labelledby="title desc">
+  <title id="title">七阶段脚本化抓取放置专家</title>
+  <desc id="desc">场景静置后，专家依次执行预抓取、垂直下探、夹持、抬升、搬运、释放和撤离。</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
+    </marker>
+    <style>
+      .title { font: 700 28px Arial, "Noto Sans SC", sans-serif; fill: #172033; }
+      .subtitle { font: 16px Arial, "Noto Sans SC", sans-serif; fill: #526078; }
+      .phase-number { font: 700 14px Arial, "Noto Sans SC", sans-serif; fill: #475569; }
+      .phase-name { font: 700 18px Arial, "Noto Sans SC", sans-serif; fill: #172033; }
+      .phase-detail { font: 14px Arial, "Noto Sans SC", sans-serif; fill: #526078; }
+      .settle { font: 600 14px Arial, "Noto Sans SC", sans-serif; fill: #475569; }
+      .footer { font: 600 15px Arial, "Noto Sans SC", sans-serif; fill: #334155; }
+      .flow { stroke: #64748b; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+    </style>
+  </defs>
+
+  <rect width="1400" height="360" rx="24" fill="#f8fafc"/>
+  <text x="700" y="42" text-anchor="middle" class="title">七阶段脚本化专家</text>
+  <text x="700" y="70" text-anchor="middle" class="subtitle">每个阶段都把任务意图转换成明确的目标、控制方式和可观察事件。</text>
+
+  <rect x="28" y="91" width="210" height="40" rx="20" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="133" y="116" text-anchor="middle" class="settle">场景静置 · episode 准备</text>
+  <path d="M 238 111 H 265" class="flow"/>
+
+  <g transform="translate(270 92)">
+    <rect width="150" height="150" rx="16" fill="#eef2ff" stroke="#818cf8" stroke-width="2"/>
+    <text x="18" y="28" class="phase-number">1</text>
+    <text x="75" y="61" text-anchor="middle" class="phase-name">预抓取</text>
+    <text x="75" y="92" text-anchor="middle" class="phase-detail">规划至物体上方</text>
+    <text x="75" y="114" text-anchor="middle" class="phase-detail">夹爪张开</text>
+  </g>
+  <path d="M 420 167 H 444" class="flow"/>
+
+  <g transform="translate(449 92)">
+    <rect width="150" height="150" rx="16" fill="#eff6ff" stroke="#60a5fa" stroke-width="2"/>
+    <text x="18" y="28" class="phase-number">2</text>
+    <text x="75" y="61" text-anchor="middle" class="phase-name">垂直下探</text>
+    <text x="75" y="92" text-anchor="middle" class="phase-detail">固定 xy</text>
+    <text x="75" y="114" text-anchor="middle" class="phase-detail">逐步降低 z</text>
+  </g>
+  <path d="M 599 167 H 623" class="flow"/>
+
+  <g transform="translate(628 92)">
+    <rect width="150" height="150" rx="16" fill="#ecfeff" stroke="#22d3ee" stroke-width="2"/>
+    <text x="18" y="28" class="phase-number">3</text>
+    <text x="75" y="61" text-anchor="middle" class="phase-name">夹持</text>
+    <text x="75" y="92" text-anchor="middle" class="phase-detail">手臂保持</text>
+    <text x="75" y="114" text-anchor="middle" class="phase-detail">手指力控制</text>
+  </g>
+  <path d="M 778 167 H 802" class="flow"/>
+
+  <g transform="translate(807 92)">
+    <rect width="150" height="150" rx="16" fill="#ecfdf5" stroke="#34d399" stroke-width="2"/>
+    <text x="18" y="28" class="phase-number">4</text>
+    <text x="75" y="61" text-anchor="middle" class="phase-name">抬升</text>
+    <text x="75" y="92" text-anchor="middle" class="phase-detail">离开桌面</text>
+    <text x="75" y="114" text-anchor="middle" class="phase-detail">限制目标增量</text>
+  </g>
+  <path d="M 957 167 H 981" class="flow"/>
+
+  <g transform="translate(986 92)">
+    <rect width="150" height="150" rx="16" fill="#fffbeb" stroke="#fbbf24" stroke-width="2"/>
+    <text x="18" y="28" class="phase-number">5</text>
+    <text x="75" y="61" text-anchor="middle" class="phase-name">搬运</text>
+    <text x="75" y="92" text-anchor="middle" class="phase-detail">移动至 bowl</text>
+    <text x="75" y="114" text-anchor="middle" class="phase-detail">保持夹持力</text>
+  </g>
+  <path d="M 1136 167 H 1160" class="flow"/>
+
+  <g transform="translate(1165 92)">
+    <rect width="100" height="150" rx="16" fill="#fff7ed" stroke="#fb923c" stroke-width="2"/>
+    <text x="16" y="28" class="phase-number">6</text>
+    <text x="50" y="61" text-anchor="middle" class="phase-name">释放</text>
+    <text x="50" y="92" text-anchor="middle" class="phase-detail">张开</text>
+    <text x="50" y="114" text-anchor="middle" class="phase-detail">夹爪</text>
+  </g>
+  <path d="M 1265 167 H 1284" class="flow"/>
+
+  <g transform="translate(1289 92)">
+    <rect width="83" height="150" rx="16" fill="#fdf2f8" stroke="#f472b6" stroke-width="2"/>
+    <text x="14" y="28" class="phase-number">7</text>
+    <text x="41.5" y="61" text-anchor="middle" class="phase-name" font-size="16">撤离</text>
+    <text x="41.5" y="92" text-anchor="middle" class="phase-detail">上移并</text>
+    <text x="41.5" y="114" text-anchor="middle" class="phase-detail">等待静置</text>
+  </g>
+
+  <rect x="210" y="278" width="980" height="48" rx="14" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="700" y="307" text-anchor="middle" class="footer">任务意图 → 位姿目标 → 手臂/手指命令 → 实测运动 → containment 结果</text>
+</svg>

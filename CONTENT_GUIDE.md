@@ -97,6 +97,8 @@ status: planned
 - 提交前清除 `execution_count` 和所有输出；不要提交 checkpoint、缓存或大型生成文件。
 - `metadata.robo_genesis` 的 lesson、slug、locale、duration、hardware 和 status 必须与 `course.json` 一致。
 - notebook 应展示本讲关键逻辑，同时复用 `src/robo_genesis/` 中已经稳定的公共实现。
+- 从 L08 开始，凡 notebook 提供 `ROBO_GENESIS_RENDER` 开关，默认值设为 `1`，让正常学习
+  路径直接呈现仿真画面；同时保留显式的 `0` 无渲染 fallback，并说明该路径省略了哪些视觉证据。
 - 长时间或高硬件要求的实验必须提供最小验证路径，并明确完整实验是否实际运行。
 
 ### Python 与命令规范
@@ -239,6 +241,9 @@ Except for `locale` and the localized `title`, bilingual fields must be identica
 - Clear every `execution_count` and output before committing. Do not commit checkpoints, caches, or large generated files.
 - The lesson, slug, locale, duration, hardware, and status in `metadata.robo_genesis` match `course.json`.
 - Expose the lesson's key logic while reusing stable shared implementations from `src/robo_genesis/`.
+- Starting with L08, any notebook that provides a `ROBO_GENESIS_RENDER` switch defaults it to
+  `1` so that the normal learning path shows the simulation. Keep an explicit non-rendering
+  `0` fallback and state which visual evidence that path omits.
 - Long-running or hardware-intensive exercises provide a minimal verification path and say whether the full experiment was actually run.
 
 ### Python and command rules

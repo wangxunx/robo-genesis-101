@@ -262,12 +262,10 @@ success, frames = run_pick_place(
 )
 ```
 
-核心数值路径不创建相机，但仍会执行完整 rollout、生成 action/state trace、展开两项
-containment 分量并检查结果。这个 CPU-compatible 分支为渲染环境不可用的学员提供 fallback，
-并不表示本讲优先推荐 CPU。
-
-启用渲染时，`run_pick_place()` 会保存 8 张 world-camera 图像：静置后的起点，加上每个
-阶段完成后的画面。预期 tag 顺序为：
+Notebook 默认使用 `ROBO_GENESIS_RENDER=1`。在这条正常学习路径中，`run_pick_place()` 会
+保存 8 张 world-camera 图像：静置后的起点，加上每个阶段完成后的画面。无法使用渲染栈的
+学习者可以显式设为 `0`；这条 fallback 不创建相机，但仍会执行完整 rollout、生成
+action/state trace 与数值图、展开两项 containment 分量并检查结果。预期图像 tag 顺序为：
 
 ```text
 00_start

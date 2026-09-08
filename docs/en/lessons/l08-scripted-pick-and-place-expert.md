@@ -300,14 +300,12 @@ success, frames = run_pick_place(
 )
 ```
 
-The core numerical path builds no camera. It still performs the full rollout,
-produces the action/state trace, expands both containment components, and
-checks the result. This CPU-compatible branch is a fallback for learners
-without a working rendering stack; it is not a recommendation to prefer CPU.
-
-When rendering is enabled, `run_pick_place()` captures eight world-camera
-images: the settled start plus one image after each phase. The expected tag
-order is:
+The notebook defaults to `ROBO_GENESIS_RENDER=1`. In this normal learning path,
+`run_pick_place()` captures eight world-camera images: the settled start plus
+one image after each phase. Learners without a working rendering stack can set
+the value to `0`; that explicit fallback builds no camera but still runs the
+full rollout, produces the action/state trace and numerical plots, expands both
+containment components, and checks the result. The expected image-tag order is:
 
 ```text
 00_start
