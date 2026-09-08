@@ -67,3 +67,96 @@ def test_l07_notebooks_expose_the_scene_building_contract() -> None:
         assert all(cell["outputs"] == [] for cell in code_cells)
         assert all(fragment in code_source for fragment in required_code)
         assert "add_video_cam=False" in code_source
+
+
+def test_l08_notebooks_expose_the_scripted_expert_contract() -> None:
+    expected_code_ids = (
+        "l08-setup",
+        "l08-expert-contract",
+        "l08-rate-schedule",
+        "l08-build-scene",
+        "l08-rollout",
+        "l08-evidence",
+        "l08-final-check",
+    )
+    expected_cell_types = (
+        "markdown",
+        "markdown",
+        "code",
+        "markdown",
+        "code",
+        "markdown",
+        "code",
+        "markdown",
+        "code",
+        "markdown",
+        "code",
+        "markdown",
+        "code",
+        "markdown",
+        "markdown",
+        "code",
+    )
+    required_code = (
+        "TaskSpec(",
+        "isinstance(profile, GraspProfile)",
+        "('pregrasp', 'descend', 'grasp', 'lift', 'transport', 'release', 'retreat')",
+        "np.ceil(delta_q_inf / MOVE_MAX_DQ)",
+        "CANDIDATE_MAX_DQ",
+        "build_scene(",
+        "add_world_cam=render_enabled",
+        "add_wrist_cam=False",
+        "add_video_cam=False",
+        "scene_dr=None",
+        "class TraceRecorder:",
+        "self.bundle.franka.get_qpos()",
+        "run_pick_place(",
+        "save_frames=render_enabled",
+        "state_trace = np.stack(trace.states)",
+        "action_trace = np.stack(trace.actions)",
+        "within_footprint",
+        "inside_bowl",
+        "check_success(bundle, task)",
+        "EXPECTED_FRAME_TAGS",
+        "L08 CHECK: PASSED",
+    )
+    forbidden_code = (
+        "LeRobotDataset",
+        "record_dataset",
+        "SceneDomainRandomizationConfig",
+        "apply_episode_randomization",
+        "sys.path",
+    )
+    localized_code: dict[str, tuple[str, ...]] = {}
+
+    for locale in ("en", "zh"):
+        path = (
+            PROJECT_ROOT
+            / "notebooks"
+            / locale
+            / "l08-demonstration-acquisition-and-scripted-experts.ipynb"
+        )
+        notebook = json.loads(path.read_text(encoding="utf-8"))
+        cells = notebook["cells"]
+        code_cells = [cell for cell in cells if cell["cell_type"] == "code"]
+        code_sources = tuple("".join(cell["source"]) for cell in code_cells)
+        code_source = "\n".join(code_sources)
+        localized_code[locale] = code_sources
+
+        assert len(cells) == 16
+        assert tuple(cell["cell_type"] for cell in cells) == expected_cell_types
+        assert tuple(cell["id"] for cell in code_cells) == expected_code_ids
+        assert notebook["metadata"]["robo_genesis"] == {
+            "lesson": "L08",
+            "slug": "demonstration-acquisition-and-scripted-experts",
+            "locale": locale,
+            "duration_minutes": 120,
+            "hardware": "gpu-recommended",
+            "status": "planned",
+        }
+        assert all(cell["execution_count"] is None for cell in code_cells)
+        assert all(cell["outputs"] == [] for cell in code_cells)
+        assert all(fragment in code_source for fragment in required_code)
+        assert all(fragment not in code_source for fragment in forbidden_code)
+
+    assert localized_code["en"] == localized_code["zh"]
