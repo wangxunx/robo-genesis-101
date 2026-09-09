@@ -1367,3 +1367,41 @@ NVIDIA CUDA wheels；本轮没有把 `.4` 中主动中止的多 GiB 完整隔离
 
 `M3.L09.5` 已于 2026-09-09 通过项目负责人验收；未收到明确启动指令前不开始
 `M3.L09.6`。
+
+### 20.6 M3.L09.6 状态同步后复验
+
+项目负责人验收 `.1`–`.5` 并明确启动 `.6` 后，L09 已原子同步为 `gpu-verified`：
+
+- `course.json`、双语讲义 frontmatter 与课程状态说明；
+- EN/ZH notebook metadata，以及 setup/final-check 中的 manifest status 断言；
+- `README.md`、`README_en.md`、根语言入口与双语首页的课程状态摘要和进度表；
+- manifest 与 L09 notebook 合同测试。
+
+硬件字段继续为 `gpu-recommended`。`gpu-verified` 表示本讲的正常双相机录制路径已经在
+参考 R9700 AMD+EGL 环境通过；第 20.1–20.4 节同时保留 EN/ZH CPU 无渲染诊断和
+CPU+EGL 完整录制的独立证据。无渲染分支仍只检查 sampling/schema，不把 GPU 改写成
+阅读讲义的硬门槛，也不把诊断模式冒充为已完成核心实验。
+
+状态 literal 更新后，双语 notebook 的 8 个 code-cell ID/source 仍完全一致，规范化
+SHA-256 从 `.5` 执行时的
+`321754fe5e73deceaf315f8f351f809061e3b454fbf834cea1a0e7f2e779e25d` 变为
+`614980d9aeb5a6cd42e88f9caf57293608ae461375665cc22501979afc98ede5`；唯一行为语义变化是
+setup 和 final-check 中的 manifest status 断言从 `planned` 改为 `gpu-verified`。
+
+为验证最终源码，English notebook 又在独立 CPU、`render=0` kernel 中从头执行，耗时
+8.24 秒。8 个 code cell 全部完成、没有 error output，setup 读取到
+`status=gpu-verified`；sampling/schema 通过，scene、camera、recorder、writer、dataset、
+readback 与视觉证据均明确 `SKIP`，最终输出 `L09 DIAGNOSTIC CHECK: PASSED` 和
+`Core recording experiment: NOT COMPLETED`。执行副本与当前双语提交版 code source hash
+一致，隔离 datasets 目录没有产生文件，产物只位于 `/tmp`。
+
+状态同步后的仓库门禁结果为：course validation 通过（13 lessons、32 localized Markdown
+files、26 notebooks、32 Python files），pytest 41 passed，compileall 通过，`uv lock
+--check` 解析 235 packages，普通与 `EDGEONE=1` 文档构建通过，`git diff --check` 通过。
+`npm ci` 安装并审计 190 个包，保留 11 项既有 advisory（4 low、1 moderate、6 high），
+没有执行自动依赖升级。
+
+`.6` 没有改变 scene、专家、recorder、schema、视频、持久化或 readback 逻辑，因此 `.5`
+已验收的 CPU+EGL 与 AMD+EGL 双相机证据继续适用。以上证据支持 L09 当前公开状态为
+`gpu-verified`。`M3.L09.6` 已于 2026-09-10 通过项目负责人验收，L09 六个子步骤至此
+全部完成并验收。
