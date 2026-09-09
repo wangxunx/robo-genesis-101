@@ -1247,3 +1247,123 @@ containment 和最终 `L08 CHECK: PASSED`。执行副本与当前提交版 code 
 同时明确 CPU 无相机数值路径也已验证。
 
 `M3.L08.6` 已于 2026-09-08 通过项目负责人验收；L08 六个子步骤至此全部完成并验收。
+
+## 20. L09 / M3.L09.5 合成数据录制 clean-kernel 验证
+
+> 验证日期：2026-09-09（Asia/Shanghai）
+>
+> 范围：L09 双语无渲染诊断、English CPU+EGL 与参考 R9700 AMD+EGL 的真实双相机
+> 录制、持久化、重新读取和人工图像检查。`M3.L09.5` 已于 2026-09-09 通过项目负责人
+> 验收；L09 公开状态仍为 `planned`，本节不提前执行 `.6` 的状态同步。
+
+### 20.1 环境与执行矩阵
+
+本轮复用仓库 `.venv`：Python 3.12.3、Genesis 1.3.3、LeRobot 0.6.0、PyAV 15.1.0、
+PyTorch `2.9.1+rocm7.2.1.gitff65f5bc` 和 HIP `7.2.53211-e1a6bc5663`。AMD 路径将一张
+Radeon AI PRO R9700 映射为进程内 `cuda:0`，notebook 实际选择 `amdgpu`，没有静默回退
+CPU。四条路径均由 `jupyter nbconvert --execute --to notebook` 启动独立 kernel，并使用
+独立 dataset、output 和 cache 目录。
+
+最终四份执行副本与当前双语提交版 notebook 的 8 个 code-cell ID/source 一致，规范化
+code SHA-256 均为
+`321754fe5e73deceaf315f8f351f809061e3b454fbf834cea1a0e7f2e779e25d`。仓库中的 EN/ZH
+notebook 继续保持空 output 和 `execution_count: null`。
+
+| Notebook / 能力路径 | 请求后端 → 实际后端 | 总执行时间 | 结果 |
+| --- | --- | ---: | --- |
+| EN / CPU / `render=0` | `cpu` → 未初始化 Genesis | 8.24 秒 | 8/8 code cells 无错误；sampling/schema 通过，明确报告核心录制实验未完成 |
+| ZH / CPU / `render=0` | `cpu` → 未初始化 Genesis | 8.25 秒 | 8/8 code cells 无错误；结果与英文诊断路径一致且不依赖英文 kernel 状态 |
+| EN / CPU+EGL / `render=1` | `cpu` → `cpu` | 92.24 秒 | 真实双相机录制、持久化、PyAV readback 与最终 `L09 CHECK: PASSED` |
+| EN / AMD+EGL / `render=1` | `auto` → `amdgpu` | 163.26 秒 | 真实双相机录制、GPU 默认设备 readback 与最终 `L09 CHECK: PASSED` |
+
+`render=0` 两条路径只验证 100 Hz 到 5/30 FPS 的采样与 feature schema；它们没有创建
+Genesis scene、camera、recorder 或 dataset writer，最终明确输出
+`L09 DIAGNOSTIC CHECK: PASSED` 和 `Core recording experiment: NOT COMPLETED`。因此本节
+不把无渲染路径计作本课核心实验完成证据。
+
+### 20.2 录制、持久化与读取证据
+
+两条 `render=1` 路径都运行 2 次 attempt，2 次均通过 task success gate，保存的 episode
+frames 均为 `[42, 43]`。重新打开数据集后得到 85 frames、2 episodes、1 task；全局
+`index` 连续，第二条 episode 的 `frame_index` 和 `timestamp` 从 0 重新开始，timestamp
+与 `frame_index / 5` 一致。state/action 均为 9 维 finite 数值，task text 精确对应
+banana-to-bowl 任务。
+
+两路 `160×120` H.264 视频都实际完成编码，并通过 LeRobot 的 PyAV backend 解码；代表
+RGB sample 为 `(3,120,160)` `torch.float32` finite。dataset 中可找到 data Parquet、
+episode metadata、`meta/info.json`、`meta/stats.json`、`meta/tasks.parquet` 和 world/wrist
+两路 MP4。CPU 数据集精确大小为 221917 bytes，AMD 数据集为 221949 bytes。
+
+AMD 初次 readback 暴露出一个设备相关问题：Genesis 会把 PyTorch 默认设备设为 GPU，
+Hugging Face `Column` 因而可能包含 GPU scalar tensor，不能直接交给 NumPy。notebook
+现先用 `rows.with_format(None)` 得到普通 Python rows，再构造 NumPy 数组；针对性测试同步
+锁定这一行为。修复后用只读探针确认默认设备仍为 `cuda:0`，85 个 index、`(85,9)` state
+以及两路 `(3,120,160)` 图像均可读取；最终四条矩阵都基于修复后的同一 code hash 重跑。
+
+本次 attempt loop 加 `finalize()` 的环境限定观察值如下：
+
+| 后端 | 用时 | committed frames/s | accepted episodes/h |
+| --- | ---: | ---: | ---: |
+| CPU | 24.45 秒 | 3.48 | 294.53 |
+| AMD R9700 | 67.45 秒 | 1.26 | 106.75 |
+
+这些数值只描述当前 `n_envs=1`、5 FPS、`160×120`、H.264、2 个固定成功 episode 的运行，
+不构成跨主机性能预期，也不能由这两次成功推断专家成功率或数据集充分性。
+
+### 20.3 人工视觉与 SVG 检查
+
+从 CPU+EGL 与 AMD+EGL 的持久化 episode 0 各取 start、middle、end，并排检查 world/wrist
+两路图像。12 张图都非空、非全黑且无明显错位或损坏：start 中 banana 位于桌面，middle
+中位于夹爪附近，end 中位于 bowl 内；同列两路图像标注的 episode、frame 和 timestamp
+一致。CPU 与 AMD 的画面语义相同。
+
+timeline 图显示 global index 跨 episode 连续，同时 episode 0→1 边界清楚，第二条 episode
+的 frame index 和 timestamp 正确重置；arm 与 finger 分 panel 的 command/state 曲线也能
+正常显示。本轮只把这些图用于时间边界与记录内容检查，不据此判断策略质量。
+
+英文和中文课程 SVG 均用 FFmpeg 的常规 SVG 解码路径实际渲染为 `1400×760` RGBA PNG；
+人工检查确认原始配色、标题、节点、箭头和边界完整，没有文字或图形裁切。VitePress 的
+普通与 EdgeOne 构建也都能处理这两份 SVG。
+
+### 20.4 Warning、依赖检查与证据边界
+
+两条完整路径观察到 Genesis 1.3.3 已知的 Franka tendon approximation、neutral qpos
+超 joint limit、solver time constant 从 `0.005` 调整为 `0.01`、neutral configuration
+self-collision pair filtering，以及 Quadrants tuple weak-reference/cache warning；AMD
+路径还出现第三方 `ast.Str` Python 3.14 deprecation warning。H.264 encoder 与 MP4 muxer
+输出为正常运行日志。以上 warning 没有导致 scene、episode、编码、readback、图像或最终
+断言失败，本轮也没有 EGL、OpenGL 或 backend fallback 错误。
+
+`uv lock --check` 通过并解析 235 packages。另在新的 `/tmp` environment 路径执行
+`uv sync --extra data --locked --dry-run`，锁定图成功解析并计划安装 218 packages，包括
+`lerobot==0.6.0`、`av==15.1.0` 与 `torch==2.9.1`。通用 PyPI 解析仍会带入体积较大的
+NVIDIA CUDA wheels；本轮没有把 `.4` 中主动中止的多 GiB 完整隔离下载改写为“安装通过”。
+实际运行矩阵使用已安装完整依赖的仓库 `.venv`，LeRobot 录制、H.264 编码与 PyAV 解码均
+已真实执行。
+
+本节证据支持当前 Linux CPU+EGL 与一张参考 R9700 AMD+EGL 的 L09 单环境录制路径。它
+不外推到其他 AMD/ROCm、NVIDIA、Apple Silicon、Windows、viewer 模式、并行 recorder、
+大规模数据采集、长时间稳定性、策略训练或闭环成功率。
+
+### 20.5 仓库门禁与当前状态
+
+本轮在修复后的同一工作树完成：
+
+- `.venv/bin/python -m robo_genesis.course_validation`：通过，13 lessons、32 localized
+  Markdown files、26 notebooks、32 Python files；
+- `.venv/bin/python -m pytest`：41 passed；
+- `.venv/bin/python -m compileall -q src scripts tests`：通过；
+- `npm ci`：安装并审计 190 个包，报告 11 项既有 advisory（4 low、1 moderate、6 high），
+  未运行 `npm audit fix`；
+- `npm run docs:build` 与 `EDGEONE=1 npm run docs:build`：按正常串行方式均通过；
+- `git diff --check`：通过；
+- L09 合同测试覆盖 EN/ZH cell type/ID/code parity、clean output、sampling 源码对齐、
+  schema 和 GPU-safe readback；course validation 同时检查 notebook 内部链接，
+  learner-facing 扫描未发现新增的开发流程说明。
+
+讲义中现有的 `planned` 状态说明仍与 `course.json` 一致；其中关于 review/运行进度的文字
+将在项目负责人验收 `.1`–`.5` 并明确启动 `.6` 后，与 manifest、notebook、README 和首页
+一起原子更新。本步不提前改变公开状态。
+
+`M3.L09.5` 已于 2026-09-09 通过项目负责人验收；未收到明确启动指令前不开始
+`M3.L09.6`。

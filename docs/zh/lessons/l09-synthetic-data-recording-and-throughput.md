@@ -5,13 +5,14 @@ locale: zh
 title: "合成数据录制与采数吞吐"
 duration_minutes: 120
 hardware: gpu-recommended
-status: planned
+status: gpu-verified
 ---
 
 # L09 · 合成数据录制与采数吞吐
 
-> **课程状态：** L09 目前仍为 `planned`。中文讲义正在 review；双语 notebook 与约定的
-> 运行矩阵尚未完成验证。
+> **课程状态：** 双语讲义和 notebook 均已完成。EN/ZH CPU 无渲染诊断路径、English
+> CPU+EGL 路径和参考 R9700 AMD+EGL 路径均已通过，L09 当前为 `gpu-verified`。
+> GPU 仍是完成正常双相机录制实验的推荐路径；无渲染路径只检查 sampling 和 schema。
 
 ## 从一次成功 rollout 到一份可信数据集
 

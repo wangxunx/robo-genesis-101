@@ -5,14 +5,16 @@ locale: en
 title: "Synthetic Data Recording and Collection Throughput"
 duration_minutes: 120
 hardware: gpu-recommended
-status: planned
+status: gpu-verified
 ---
 
 # L09 · Synthetic Data Recording and Collection Throughput
 
-> **Course status:** L09 remains `planned`. This English lecture is under
-> review; the bilingual notebook and the declared runtime matrix have not yet
-> completed verification.
+> **Course status:** the bilingual lectures and notebooks are complete. The
+> EN/ZH CPU non-rendering diagnostic paths, English CPU+EGL path, and a
+> reference R9700 AMD+EGL path all passed. L09 is `gpu-verified`; GPU remains
+> recommended for the normal camera-recording experiment, while the
+> non-rendering path checks only sampling and schema.
 
 ## From a successful rollout to a trustworthy dataset
 

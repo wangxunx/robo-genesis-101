@@ -182,7 +182,7 @@
         "zh": "docs/zh/lessons/l09-synthetic-data-recording-and-throughput.md",
         "en": "docs/en/lessons/l09-synthetic-data-recording-and-throughput.md"
       },
-      "status": "planned"
+      "status": "gpu-verified"
     },
     {
       "id": "L10",

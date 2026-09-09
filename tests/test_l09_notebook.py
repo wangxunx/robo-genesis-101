@@ -83,7 +83,11 @@ def test_l09_notebooks_expose_the_recording_contract() -> None:
         "dataset.finalize()",
         "LeRobotDatasetMetadata(REPO_ID, root=dataset_root)",
         "video_backend='pyav'",
+        "plain_rows = rows.with_format(None)",
+        "np.asarray(plain_rows['index'], dtype=np.int64)",
+        "np.asarray(plain_rows['observation.state'], dtype=float)",
         "frame_indices[episode_indices == episode] / DATASET_FPS",
+        "lesson.status.value == 'gpu-verified'",
         "observation.images.world",
         "observation.images.wrist",
         "L09 CHECK: PASSED",
@@ -99,6 +103,7 @@ def test_l09_notebooks_expose_the_recording_contract() -> None:
         "capture_schedule",
         "recorder.capture_steps",
         "recorder.control_steps",
+        "lesson.status.value == 'planned'",
     )
     localized_code: dict[str, tuple[str, ...]] = {}
 
@@ -125,7 +130,7 @@ def test_l09_notebooks_expose_the_recording_contract() -> None:
             "locale": locale,
             "duration_minutes": 120,
             "hardware": "gpu-recommended",
-            "status": "planned",
+            "status": "gpu-verified",
         }
         assert all(cell["execution_count"] is None for cell in code_cells)
         assert all(cell["outputs"] == [] for cell in code_cells)

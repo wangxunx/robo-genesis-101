@@ -20,5 +20,5 @@ features:
   - title: Bilingual by design
     details: Lectures and notebooks use paired English and Chinese structures.
   - title: 当前状态 · Current status
-    details: Five lessons are CPU-verified, the training lesson is GPU-verified, and no lesson is published yet.
+    details: Seven lessons are CPU-verified, three lessons are GPU-verified, and no lesson is published yet.
 ---
