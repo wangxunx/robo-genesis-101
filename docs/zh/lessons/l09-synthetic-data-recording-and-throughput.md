@@ -59,7 +59,7 @@ L12 则会训练策略。本讲的目标更聚焦：得到一份规模很小、�
 | 15–35 分钟 | `observation_t`、`action_t` 与 transition | 标出 capture、command 和 step 的准确顺序 |
 | 35–50 分钟 | 从 100 Hz control 到 5/30 FPS | 推导 capture index，并区分物理间隔与逻辑 timestamp |
 | 50–65 分钟 | User feature、自动字段与 action 语义 | 说明每个 shape、名称顺序和字段所有权 |
-| 65–90 分钟 | 录制两个通过验收的 episode | 得到 attempt ledger 和两个已提交 episode boundary |
+| 65–90 分钟 | 录制两个通过验收的 episode | 保存两条完整 episode，并丢弃失败 attempt |
 | 90–105 分钟 | Finalize 并用 PyAV 回读 | 检查 index、timestamp、tensor、task text 与两路视频 |
 | 105–115 分钟 | Timeline、command/state 曲线与同步 montage | 用数值和视觉证据解释一条已持久化 episode |
 | 115–120 分钟 | 吞吐边界与单变量练习 | 区分 dataset FPS、batching 与实测 wall-clock throughput |
@@ -89,12 +89,13 @@ transaction。*
 悄悄学习“错误状态下的动作”；缺少事务边界，则可能让半次 attempt 混入一份原本对齐的
 数据集。
 
-## 在 transition 前对齐 observation 与 action
+## 在推进模拟器前对齐 observation 与 action
 
-### 当前 hook 位于 transition 之前
+### Recorder 在模拟器推进前运行
 
-共享专家先计算 command，再调用 `recorder.on_step(action)`，随后发送 command、推进模拟器，
-并更新 wrist camera pose：
+本讲把“应用 action 后，模拟器从当前 state 变到下一个 state 的过程”称为
+**transition（状态转移）**。L08 的脚本化专家先计算 command，再调用
+`recorder.on_step(action)`，随后发送 command、推进模拟器，并更新 wrist camera pose：
 
 ```text
 当前 simulator state 与当前 camera pose
@@ -122,7 +123,7 @@ transaction。*
 这项约定与 L08 的 trace 一致。持久化 recorder 会增加两路 camera image 和一次采样决定，
 但不能把 hook 移到 `scene.step()` 的另一侧。
 
-### 所有 modality 共用一次采样决定
+### 所有记录字段共用一次采样决定
 
 当一个 control step 被保留时，recorder 应同时保留：
 
@@ -134,9 +135,11 @@ wrist RGB_t
 task text
 ```
 
-不要让两台相机分别使用不同计数器降频；不要保留每个 action 却只保留每二十个 state；也
-不要在渲染 world 与 wrist 之间推进 scene。事后发现数组长度相同，并不能证明独立采样的值
-来自同一时刻。
+整组数据只使用一次“保留或跳过”的决定。如果保留一个 control step，就同时保存它的
+state、action 和两路相机图像；如果跳过，就全部不保存。不要让每个字段使用自己的采样
+计数器，也不要在渲染 world 与 wrist 之间推进 scene。数组长度相同，并不能证明分别采样的
+值已经对齐；它只能说明各字段的样本数量相同，不能说明相同行号的数据来自同一个
+control step。
 
 ::: warning Shape 正确的数据集仍可能错开一帧
 把 `state_{t+1}` 与 `action_t` 配对，往往仍能得到 shape 完美、数值 finite、曲线看似合理的
@@ -165,6 +168,8 @@ callback 明确保留，从该样本之后才开始累计后续 control time。�
 规则是：
 
 ```python
+control_fps = 100  # Example: 100 control steps per simulated second
+dataset_fps = 30   # Example: retain 30 dataset frames per simulated second
 phase = control_fps - dataset_fps
 
 for control_step in range(total_control_steps):
@@ -265,10 +270,10 @@ panda_finger_joint1, panda_finger_joint2
 名称明确了每个维度的归属。只检查 `shape == (9,)`，无法发现两个 finger 对调或 arm/finger
 顺序发生变化。
 
-在 grasp、lift 与 transport 阶段，模拟器对两个 fingers 执行 force control；recorded action
-仍对两项 finger 分量使用 `0.0` closed-position proxy。这样可以为后续学习与执行保留统一的
-9 维 position-target 接口，但它**不表示**这些阶段的底层 finger actuator 使用了 position
-control。
+在 grasp、lift 与 transport 阶段，arm 接收 position target，两个 fingers 则通过闭合力控制。
+数据集仍保存统一的 9 维 position-target action：前 7 项是 arm target，最后 2 项都是 `0.0`。
+这里的 `0.0` 只是“闭合夹爪”的替代表示，既不是实际下发的 force command，也不是实测
+finger position。这样可以让 action 格式与后续输出 9 维关节位置目标的 policy 保持一致。
 
 ## 把每条 episode 当作一次事务
 
@@ -292,16 +297,8 @@ reset scene 与 EpisodeRecorder
 camera image。课程的正常 success-only 路径会一直等到 success 成立才调用 `add_frame()`，
 因此 failed attempt 根本不会进入 writer。
 
-Notebook 至少保留以下 attempt ledger：
-
-- attempt number 与确定性的 reset seed；
-- task predicate 返回的 `success`；
-- control callback 与保留 sample 的数量；
-- buffer 被 committed 还是 discarded；
-- accepted episode 的 task text。
-
 目标是得到两条 accepted banana-to-bowl episode，最多执行十次 attempt。如果没有得到两次
-success，最终检查会明确失败，不能悄悄把更少 episode 重新解释为充分结果。
+success，最终检查失败。
 
 ### Success 是 episode-level gate
 
@@ -309,9 +306,7 @@ success，最终检查会明确失败，不能悄悄把更少 episode 重新解�
 containment 检查。它决定整条 attempt 是否进入主数据集。
 
 因此，success-only 数据集不会增加一个在每个已保存 row 中都为 true 的逐帧 `success`
-feature。这样的字段既冗余，也无法保留 rejected attempt 在哪里、为什么失败。现有 CLI
-可选的 `FAILED:` task prefix 只是调试约定，不是 reward、recovery 或 preference learning
-可依赖的结构化 outcome label；设计这类 schema 是另一项任务。
+feature。这样的字段既冗余，也无法保留 rejected attempt 在哪里、为什么失败。
 
 ### `save_episode()` 与 `finalize()` 关闭不同边界
 
@@ -378,15 +373,14 @@ Notebook 还会在 kernel 启动前把 `HF_DATASETS_CACHE`、`XDG_CACHE_HOME` �
 目录、home directory 或任何尚未解析并检查的路径。
 :::
 
-### 渲染是正常路径
+### 完成本课实验必须启用渲染
 
-`ROBO_GENESIS_RENDER=1` 是默认学习路径：它会创建两台相机、运行真实 scripted attempt、
-写入数据集、重新打开数据集，并生成视觉证据。
+要完成 L09 实验，必须设置 `ROBO_GENESIS_RENDER=1`。它会创建两台相机、运行 scripted
+attempt、写入并重新打开数据集，以及生成视觉证据。
 
-`ROBO_GENESIS_RENDER=0` 是显式的能力 fallback。它只检查 sampling schedule、schema 与
-throughput reasoning，不创建 camera、不运行 recorder，也不写 LeRobot dataset；
-persistence、readback 与 visual check 会报告 `SKIP`。不能把合成数组或空白占位图冒充
-Genesis camera frame。
+`ROBO_GENESIS_RENDER=0` 只会对 sampling schedule、schema 和 throughput calculation 做
+有限的诊断检查。它不会创建 camera、运行 recorder、写入或重新打开 dataset，也不会生成
+视觉证据，因此不能完成本课实验。
 
 ## 不要相信 writer，重新打开结果
 

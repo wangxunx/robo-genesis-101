@@ -66,7 +66,7 @@ Before starting, you should be able to:
 | 15–35 min | `observation_t`, `action_t`, and the transition | Mark the exact capture, command, and step order |
 | 35–50 min | 100 Hz control to 5/30 FPS | Derive capture indices and separate physical gaps from logical timestamps |
 | 50–65 min | User features, automatic fields, and action semantics | State every shape, name order, and ownership rule |
-| 65–90 min | Record two accepted episodes | Produce an attempt ledger and two committed episode boundaries |
+| 65–90 min | Record two accepted episodes | Save two complete episodes and discard failed attempts |
 | 90–105 min | Finalize and read back with PyAV | Check indices, timestamps, tensors, task text, and both videos |
 | 105–115 min | Timeline, command/state curves, and synchronized montage | Explain one persisted episode using numerical and visual evidence |
 | 115–120 min | Throughput boundaries and one-variable exercise | Separate dataset FPS, batching, and measured wall-clock throughput |
@@ -102,12 +102,14 @@ silently teach an action from the wrong state even when every episode file is
 valid. A missing transaction boundary can leave half an attempt in an
 otherwise well-aligned dataset.
 
-## Align observation and action before the transition
+## Align observation and action before advancing the simulator
 
-### The current hook is pre-transition
+### The recorder runs before the simulator advances
 
-The shared expert computes a command, calls `recorder.on_step(action)`, sends
-that command, advances the simulator, and updates the wrist camera pose:
+Here, a **transition** is the change from the simulator's current state to its
+next state after an action is applied. The scripted expert from L08 computes a
+command, calls `recorder.on_step(action)`, sends that command, advances the
+simulator, and updates the wrist camera pose:
 
 ```text
 current simulator state and current camera poses
@@ -137,7 +139,7 @@ This convention agrees with the L08 trace. The persistent recorder adds two
 camera images and a sampling decision, but it must not move the hook to the
 other side of `scene.step()`.
 
-### All modalities share one sampling decision
+### All recorded fields share one sampling decision
 
 When a control step is retained, the recorder keeps all of these values
 together:
@@ -150,10 +152,12 @@ wrist RGB_t
 task text
 ```
 
-Do not decimate each camera on a different counter. Do not keep every action
-but only every twentieth state. Do not advance the scene between rendering the
-world and wrist views. Equal array lengths checked after the fact cannot prove
-that independently sampled values refer to the same instant.
+Use one keep-or-skip decision for the whole group. If a control step is kept,
+store its state, action, and both camera images; if it is skipped, store none of
+them. Do not give each field its own sampling counter, and do not advance the
+scene between rendering the world and wrist views. Equal array lengths alone
+show only that the fields contain the same number of samples, not that
+corresponding rows came from the same control step.
 
 ::: warning A shape-correct dataset can still be one frame wrong
 Pairing `state_{t+1}` with `action_t` often produces arrays with perfect shapes,
@@ -187,6 +191,8 @@ time accumulates after that first sample. One equivalent rule for integer
 rates is:
 
 ```python
+control_fps = 100  # Example: 100 control steps per simulated second
+dataset_fps = 30   # Example: retain 30 dataset frames per simulated second
 phase = control_fps - dataset_fps
 
 for control_step in range(total_control_steps):
@@ -292,12 +298,13 @@ panda_finger_joint1, panda_finger_joint2
 The names make dimension ownership explicit. Checking only `shape == (9,)`
 would not detect a swapped finger pair or an arm/finger reorder.
 
-During grasp, lift, and transport, the simulator executes force control on the
-two fingers. The recorded action still uses the closed-position proxy `0.0`
-for both finger components. This creates one stable nine-dimensional
-position-target interface for later learning and execution. It does **not**
-claim that the low-level finger actuator used position control during those
-phases.
+During grasp, lift, and transport, the arm receives position targets, while the
+two fingers are controlled by a closing force. The dataset still stores one
+nine-value position-target action: seven arm targets followed by two zeros.
+For the finger entries, `0.0` is a proxy meaning “close the gripper”; it is
+neither the actual force command nor the measured finger position. This keeps
+the action format consistent with the later policy, which outputs nine joint-
+position targets.
 
 ## Treat each episode as a transaction
 
@@ -323,17 +330,8 @@ camera images before `save_episode()`. By waiting until success before calling
 `add_frame()`, the course's normal success-only path never puts a failed
 attempt into the writer at all.
 
-The notebook keeps an attempt ledger with at least:
-
-- attempt number and deterministic reset seed;
-- `success` returned by the task predicate;
-- number of control callbacks and retained samples;
-- whether the buffer was committed or discarded; and
-- the task text for an accepted episode.
-
 The target is two accepted banana-to-bowl episodes, with at most ten attempts.
-If two successes are not obtained, the final check fails explicitly; it does
-not quietly reinterpret fewer episodes as sufficient.
+If two successes are not obtained, the final check fails.
 
 ### Success is an episode-level gate
 
@@ -343,10 +341,7 @@ the whole attempt enters the main dataset.
 
 The success-only dataset therefore does not add a per-frame `success` feature
 that would be true in every saved row. Such a column would be redundant and
-would not preserve where or why a rejected attempt failed. The existing CLI's
-optional `FAILED:` task prefix is a debugging convention, not a structured
-outcome label for reward, recovery, or preference learning. Designing such a
-schema is a separate task.
+would not preserve where or why a rejected attempt failed.
 
 ### `save_episode()` and `finalize()` close different boundaries
 
@@ -421,17 +416,16 @@ directory, project root, home directory, or a path that has not been resolved
 and checked.
 :::
 
-### Rendering is the normal path
+### Rendering is required for the hands-on experiment
 
-`ROBO_GENESIS_RENDER=1` is the default learning path. It creates both cameras,
-runs the real scripted attempts, writes the dataset, reopens it, and produces
-visual evidence.
+`ROBO_GENESIS_RENDER=1` is required to complete the L09 experiment. It creates
+both cameras, runs the scripted attempts, writes and reopens the dataset, and
+produces visual evidence.
 
-`ROBO_GENESIS_RENDER=0` is an explicit capability fallback. It checks the
-sampling schedule, schema, and throughput reasoning without creating cameras,
-running the recorder, or writing a LeRobot dataset. Its persistence, readback,
-and visual checks report `SKIP`. A synthetic array or empty placeholder must
-not be presented as a Genesis camera frame.
+`ROBO_GENESIS_RENDER=0` runs only limited diagnostic checks of the sampling
+schedule, schema, and throughput calculations. It does not create cameras, run
+the recorder, write or reopen a dataset, or produce visual evidence, so it does
+not complete the experiment.
 
 ## Reopen the result instead of trusting the writer
 
