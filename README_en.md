@@ -69,7 +69,7 @@ Statuses progress from `planned` to `draft`, `reviewed`, `cpu-verified` or
 
 - Python: `3.12.x`; the declared project range is `>=3.12,<3.13`.
 - Genesis: `genesis-world==1.3.3`.
-- LeRobot: the training extra pins `lerobot==0.6.0`.
+- LeRobot: the data and training extras pin `lerobot==0.6.0`.
 - Full-training reference platform: Linux x86_64, AMD Radeon AI PRO R9700, system ROCm 7.2.0, and the tested ROCm 7.2.1 PyTorch wheels.
 
 Other AMD GPUs, NVIDIA CUDA, the complete CPU-only path, Apple Silicon, Windows, and other Python versions have not been verified. See the [compatibility matrix](COMPATIBILITY.md) for exact versions, wheel checksums, verified capabilities, and limitations.
@@ -116,9 +116,9 @@ This command uses the repository's portable dependency resolution; by itself it 
 uv run python -m robo_genesis.setup_assets
 ```
 
-Lessons with a verified status are ready to follow from the course table. The
-remaining `planned` pages and notebooks are structural placeholders, not
-finished tutorials.
+Lessons with a verified status are ready to follow from the course table.
+Materials that remain `planned` may be scaffolds or works in progress; they are
+not finished tutorials.
 
 ### Run the L01 environment self-check
 

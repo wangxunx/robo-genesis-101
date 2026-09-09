@@ -161,34 +161,35 @@ control_steps_per_frame = 100 / f.
 5 FPS 恰好对应 20 个 control steps；30 FPS 则约为 3.333，无法直接成为一个可执行的整数
 step 间隔。始终每 3 步采一次会得到约 33.3 FPS，始终每 4 步采一次则只有 25 FPS。
 
-### 使用确定性的 phase accumulator
+### 使用 recorder 的分数累加器
 
-Phase accumulator 可以只在整数 control index 上执行，同时保持所需的平均采样率。首个
-callback 明确保留，从该样本之后才开始累计后续 control time。对于整数 rate，一种等价
-规则是：
+`EpisodeRecorder` 用一个持续累加的数值，把非整数间隔转换成整数 step 上的采样决定。
+它先预载一个完整间隔以保留第一次 callback，之后每次 callback 都加 `1`：
 
 ```python
 control_fps = 100  # Example: 100 control steps per simulated second
 dataset_fps = 30   # Example: retain 30 dataset frames per simulated second
-phase = control_fps - dataset_fps
+steps_per_frame = control_fps / dataset_fps
+accum = steps_per_frame
 
 for control_step in range(total_control_steps):
-    phase += dataset_fps
-    if phase >= control_fps:
-        capture(control_step)
-        phase -= control_fps
+    accum += 1.0
+    if accum < steps_per_frame:
+        continue
+    accum -= steps_per_frame
+    capture(control_step)
 ```
 
-对于 100 次 callback，合同如下：
+这与源码中 recorder 的更新顺序相同。对于 100 次 callback，它会得到：
 
 | Dataset rate | 起始 capture index | Gap pattern | 保留数量 |
 |---:|---|---|---:|
-| 5 FPS | `0, 20, 40, 60, 80` | `20` | 5 |
-| 30 FPS | `0, 4, 7, 10, 14, ...` | `3` 和 `4` | 30 |
+| 5 FPS | `0, 19, 39, 59, 79, 99` | 第一次为 `19`，之后为 `20` | 6 |
+| 30 FPS | `0, 3, 6, 10, 13, ...` | `3` 和 `4` | 30 |
 
-Sampler 必须在每条 episode 开始时重置。合法输入范围是
-`0 < dataset_fps <= control_fps`；零、负数或高于 control rate 的值都属于配置错误。
-Capture index 必须严格递增，也不能延续上一条 attempt 遗留的 phase。
+5 FPS 多出的一个样本来自两点：第一次 callback 被保留，最后又恰好在 callback 99 达到
+阈值。Episode 越长，平均采样率越接近目标值。每次 attempt 开始时，
+`EpisodeRecorder.reset()` 都会恢复预载的累加器，不会沿用上一次 attempt 的采样进度。
 
 ### Logical timestamp 不等于准确的物理 step 时间
 
@@ -199,21 +200,21 @@ timestamp = frame_index / dataset_fps.
 ```
 
 在 30 FPS 下，logical timestamp 依次为 `0`、`0.0333...`、`0.0666...`。对应的 simulator
-callback 可能位于 index `0`、`4`、`7`、`10`，实际物理间隔依次为 40、30、30 ms。
+callback 可能位于 index `0`、`3`、`6`、`10`，实际物理间隔依次为 30、30、40 ms。
 Logical timeline 是均匀的，而整数 step 上的采样间隔会交替变化。
 
 这些时间量都有用，但回答的问题不同：
 
 | 时间量 | 含义 | 默认 schema 是否存储？ |
 |---|---|---|
-| Control-step index | 哪个 simulator callback 被保留 | 本讲只作为诊断信息 |
-| 物理仿真时间 | `control_step / control_fps` | 可由诊断 index 推导 |
+| Control-step index | 哪个 simulator callback 会被保留 | 只在采样练习中计算 |
+| 物理仿真时间 | `control_step / control_fps` | 可由计算出的 index 推导 |
 | LeRobot timestamp | 均匀的 episode 时间，即 `frame_index / dataset_fps` | 是 |
 | Wall-clock time | 机器完成模拟、渲染、编码与写入所花的时间 | 单独测量 |
 
-Notebook 会暴露实际 capture-step index 用于验证，但不会把它加入 policy input。不要把
-LeRobot logical timestamp 称为 wall-clock measurement，也不要把平均 `3.333` gap 当成一个
-固定的 simulator step 数。
+Notebook 会用相同的累加逻辑计算预期 capture index，但不会把它写入数据集或作为 policy
+input。不要把 LeRobot logical timestamp 称为 wall-clock measurement，也不要把平均
+`3.333` gap 当成一个固定的 simulator step 数。
 
 ## 写入前先定义 frame schema
 

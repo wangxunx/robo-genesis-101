@@ -30,6 +30,7 @@ robo-genesis-validate = "robo_genesis.course_validation:main"
 data = [
     "imageio==2.37.4",
     "imageio-ffmpeg==0.6.0",
+    "lerobot[dataset]==0.6.0",
     "pyarrow==25.0.0",
 ]
 training = [

@@ -183,36 +183,38 @@ At 5 FPS this is exactly 20 control steps. At 30 FPS it is approximately
 third step would produce about 33.3 FPS; always taking every fourth would
 produce 25 FPS.
 
-### Use a deterministic phase accumulator
+### Use the recorder's fractional accumulator
 
-A phase accumulator preserves the requested average using only integer control
-indices. The first callback is retained explicitly, and subsequent control
-time accumulates after that first sample. One equivalent rule for integer
-rates is:
+`EpisodeRecorder` converts the fractional interval into integer capture
+decisions with a running accumulator. It preloads the accumulator so that the
+first callback is retained, then adds one on every callback:
 
 ```python
 control_fps = 100  # Example: 100 control steps per simulated second
 dataset_fps = 30   # Example: retain 30 dataset frames per simulated second
-phase = control_fps - dataset_fps
+steps_per_frame = control_fps / dataset_fps
+accum = steps_per_frame
 
 for control_step in range(total_control_steps):
-    phase += dataset_fps
-    if phase >= control_fps:
-        capture(control_step)
-        phase -= control_fps
+    accum += 1.0
+    if accum < steps_per_frame:
+        continue
+    accum -= steps_per_frame
+    capture(control_step)
 ```
 
-For 100 callbacks, the contracts are:
+This is the same update order used by the source recorder. For 100 callbacks,
+it produces:
 
 | Dataset rate | Initial capture indices | Gap pattern | Number retained |
 |---:|---|---|---:|
-| 5 FPS | `0, 20, 40, 60, 80` | `20` | 5 |
-| 30 FPS | `0, 4, 7, 10, 14, ...` | `3` and `4` | 30 |
+| 5 FPS | `0, 19, 39, 59, 79, 99` | first `19`, then `20` | 6 |
+| 30 FPS | `0, 3, 6, 10, 13, ...` | `3` and `4` | 30 |
 
-The sampler resets for every episode. Its accepted domain is
-`0 < dataset_fps <= control_fps`; zero, negative, or faster-than-control rates
-are configuration errors. Capture indices must be strictly increasing and
-must not continue the phase left over from a previous attempt.
+The extra 5 FPS sample comes from retaining the first callback and then reaching
+the last threshold at callback 99. Over longer episodes, the average approaches
+the requested rate. `EpisodeRecorder.reset()` restores the preloaded accumulator
+for every attempt, so sampling never continues from the previous attempt.
 
 ### Logical timestamp is not the exact physical step time
 
@@ -224,22 +226,22 @@ timestamp = frame_index / dataset_fps.
 
 At 30 FPS, the logical timestamps are `0`, `0.0333...`, `0.0666...`, and so
 on. The corresponding retained simulator callbacks may occur at indices
-`0`, `4`, `7`, `10`, with physical gaps of 40, 30, and 30 ms. The logical
+`0`, `3`, `6`, `10`, with physical gaps of 30, 30, and 40 ms. The logical
 timeline is uniform; the integer-step sampling gaps alternate.
 
 Both are useful, but they answer different questions:
 
 | Quantity | Meaning | Stored by the default schema? |
 |---|---|---|
-| Control-step index | Which simulator callback was retained | Diagnostic only in this lesson |
-| Physical simulator time | `control_step / control_fps` | Derivable from the diagnostic index |
+| Control-step index | Which simulator callback would be retained | Calculated in the sampling exercise only |
+| Physical simulator time | `control_step / control_fps` | Derivable from the calculated index |
 | LeRobot timestamp | Uniform episode time, `frame_index / dataset_fps` | Yes |
 | Wall-clock time | How long the machine took to simulate, render, encode, and write | Measured separately |
 
-The notebook will expose actual capture-step indices for verification, but it
-will not add them as a policy input. Do not call LeRobot's logical timestamp a
-wall-clock measurement, and do not treat the average `3.333` gap as one fixed
-number of simulator steps.
+The notebook calculates the expected capture indices with the same accumulator,
+but does not add them to the dataset or use them as policy input. Do not call
+LeRobot's logical timestamp a wall-clock measurement, and do not treat the
+average `3.333` gap as one fixed number of simulator steps.
 
 ## Define the frame schema before writing data
 

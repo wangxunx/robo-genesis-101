@@ -1370,6 +1370,14 @@ wheels = [
 ]
 
 [package.optional-dependencies]
+dataset = [
+    { name = "av" },
+    { name = "datasets" },
+    { name = "jsonlines" },
+    { name = "pandas" },
+    { name = "pyarrow" },
+    { name = "torchcodec", marker = "(platform_machine == 'arm64' and sys_platform == 'darwin') or (platform_machine == 'AMD64' and sys_platform == 'linux') or (platform_machine == 'aarch64' and sys_platform == 'linux') or (platform_machine == 'arm64' and sys_platform == 'linux') or (platform_machine == 'x86_64' and sys_platform == 'linux') or sys_platform == 'win32'" },
+]
 smolvla = [
     { name = "accelerate" },
     { name = "num2words" },
@@ -2608,6 +2616,7 @@ dependencies = [
 data = [
     { name = "imageio" },
     { name = "imageio-ffmpeg" },
+    { name = "lerobot", extra = ["dataset"] },
     { name = "pyarrow" },
 ]
 training = [
@@ -2635,6 +2644,7 @@ requires-dist = [
     { name = "imageio-ffmpeg", marker = "extra == 'data'", specifier = "==0.6.0" },
     { name = "ipykernel", specifier = ">=6.29,<7" },
     { name = "jupyterlab", specifier = ">=4.4,<5" },
+    { name = "lerobot", extras = ["dataset"], marker = "extra == 'data'", specifier = "==0.6.0" },
     { name = "lerobot", extras = ["smolvla", "training"], marker = "extra == 'training'", specifier = "==0.6.0" },
     { name = "llvmlite", specifier = "==0.48.0" },
     { name = "matplotlib", specifier = "==3.11.1" },

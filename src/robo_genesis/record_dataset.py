@@ -119,6 +119,9 @@ class EpisodeRecorder:
 
     def flush_to(self, dataset: LeRobotDataset, task: str) -> None:
         """Write the buffered frames into the dataset as one episode."""
+        lengths = {len(self.states), len(self.actions), len(self.world_imgs), len(self.wrist_imgs)}
+        if len(lengths) != 1 or not self.states:
+            raise ValueError("episode buffers must be non-empty and have equal lengths")
         for state, action, world, wrist in zip(self.states, self.actions, self.world_imgs, self.wrist_imgs):
             dataset.add_frame(
                 {

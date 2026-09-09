@@ -68,7 +68,7 @@ RoboGenesis 101 是一门 Datawhale 开源课程，面向具备 Python 基础、
 
 - Python：`3.12.x`；项目声明范围为 `>=3.12,<3.13`。
 - Genesis：`genesis-world==1.3.3`。
-- LeRobot：训练扩展固定为 `lerobot==0.6.0`。
+- LeRobot：数据与训练扩展均固定为 `lerobot==0.6.0`。
 - 完整训练参考平台：Linux x86_64、AMD Radeon AI PRO R9700、系统 ROCm 7.2.0，以及经实测的 ROCm 7.2.1 PyTorch wheels。
 
 其他 AMD GPU、NVIDIA CUDA、CPU-only 完整链路、Apple Silicon、Windows 和其他 Python 版本尚未验证。精确版本、wheel 校验和、已验证能力和限制见[兼容性矩阵](COMPATIBILITY.md)。
@@ -115,8 +115,8 @@ uv sync --locked --all-extras
 uv run python -m robo_genesis.setup_assets
 ```
 
-已达到验证状态的讲次可以按课程表进入学习；其余 `planned` 页面和 notebook 仍是课程
-结构占位，不应当作完整教程使用。
+已达到验证状态的讲次可以按课程表进入学习；仍为 `planned` 的材料可能是结构占位，也可能
+仍在开发或验证中，不应当作完整教程使用。
 
 ### 运行 L01 环境自检
 
