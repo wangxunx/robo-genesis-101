@@ -5,15 +5,17 @@ locale: zh
 title: "数据集解剖与模仿学习 101"
 duration_minutes: 90
 hardware: gpu-recommended
-status: planned
+status: cpu-verified
 ---
 
 # L10 · 数据集解剖与模仿学习 101
 
-> **课程状态：** L10 仍为 `planned`；双语内容、配套 notebook 和运行证据尚未全部完成。
-> 本讲规划的核心路径是只读且可在 CPU 上完成的：它打开 L09 生成的本地数据集，解码少量
-> 已保存帧并构造训练目标，不初始化 Genesis、不分配模型，也不启动训练。课程不会隐式下载
-> 示例数据集；若本地缺少输入，请先运行 L09，或将 `RG101_L10_DATASET_ROOT` 指向一份兼容副本。
+> **课程状态：** 双语讲义和 notebook 均已完成；英文和中文 notebook 已使用 L09 生成的同一份
+> 包含两个 episode 的数据集通过 CPU-only readback，因此 L10 当前为 `cpu-verified`。本实验
+> 打开本地数据，解码少量已保存帧并构造训练目标，不初始化 Genesis、不分配模型，也不启动
+> 训练。课程不会隐式下载示例数据集；若本地缺少输入，请先运行 L09，或将
+> `RG101_L10_DATASET_ROOT` 指向一份兼容副本。本实验不要求 GPU；`gpu-recommended` 仍作为
+> 本讲在完整数据到策略工作流中的硬件标签保留。
 
 ## 本讲在课程中的位置
 

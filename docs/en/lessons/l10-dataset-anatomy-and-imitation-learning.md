@@ -5,18 +5,20 @@ locale: en
 title: "Dataset Anatomy and Imitation Learning 101"
 duration_minutes: 90
 hardware: gpu-recommended
-status: planned
+status: cpu-verified
 ---
 
 # L10 · Dataset Anatomy and Imitation Learning 101
 
-> **Course status:** L10 remains `planned`; its bilingual content, companion
-> notebook, and runtime evidence are not yet complete. The intended core path
-> is read-only and CPU-capable: it opens a local dataset produced by L09,
-> decodes a few stored frames, and constructs training targets without
-> initializing Genesis, allocating a model, or starting training. No example
-> dataset is downloaded implicitly. If the local input is missing, record it
-> in L09 or point `RG101_L10_DATASET_ROOT` at a compatible copy.
+> **Course status:** the bilingual lectures and notebooks are complete. The
+> English and Chinese notebooks both passed the CPU-only readback path against
+> the same two-episode dataset produced by L09, so L10 is `cpu-verified`. The
+> lab opens local data, decodes a few stored frames, and constructs training
+> targets without initializing Genesis, allocating a model, or starting
+> training. No example dataset is downloaded implicitly. If the local input is
+> missing, record it in L09 or point `RG101_L10_DATASET_ROOT` at a compatible
+> copy. GPU is not required for this lab; `gpu-recommended` remains the hardware
+> label for its place in the broader data-to-policy workflow.
 
 ## Where this lesson fits
 

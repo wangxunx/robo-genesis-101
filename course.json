@@ -201,7 +201,7 @@
         "zh": "docs/zh/lessons/l10-dataset-anatomy-and-imitation-learning.md",
         "en": "docs/en/lessons/l10-dataset-anatomy-and-imitation-learning.md"
       },
-      "status": "planned"
+      "status": "cpu-verified"
     },
     {
       "id": "L11",

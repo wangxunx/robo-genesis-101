@@ -1405,3 +1405,162 @@ files、26 notebooks、32 Python files），pytest 41 passed，compileall 通过
 已验收的 CPU+EGL 与 AMD+EGL 双相机证据继续适用。以上证据支持 L09 当前公开状态为
 `gpu-verified`。`M3.L09.6` 已于 2026-09-10 通过项目负责人验收，L09 六个子步骤至此
 全部完成并验收。
+
+## 21. L10 / M3.L10.5 数据集读取 clean-kernel 验证
+
+> 验证日期：2026-09-10（Asia/Shanghai）
+>
+> 范围：由当前最终 English L09 notebook 在隔离 CPU+EGL 路径生成 2-episode 输入，随后在
+> 隐藏 GPU 的两个独立 kernel 中执行 EN/ZH L10 全部代码，检查 metadata、sample、双路视频、
+> statistics、episode split、action chunk、policy data contract、四类图形和缺失输入失败路径。
+> 本节不包含训练、checkpoint、Genesis 闭环 rollout 或 task success rate。`M3.L10.5` 已于
+> 2026-09-10 通过项目负责人验收；第 21.7 节记录随后进行的 `cpu-verified` 状态同步与复验。
+
+### 21.1 输入来源与身份
+
+L10 是只读数据实验，因此本轮先用当前最终
+`notebooks/en/l09-synthetic-data-recording-and-throughput.ipynb` 在独立 `/tmp` 目录运行
+CPU+EGL 完整路径。执行副本的 8 个 code-cell ID/source 与仓库版本逐字一致；按
+`jq -c '[.cells[] | select(.cell_type == "code") | {id, source}]'` 规范化后的 SHA-256 均为
+`19f331738f9d038415a43bc4836692f7d67f810e97a8ba04395be58ad0596b66`。
+
+该输入运行实际选择 `cpu` backend，2 次 attempt 均通过既有 success gate，并分别提交
+42、43 frames。最终数据集为 85 frames、2 episodes、1 task、5 FPS；task text 为
+`pick the banana and place it in the bowl`。world/wrist 两路视频均为 `160×120` H.264，记录
+backend 为 PyAV；data Parquet、episode metadata、`meta/info.json`、`meta/stats.json`、
+`meta/tasks.parquet` 和两路 MP4 均存在，数据集实际占用 221854 bytes。L09 fresh reader
+重新打开 85 frames 并解码两路视频，最终得到 `L09 CHECK: PASSED`。
+
+这次 L09 运行只用于提供与当前源码一致、可追溯的 L10 输入，不是重新开发或重新验收 L09，
+也不计作 L10 的 GPU/Genesis 路径。输入、执行 notebook、cache 和导出的检查图均位于隔离
+`/tmp` 目录，没有写入仓库或覆盖既有数据集。
+
+### 21.2 环境与双语 CPU 执行矩阵
+
+本轮复用仓库 `.venv`：Python 3.12.3、LeRobot 0.6.0、PyAV 15.1.0、PyArrow 25.0.0、
+NumPy 2.2.6、Matplotlib 3.11.1 和 PyTorch `2.9.1+rocm7.2.1.gitff65f5bc`。执行 L10 时同时
+设置 `ROCR_VISIBLE_DEVICES=-1`、`HIP_VISIBLE_DEVICES=-1` 和 `CUDA_VISIBLE_DEVICES=-1`；
+notebook 没有初始化 Genesis、GPU 或模型。EN/ZH 使用相同只读 dataset，但分别使用独立
+Jupyter runtime、IPython、output 和 cache 目录。
+
+双语提交版和两份执行副本的 8 个 code-cell ID/source 逐字一致；按第 21.1 节同一方式
+规范化后的 SHA-256 均为
+`aa49989ceb79c3285e6cb77621cec574872acebc192e17abd8243a978779ea3c`。提交版仍保持 18 cells /
+8 code cells、空 output 和 `execution_count: null`。
+
+| Notebook / 路径 | 执行时间 | 结果 |
+| --- | ---: | --- |
+| EN / CPU-only readback | 9.84 秒 | 8/8 code cells 无 error output；得到 `L10 CHECK: PASSED` |
+| ZH / CPU-only readback | 10.20 秒 | 独立 kernel 8/8 code cells 无 error output；结果与英文一致并得到 `L10 CHECK: PASSED` |
+
+以上耗时只描述本次参考主机上的小数据集读取，不是跨平台性能标准。
+
+### 21.3 Metadata、sample、statistics、split 与 chunk 证据
+
+两条完整路径都从数据集读取到 `codebase_version=v3.0`、5 FPS、2 episodes、85 frames 和
+1 task。episode 0/1 的长度与全局 bounds 分别为 `42 / [0,42)` 和 `43 / [42,85)`；feature
+集合精确包含 state、action、world/wrist、timestamp、frame/episode/global index 和
+task index，state/action joint names 与当前 9 维课程合同一致。实际视频 metadata 报告
+H.264、PyAV、5 FPS 和存储形状 `(120,160,3)`。
+
+Reader 从较长的 episode 1 读取 start/middle/end sample。state/action 为 `(9,)`
+`torch.float32`，world/wrist 为 `(3,120,160)` `torch.float32`，task、episode、frame、
+timestamp 与 global index 一致；六幅图均 finite、非空且非全黑。完整 numeric columns 为
+`(85,9)` finite arrays；state/action statistics 为 `(9,)`，两路 RGB statistics 为
+`(3,1,1)`，required fields、count、非负 std 和 normalization round trip 全部通过。
+
+按完整 episode 划分后，episode 0 的 42 frames 属于 train，episode 1 的 43 frames 属于
+eval；ID 不相交且完整覆盖 85 frames。notebook 同时明确 2 episodes 只验证 split mechanics，
+不构成稳定 benchmark。`H=4` action chunk 的实际 shape 为 `(4,9)`，offset 为
+`[0.0,0.2,0.4,0.6]` 秒，`H/fps=0.8` 秒、final sampled-target offset 为 0.6 秒；中间 sample
+mask 全为 `False`，末帧 mask 为 `[False,True,True,True]`，复制的 boundary values 不计作
+有效 target。ACT/SmolVLA 单元只核对 raw field、task text 和 camera rename contract，没有
+导入或分配模型。
+
+### 21.4 人工视觉检查与失败路径
+
+从 English 执行副本导出的四类 PNG 均已人工检查，中文执行副本的对应 PNG 与英文逐字节
+SHA-256 相同：
+
+- `1135×593` 的 2×3 world/wrist montage 中，同列 episode、frame、timestamp 一致；start、
+  middle、end 画面非空且能看到任务进展，两路视角语义正确；
+- `1190×890` 的 statistics 图将 7 维 arm rad、2 维 finger m 和 per-channel std 分 panel
+  展示，曲线、图例、坐标和单位完整；
+- `990×240` 的 split 条带把两个完整 episode 分配为 train/eval，没有帧级切分；
+- `790×240` 的 padding 图正确显示 middle frame 四个有效 target，以及 final frame 后三项
+  padding。
+
+缺失路径探针把 `RG101_L10_DATASET_ROOT` 指向一个不存在的精确子目录。English notebook
+在第一个 code cell、任何 LeRobot reader 或后续实验之前抛出 `FileNotFoundError`，错误同时
+列出 dataset info、statistics、task table、episode metadata、tabular data 和两路 video
+七类缺失项，并只给出运行 L09 或显式指定兼容数据两条恢复路径。探针结束后目标 dataset
+目录仍不存在，也没有写出失败执行 notebook；没有目录扫描、下载或 fallback 数据。
+
+### 21.5 Warning 与证据边界
+
+两条 L10 成功路径都出现 `tqdm` 关于可选 `IProgress/ipywidgets` 不可用的提示；它只影响
+notebook progress widget，没有导致 metadata、Parquet、PyAV、图形或最终断言失败。输入准备
+保留 L09 已记录的 Genesis/Franka、Quadrants 和 H.264 编码日志，没有出现新的 EGL、视频解码
+或 dataset compatibility 错误。
+
+本节证据支持当前 Linux 环境下 L10 对一份本地 LeRobot 0.6.0 双相机数据集的 CPU-only
+readback。它不证明数据多样性或充分性，不产生 training loss、gradient、optimizer、checkpoint、
+domain-randomization 收益、closed-loop rollout、task success rate、置信区间或 sim-to-real
+结论，也不外推到其他 LeRobot schema、codec、AMD/NVIDIA 组合、Apple Silicon 或 Windows。
+
+### 21.6 仓库门禁与当前状态
+
+本轮在同一工作树完成：
+
+- `.venv/bin/python -m robo_genesis.course_validation`：通过，13 lessons、32 localized
+  Markdown files、26 notebooks、33 Python files；
+- `.venv/bin/python -m pytest`：43 passed；
+- `.venv/bin/python -m compileall -q src scripts tests`：通过；
+- `UV_CACHE_DIR=<tmp> uv lock --check`：通过，解析 235 packages；
+- `npm ci`：安装 190 个包并审计 191 个包，保留 11 项既有 advisory（4 low、1 moderate、6 high），
+  没有运行 `npm audit fix`；
+- `npm run docs:build` 与 `EDGEONE=1 npm run docs:build`：均通过；
+- EN/ZH notebook cell type/ID/code parity、提交版 clean output、执行副本 source identity、
+  L10 local links/diagram targets、learner-facing 开发流程泄漏和旧固定数据结果扫描：通过；
+- `git diff --check`：通过。
+
+`M3.L10.5` 已于 2026-09-10 通过项目负责人验收。当时 L10 的 `course.json`、双语讲义、
+notebook metadata、README、首页与 sidebar 仍一致地保持 `planned`；随后进行的状态同步与
+最终源码复验见第 21.7 节。
+
+### 21.7 M3.L10.6 状态同步后复验
+
+项目负责人验收 `.1`–`.5` 并明确启动 `.6` 后，L10 已原子同步为 `cpu-verified`：
+
+- `course.json`、双语讲义 frontmatter 与课程状态说明；
+- EN/ZH notebook 顶部状态、metadata，以及 setup/final contract 中的 manifest status 断言；
+- `README.md`、`README_en.md` 与双语首页的状态摘要和课程表；
+- manifest 顺序合同与 L10 notebook 状态合同。
+
+L10 的 90 分钟时长、slug、双语路径和 `gpu-recommended` hardware 字段均未改变。公开状态
+`cpu-verified` 对应本节第 21.1–21.6 节已经验收的双语 CPU-only readback 证据；它不表示本讲
+执行过 GPU、训练或 Genesis 闭环实验。当前公开状态统计为 8 个 `cpu-verified`、3 个
+`gpu-verified`、2 个 `planned` 和 0 个 `published`。
+
+状态 literal 更新后，双语 notebook 仍为 18 cells / 8 code cells，code-cell ID/source 逐字
+一致，提交版 output 为空且 `execution_count: null`。按第 21.1 节相同方式规范化的 code
+SHA-256 从 `.5` 执行时的
+`aa49989ceb79c3285e6cb77621cec574872acebc192e17abd8243a978779ea3c` 变为
+`6c04032b92871f7b185e43060a4889b0b84f336cbe84df0205180efbccc1c237`；行为语义变化仅为 setup
+和 final contract 的 manifest status 从 `planned` 改为 `cpu-verified`。
+
+为验证最终源码，English notebook 使用第 21.1 节同一只读 2-episode 数据，在新的独立 CPU
+kernel 和 cache/output 目录中从头执行。8/8 code cells 均完成、没有 error output，耗时
+9.87 秒；metadata、85-frame numeric arrays、两路 PyAV decode、statistics、train `[0]` /
+eval `[1]` split、`H=4` chunk 和 policy data contract 全部通过，最终再次得到
+`L10 CHECK: PASSED`。运行仍只观察到可选 `IProgress/ipywidgets` 缺失提示。
+
+状态同步后的仓库门禁结果为：course validation 通过（13 lessons、32 localized Markdown
+files、26 notebooks、33 Python files），pytest 43 passed，compileall 通过，`uv lock --check`
+解析 235 packages，普通与 `EDGEONE=1` 文档构建通过，EN/ZH notebook parity、clean output、
+公开状态残留扫描和 `git diff --check` 均通过。`npm ci` 安装 190 个包并审计 191 个包，保留
+11 项既有 advisory（4 low、1 moderate、6 high），没有执行自动依赖升级。
+
+以上证据支持 L10 的 `cpu-verified` 状态，同时继续保留第 21.5 节的数据充分性、训练、闭环与
+跨平台边界。`M3.L10.6` 已于 2026-09-10 通过项目负责人验收；L10 六个步骤至此全部完成并
+验收，未开始 L11。

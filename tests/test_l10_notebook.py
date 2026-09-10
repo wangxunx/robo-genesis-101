@@ -33,6 +33,7 @@ def test_l10_notebooks_expose_the_dataset_read_contract() -> None:
         "os.environ.get('RG101_L10_DATASET_ROOT')",
         "(DATASETS_DIR / 'l09_banana_demo').resolve()",
         "RG101_L10_REPO_ID",
+        "lesson.status.value == 'cpu-verified'",
         "HF_DATASETS_CACHE",
         "meta' / 'info.json",
         "meta' / 'stats.json",
@@ -82,6 +83,7 @@ def test_l10_notebooks_expose_the_dataset_read_contract() -> None:
         "lerobot_train",
         "torch.cuda",
         "from transformers",
+        "lesson.status.value == 'planned'",
         "lesson.status.value == 'gpu-verified'",
         "metadata.total_frames == 85",
         "libsvtav1",
@@ -110,7 +112,7 @@ def test_l10_notebooks_expose_the_dataset_read_contract() -> None:
             "locale": locale,
             "duration_minutes": 90,
             "hardware": "gpu-recommended",
-            "status": "planned",
+            "status": "cpu-verified",
         }
         assert all(cell["execution_count"] is None for cell in code_cells)
         assert all(cell["outputs"] == [] for cell in code_cells)
