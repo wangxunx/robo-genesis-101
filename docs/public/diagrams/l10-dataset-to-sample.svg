@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="800" viewBox="0 0 1400 800" role="img" aria-labelledby="title desc">
+  <title id="title">From persisted LeRobot dataset to policy-ready input</title>
+  <desc id="desc">Metadata, Parquet rows, and world and wrist video files enter a LeRobot reader. The reader constructs a decoded sample with state, images, task, and action. A separate policy adapter then renames, normalizes, resizes, tokenizes, and batches values for a model.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
+    </marker>
+    <style>
+      .title { font: 700 29px Inter, ui-sans-serif, system-ui, sans-serif; fill: #0f172a; }
+      .subtitle { font: 400 16px Inter, ui-sans-serif, system-ui, sans-serif; fill: #475569; }
+      .section { font: 700 19px Inter, ui-sans-serif, system-ui, sans-serif; fill: #0f172a; }
+      .label { font: 700 16px Inter, ui-sans-serif, system-ui, sans-serif; fill: #0f172a; }
+      .body { font: 400 14px Inter, ui-sans-serif, system-ui, sans-serif; fill: #334155; }
+      .small { font: 500 12px Inter, ui-sans-serif, system-ui, sans-serif; fill: #475569; }
+      .code { font: 600 13px ui-monospace, SFMono-Regular, Menlo, monospace; fill: #1e293b; }
+      .flow { stroke: #64748b; stroke-width: 2.2; fill: none; marker-end: url(#arrow); }
+      .dash { stroke: #94a3b8; stroke-width: 1.5; stroke-dasharray: 6 5; fill: none; }
+    </style>
+  </defs>
+
+  <rect width="1400" height="800" rx="24" fill="#f8fafc"/>
+  <text x="700" y="43" text-anchor="middle" class="title">From persisted dataset to policy-ready input</text>
+  <text x="700" y="73" text-anchor="middle" class="subtitle">Storage schema, decoded sample, and model preprocessing are three different contracts.</text>
+
+  <rect x="30" y="105" width="390" height="625" rx="20" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.6"/>
+  <text x="55" y="139" class="section">A · Dataset on disk</text>
+
+  <rect x="55" y="164" width="340" height="154" rx="14" fill="#eff6ff" stroke="#60a5fa" stroke-width="1.8"/>
+  <text x="225" y="194" text-anchor="middle" class="label">Metadata</text>
+  <text x="225" y="222" text-anchor="middle" class="code">info.json · stats.json</text>
+  <text x="225" y="247" text-anchor="middle" class="code">tasks · episode rows</text>
+  <text x="225" y="273" text-anchor="middle" class="body">identity · schema · FPS · boundaries</text>
+  <text x="225" y="298" text-anchor="middle" class="small">inspect first; no video decode</text>
+
+  <rect x="55" y="342" width="340" height="146" rx="14" fill="#ecfdf5" stroke="#34d399" stroke-width="1.8"/>
+  <text x="225" y="372" text-anchor="middle" class="label">Tabular data · Parquet</text>
+  <text x="225" y="402" text-anchor="middle" class="code">state · action · timestamp</text>
+  <text x="225" y="427" text-anchor="middle" class="code">frame / episode / global index</text>
+  <text x="225" y="457" text-anchor="middle" class="small">whole numeric columns, no RGB needed</text>
+
+  <rect x="55" y="512" width="340" height="171" rx="14" fill="#fff7ed" stroke="#fb923c" stroke-width="1.8"/>
+  <text x="225" y="542" text-anchor="middle" class="label">Media · MP4</text>
+  <text x="225" y="572" text-anchor="middle" class="code">observation.images.world</text>
+  <text x="225" y="598" text-anchor="middle" class="code">observation.images.wrist</text>
+  <text x="225" y="628" text-anchor="middle" class="body">frames located by episode + timestamp</text>
+  <text x="225" y="655" text-anchor="middle" class="small">decode only requested views and moments</text>
+
+  <path d="M395 241 C445 241 452 288 500 288" class="flow"/>
+  <path d="M395 415 H500" class="flow"/>
+  <path d="M395 598 C445 598 452 544 500 544" class="flow"/>
+
+  <rect x="500" y="185" width="300" height="458" rx="20" fill="#ffffff" stroke="#a78bfa" stroke-width="2.2"/>
+  <text x="650" y="220" text-anchor="middle" class="section">B · LeRobot reader</text>
+
+  <rect x="525" y="248" width="250" height="70" rx="12" fill="#faf5ff" stroke="#c084fc"/>
+  <text x="650" y="277" text-anchor="middle" class="label">1 · Audit metadata</text>
+  <text x="650" y="301" text-anchor="middle" class="small">version · features · episodes · stats</text>
+
+  <path d="M650 318 V348" class="flow"/>
+  <rect x="525" y="360" width="250" height="70" rx="12" fill="#f5f3ff" stroke="#a78bfa"/>
+  <text x="650" y="389" text-anchor="middle" class="label">2 · Fetch numeric row</text>
+  <text x="650" y="413" text-anchor="middle" class="small">preserve indices and episode identity</text>
+
+  <path d="M650 430 V460" class="flow"/>
+  <rect x="525" y="472" width="250" height="70" rx="12" fill="#eef2ff" stroke="#818cf8"/>
+  <text x="650" y="501" text-anchor="middle" class="label">3 · Resolve task + video</text>
+  <text x="650" y="525" text-anchor="middle" class="small">lookup task; decode matching timestamps</text>
+
+  <path d="M650 542 V570" class="flow"/>
+  <rect x="535" y="579" width="230" height="40" rx="20" fill="#ede9fe"/>
+  <text x="650" y="604" text-anchor="middle" class="body">assemble one public sample</text>
+
+  <path d="M800 414 H865" class="flow"/>
+
+  <rect x="880" y="105" width="490" height="402" rx="20" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.6"/>
+  <text x="905" y="139" class="section">C · Decoded behavior-cloning sample</text>
+
+  <rect x="905" y="169" width="440" height="276" rx="15" fill="#ecfeff" stroke="#22d3ee" stroke-width="1.8"/>
+  <text x="1125" y="200" text-anchor="middle" class="code">sample = {</text>
+  <text x="1125" y="231" text-anchor="middle" class="code">observation.state: float32 (9,),</text>
+  <text x="1125" y="262" text-anchor="middle" class="code">observation.images.world: CHW,</text>
+  <text x="1125" y="293" text-anchor="middle" class="code">observation.images.wrist: CHW,</text>
+  <text x="1125" y="324" text-anchor="middle" class="code">task: Python string,</text>
+  <text x="1125" y="355" text-anchor="middle" class="code">action: (9,) or (H,9),</text>
+  <text x="1125" y="386" text-anchor="middle" class="code">indices + optional action_is_pad</text>
+  <text x="1125" y="417" text-anchor="middle" class="code">}</text>
+  <text x="1125" y="473" text-anchor="middle" class="small">Visible sample contract; still not the model's internal tensor layout</text>
+
+  <path d="M1125 507 V550" class="flow"/>
+  <rect x="880" y="562" width="490" height="168" rx="20" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.6"/>
+  <text x="905" y="596" class="section">D · Saved policy adapter</text>
+  <rect x="905" y="618" width="440" height="76" rx="13" fill="#fefce8" stroke="#facc15" stroke-width="1.8"/>
+  <text x="1125" y="647" text-anchor="middle" class="body">rename · normalize · resize · tokenize · pad · batch</text>
+  <text x="1125" y="674" text-anchor="middle" class="small">model-specific transformation; restore it with the checkpoint</text>
+
+  <path d="M420 747 H800" class="dash"/>
+  <path d="M880 747 H1370" class="dash"/>
+  <text x="610" y="772" text-anchor="middle" class="small">dataset identity and decoding boundary</text>
+  <text x="1125" y="772" text-anchor="middle" class="small">policy preprocessing and checkpoint boundary</text>
+</svg>
