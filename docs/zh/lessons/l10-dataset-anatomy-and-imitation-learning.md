@@ -62,14 +62,10 @@ ID、一条真实的行为克隆 sample，以及一个带有明确边界 mask �
 
 完成 L10 后，你应该能够：
 
-1. 根据 metadata、feature schema、task/episode 表和 statistics，说明一份 LeRobot 数据集
-   包含什么、如何组织，以及它是否满足本课程的输入合同；
-2. 读取一条真实 sample，并从存储表示和解码表示两个层面正确解释 state、action、task、
-   `world` 图像和 `wrist` 图像；
-3. 把对齐的单步专家目标扩展为一个绝不跨越 episode 边界的 action chunk，并解释 padding
-   mask 的作用；
-4. 设计 episode-level train/eval split，并分别说明离线数据检查、held-out loss 和闭环任务
-   评估能够证明什么。
+1. 说明录制的机器人演示如何组织成可用于模仿学习的数据集；
+2. 检查一份真实数据集，并总结训练前已经验证了什么、还有哪些问题尚不能回答；
+3. 解释行为克隆如何把专家演示转化为学习目标，以及为什么需要保留轨迹结构；
+4. 区分离线 action 预测质量与闭环任务成功。
 
 ## 先明确证据边界
 

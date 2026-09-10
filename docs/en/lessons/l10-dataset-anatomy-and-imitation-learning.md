@@ -69,15 +69,13 @@ Before starting, you should be able to:
 
 By the end of L10, you should be able to:
 
-1. use metadata, the feature schema, task and episode tables, and statistics to
-   explain what a LeRobot dataset contains and whether it satisfies this
-   course's input contract;
-2. read one real sample and correctly interpret its state, action, task,
-   `world` image, and `wrist` image across stored and decoded representations;
-3. turn an aligned single-step expert target into an action chunk that never
-   crosses an episode boundary, and explain the padding mask; and
-4. design an episode-level train/eval split and state what offline data checks,
-   held-out loss, and closed-loop task evaluation can each establish.
+1. explain how recorded robot demonstrations are organized into a dataset for
+   imitation learning;
+2. inspect a real dataset and summarize what has been verified—and what remains
+   unknown—before training;
+3. explain how behavior cloning turns expert demonstrations into learning
+   targets while preserving trajectory structure; and
+4. distinguish offline action-prediction quality from closed-loop task success.
 
 ## Start with the evidence boundary
 
