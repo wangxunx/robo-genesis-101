@@ -26,10 +26,14 @@ jobs:
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
         run: |
-          if [ -n "$BASE_SHA" ] && [ "$BASE_SHA" != "0000000000000000000000000000000000000000" ]; then
+          # A force-push leaves github.event.before unreachable, so checkout never
+          # fetches it and the range would abort. Fall back to the tip commit alone.
+          if [ -n "$BASE_SHA" ] \
+            && [ "$BASE_SHA" != "0000000000000000000000000000000000000000" ] \
+            && git cat-file -e "$BASE_SHA^{commit}" 2>/dev/null; then
             git diff --check "$BASE_SHA"...HEAD
           else
-            git diff --check
+            git show --check --format= HEAD
           fi
 
       - name: Setup Python
